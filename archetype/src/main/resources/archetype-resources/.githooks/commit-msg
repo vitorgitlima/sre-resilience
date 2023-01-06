@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Create a regex for a conventional commit.
+conventional_commit_regex="\\[SOPIVSDF00[-][0-9]+\\]\\[SOPIVSDF00[-][0-9]+\\] [-] [A-Za-z0-9]+"
+
+# Get the commit message (the parameter we're given is just the path to the
+# temporary file which holds the message).
+commit_message=$(cat "$1")
+
+# Check the message, if we match, all good.
+if [[ "$commit_message" =~ $conventional_commit_regex ]]; then
+   echo -e "\e[32mCommit message match the pattern...\e[0m"
+   exit 0
+fi
+
+# Example of commit that follows the pattern
+echo -e "\e[31mThe commit message does not match the pattern\e[0m"
+echo "An example of a valid message is: "
+echo "  \"[SOPIVSDF00-123][SOPIVSDF00-321] - commit description\""
+exit 1

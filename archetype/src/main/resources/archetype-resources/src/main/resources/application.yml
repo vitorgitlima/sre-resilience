@@ -1,0 +1,83 @@
+info:
+  app:
+    name: ${description}
+    author:
+      name: Open Insurance
+server:
+  compression:
+    enabled: true
+    mime-types: text/javascript,application/javascript,application/json
+    min-response-size: 1024
+  port: ${SERVER_PORT:8080}
+  servlet.context-path: ${APPLICATION_CONTEXT:}
+
+application:
+  timeZone: GMT-3
+  rest:
+    config:
+      timeout: 60000
+      connectTimeout: 60000
+
+spring:
+  messages:
+    encoding: ISO-8859-1
+  jmx:
+    enabled: false
+  main:
+    banner-mode: "off"
+    lazy-initialization: false
+  application:
+    name: Open Insurance - ${description}
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:production}
+  cache:
+    redis:
+      time-to-live: ${CACHE_DEFAULT_TTL:30}
+    type: redis
+    enabled: ${CACHE_ENABLED:true}
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+        page-parameter: page
+        size-parameter: page-size
+  redis:
+    host: ${REDIS_HOST:localhost}
+    password: ${REDIS_PASSWORD:}
+    port: ${REDIS_PORT:6379}
+    ssl: ${REDIS_SSL:false}
+    connect-timeout: 1800000
+    client-type: JEDIS
+    jedis.pool:
+      max-idle: 20
+      min-idle: 8
+      max-active: 20
+
+mongo-properties:
+  url: ${MONGODB_URL:mongodb://${mongo-properties.username}:${mongo-properties.password}@${mongo-properties.host}:${mongo-properties.port}/${mongo-properties.database}?${mongo-properties.query-string}}
+  host: ${MONGO_HOST:localhost}
+  port: ${MONGO_PORT:27017}
+  database: ${MONGO_DB:opin-db-apis}
+  username: ${MONGO_USER:admin}
+  password: ${MONGO_PASS:admin!}
+  query-string: ${MONGO_QUERY_STRING:retryWrites=true&w=majority}
+  connection-pool-max-connection-life-time: 3
+  connection-pool-min-size: ${MONGO_MIN_CONNECTIONS:75}
+  connection-pool-max-size: ${MONGO_MAX_CONNECTIONS:150}
+  connection-pool-maintenance-frequency: 1
+  connection-pool-maintenance-initial-delay: 5
+  connection-pool-max-connection-idle-time: 1
+  connection-pool-max-wait-time: 15
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /actuator
+
+jetty:
+  threads:
+    min: 50
+    max: 300
+    idle-timeout: 15000
