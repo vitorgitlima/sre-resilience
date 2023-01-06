@@ -47,18 +47,9 @@ This will make sure your commit messages follow our Conventional Commits Specifi
 ```bash
 docker-compose -f misc/docker/docker-compose.yml up -d
 
-./mvnw spring-boot:run -Dspring-boot.run.profiles=development  # or via ide
+./mvnw spring-boot:run # or via ide
 
 ```
-
-## Running apllication via ide
-- Run Application 
-  - Edit Configurations:
-    Add parameter in 'Environment variables:' 
-      spring.profiles.active=development
-  
-    ![Alt text](docs/application_environment.png?raw=true "Edit Configuration / Environment variables")
-
 ## Removing apllication and reset data on Mongo
 ```bash
 docker-compose -f misc/docker/docker-compose.yml down -v
@@ -169,11 +160,4 @@ TTL "key"
 - Redis-cli: To clear all keys
 
 ```sh
-FLUSHALL
-```
-
-# Creation new project
-To create a new project exists one folder `archetype` on project root, this folder contains a structure to create a new project 
-with all default configs, for more information see the `readme.md` on folder. 
-
- 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																											   
+FLUSHALL							  																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																											   

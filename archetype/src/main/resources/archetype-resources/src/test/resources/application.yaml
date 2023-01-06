@@ -1,0 +1,9 @@
+spring:
+  redis:
+    host: localhost
+    port: 6370
+  data:
+    mongodb:
+      port: 27020
+      host: localhost
+  main.allow-bean-definition-overriding: true
