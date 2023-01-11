@@ -1,23 +1,43 @@
 package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
-import br.com.bradescoseguros.opin.businessrule.usecase.demosre.IDemoSREUseCase;
+import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSREUseCase;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
+import br.com.bradescoseguros.opin.interfaceadapter.controller.dto.demosre.DemoSREDTO;
+import br.com.bradescoseguros.opin.interfaceadapter.mapper.DemoSREMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
 public class DemoSREController {
 
 	@Autowired
-	private IDemoSREUseCase demoSREUseCase;
+	private DemoSREUseCase demoSREUseCase;
 
-	@GetMapping("/ok")
-	public ResponseEntity<DemoSRE> ok() {
-		return  ResponseEntity.ok(demoSREUseCase.getDemoSRE());
+	@GetMapping("/getDemoSRE/{id}")
+	public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
+		return  ResponseEntity.ok(this.demoSREUseCase.getDemoSRE(id));
+	}
+
+	@PostMapping("/insertDemoSRE")
+	public ResponseEntity<DemoSRE> insertDemoSRE(@RequestBody final DemoSREDTO payload) {
+		DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
+		this.demoSREUseCase.insertDemoSRE(demoSRE);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("/updateDemoSRE")
+	public ResponseEntity<DemoSRE> updateDemoSRE(@RequestBody final DemoSREDTO payload) {
+		DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
+		this.demoSREUseCase.updateDemoSRE(demoSRE);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("/removeDemoSRE/{id}")
+	public ResponseEntity<DemoSRE> removeDemoSRE(@PathVariable final Integer id) {
+		this.demoSREUseCase.removeDemoSRE(id);
+		return ResponseEntity.noContent().build();
 	}
 
 }
