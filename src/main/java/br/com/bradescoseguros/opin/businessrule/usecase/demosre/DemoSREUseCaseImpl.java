@@ -35,7 +35,7 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
 	public void updateDemoSRE(final DemoSRE payload) {
 		validator.execute(payload);
 
-		final String notFound = "demo-sre-id-not-found-for-update";
+		final String notFound = "demo-sre.id-not-found";
 
 		if (gateway.findById(payload.getId()).isEmpty()) {
 			throw new NotFoundException(messageSourceService.getMessage(notFound));
@@ -46,6 +46,13 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
 
 	@Override
 	public void removeDemoSRE(final Integer id) {
+
+		final String notFound = "demo-sre.id-not-found";
+
+		if (gateway.findById(id).isEmpty()) {
+			throw new NotFoundException(messageSourceService.getMessage(notFound));
+		}
+		
 		gateway.removeDemoSRE(id);
 	}
 }

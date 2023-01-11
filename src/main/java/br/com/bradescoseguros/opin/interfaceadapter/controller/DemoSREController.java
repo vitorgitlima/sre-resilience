@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/sre/v1")
 public class DemoSREController {
 
 	@Autowired
@@ -17,7 +17,7 @@ public class DemoSREController {
 
 	@GetMapping("/getDemoSRE/{id}")
 	public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
-		return  ResponseEntity.ok(this.demoSREUseCase.getDemoSRE(id));
+		return ResponseEntity.ok(this.demoSREUseCase.getDemoSRE(id));
 	}
 
 	@PostMapping("/insertDemoSRE")
@@ -27,14 +27,14 @@ public class DemoSREController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@PostMapping("/updateDemoSRE")
+	@PutMapping("/updateDemoSRE")
 	public ResponseEntity<DemoSRE> updateDemoSRE(@RequestBody final DemoSREDTO payload) {
 		DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
 		this.demoSREUseCase.updateDemoSRE(demoSRE);
 		return ResponseEntity.noContent().build();
 	}
 
-	@PostMapping("/removeDemoSRE/{id}")
+	@DeleteMapping("/removeDemoSRE/{id}")
 	public ResponseEntity<DemoSRE> removeDemoSRE(@PathVariable final Integer id) {
 		this.demoSREUseCase.removeDemoSRE(id);
 		return ResponseEntity.noContent().build();

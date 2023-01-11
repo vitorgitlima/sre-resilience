@@ -15,6 +15,9 @@ import java.util.Set;
 @Service
 public class DemoSREValidator {
 	private final Set<ErrorData> errors = new HashSet<>();
+
+	private static final String ERROR_MESSAGE = "demo-sre.invalid-property";
+
 	@Autowired
 	private MessageSourceService messageSourceService;
 
@@ -29,7 +32,7 @@ public class DemoSREValidator {
 	private void validatePayload(final Set<ErrorData> errors, final DemoSRE payload) {
 		if (Objects.isNull(payload)) {
 			generateValidationError(errors, messageSourceService
-					.getMessage("Payload null or invalid"), "payload");
+					.getMessage(ERROR_MESSAGE), null);
 			return;
 		}
 
@@ -39,21 +42,19 @@ public class DemoSREValidator {
 
 	private void validateId(final Set<ErrorData> errors, final Integer id) {
 		final String field = "id";
-		final String message = "Invalid ID value";
 
 		if (Objects.isNull(id) || id <= 0) {
 			generateValidationError(errors, messageSourceService
-					.getMessage(message), field);
+					.getMessage(ERROR_MESSAGE, field), field);
 		}
 	}
 
 	private void validateValue(final Set<ErrorData> errors, final String value) {
 		final String field = "value";
-		final String message = "Field 'value' must have a value";
 
 		if (!StringUtils.hasText(value)) {
 			generateValidationError(errors, messageSourceService
-					.getMessage(message), field);
+					.getMessage(ERROR_MESSAGE, field), field);
 		}
 	}
 

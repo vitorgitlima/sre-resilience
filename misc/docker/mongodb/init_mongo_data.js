@@ -3,6 +3,7 @@ db = db.getSiblingDB('opin-db-apis')
 
 db.createCollection('faixa_cep');
 db.createCollection('produtos');
+db.createCollection('demo_sre');
 
 print('Insert data into faixa-cep #################################################################');
 db.getCollection('faixa_cep').insert({
