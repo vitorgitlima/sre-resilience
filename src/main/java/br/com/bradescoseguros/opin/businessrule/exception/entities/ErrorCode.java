@@ -7,5 +7,6 @@ public enum ErrorCode {
     NOT_FOUND,
     INTERNAL_ERROR,
     FORBIDDEN,
-    BAD_REQUEST
+    BAD_REQUEST,
+    DEMOSRE_NO_CONTENT
 }

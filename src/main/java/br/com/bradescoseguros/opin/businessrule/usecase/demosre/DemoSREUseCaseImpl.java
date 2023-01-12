@@ -1,6 +1,8 @@
 package br.com.bradescoseguros.opin.businessrule.usecase.demosre;
 
+import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
+import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRENoContentException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
@@ -20,9 +22,11 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
 	@Autowired
 	private MessageSourceService messageSourceService;
 
+	private static final String NOT_FOUND = "demo-sre.id-not-found";
+
 	@Override
 	public DemoSRE getDemoSRE(final Integer id) {
-		return gateway.findById(id).orElse(null);
+		return gateway.findById(id).orElseThrow(() -> new DemoSRENoContentException(messageSourceService.getMessage(NOT_FOUND)));
 	}
 
 	@Override
@@ -35,10 +39,8 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
 	public void updateDemoSRE(final DemoSRE payload) {
 		validator.execute(payload);
 
-		final String notFound = "demo-sre.id-not-found";
-
 		if (gateway.findById(payload.getId()).isEmpty()) {
-			throw new NotFoundException(messageSourceService.getMessage(notFound));
+			throw new NotFoundException(messageSourceService.getMessage(NOT_FOUND));
 		}
 
 		gateway.updateDemoSRE(payload);
@@ -47,10 +49,8 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
 	@Override
 	public void removeDemoSRE(final Integer id) {
 
-		final String notFound = "demo-sre.id-not-found";
-
 		if (gateway.findById(id).isEmpty()) {
-			throw new NotFoundException(messageSourceService.getMessage(notFound));
+			throw new NotFoundException(messageSourceService.getMessage(NOT_FOUND));
 		}
 		
 		gateway.removeDemoSRE(id);
