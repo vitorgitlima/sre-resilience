@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DemoSREDTO {
 
-	private Integer id;
+    private Integer id;
 
-	private String value;
+    private String value;
 }

@@ -3,7 +3,6 @@ package br.com.bradescoseguros.opin.external.exception;
 import br.com.bradescoseguros.opin.businessrule.exception.*;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorCode;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorData;
-import br.com.bradescoseguros.opin.businessrule.exception.entities.ResponseHomeInsuranceListEmpty;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaData;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
@@ -138,7 +137,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         final String warnMessage = MessageFormat.format("NoContentException: {0}", exception.getMessage());
         log.warn(warnMessage, NO_CONTENT_CODE, exception.getLocalizedMessage());
 
-        return ResponseEntity.ok(new ResponseHomeInsuranceListEmpty());
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

@@ -1,10 +1,7 @@
 package br.com.bradescoseguros.opin.external.exception;
 
-import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
-import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRENoContentException;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorCode;
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaData;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +22,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @ControllerAdvice
 @RequiredArgsConstructor
 public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHandler {
-
-//	@ExceptionHandler(DemoSRENoContentException.class)
-//	public ResponseEntity<Object> handleNoContentException(final DemoSRENoContentException exception) {
-//		final String warnMessage = MessageFormat.format("NoContentException: {0}", exception.getMessage());
-//		log.warn(warnMessage, HttpStatus.NO_CONTENT.toString(), exception.getLocalizedMessage());
-//
-//		return ResponseEntity.ok(new DemoSRE());
-//	}
-
     @ExceptionHandler(DemoSRENoContentException.class)
-    public ResponseEntity<Object> handleGatewayException(final DemoSRENoContentException exception,
+    public ResponseEntity<Object> handleDemoSRENoContentException(final DemoSRENoContentException exception,
                                                          final WebRequest request) {
         MetaDataEnvelope response =
                 new MetaDataEnvelope(HttpStatus.NO_CONTENT.toString(), ErrorCode.DEMOSRE_NO_CONTENT, exception.getMessage());
@@ -46,7 +34,7 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
         }
 
         final String errorMessage = MessageFormat.format("DemoSRENoContentException: {0}", response);
-        log.error(errorMessage, "exception", exception);
+        log.info(errorMessage);
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 HttpStatus.NO_CONTENT, request);
     }

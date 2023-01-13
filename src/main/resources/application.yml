@@ -86,3 +86,11 @@ jetty:
     min: 50
     max: 300
     idle-timeout: 15000
+
+resilience4j.retry:
+  instances:
+    CosmoRetry:
+      maxAttempts: 5
+      waitDuration: 3s
+      retryExceptions:
+        - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException

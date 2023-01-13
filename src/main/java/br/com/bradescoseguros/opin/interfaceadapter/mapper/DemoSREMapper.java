@@ -7,11 +7,11 @@ import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {CommonMappings.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DemoSREMapper {
 
-	DemoSREMapper INSTANCE = Mappers.getMapper(DemoSREMapper.class);
+    DemoSREMapper INSTANCE = Mappers.getMapper(DemoSREMapper.class);
 
-	@Named("mapDemoSREFrom")
-	DemoSRE mapDemoSREFrom(final DemoSREDTO demoSREDTO);
+    @Named("mapDemoSREFrom")
+    DemoSRE mapDemoSREFrom(final DemoSREDTO demoSREDTO);
 }
