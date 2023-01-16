@@ -12,4 +12,6 @@ public interface DemoSREGateway {
     void updateDemoSRE(final DemoSRE payload);
 
     void removeDemoSRE(final Integer id);
+
+    String externalApiCall();
 }

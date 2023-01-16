@@ -6,7 +6,6 @@ import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
-import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,6 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
 
     private static final String NOT_FOUND = "demo-sre.id-not-found";
 
-    @Retry(name = "CosmoRetry")
     @Override
     public DemoSRE getDemoSRE(final Integer id) {
         return gateway.findById(id).orElseThrow(() -> new DemoSRENoContentException(messageSourceService.getMessage(NOT_FOUND)));
@@ -55,5 +53,10 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
         }
 
         gateway.removeDemoSRE(id);
+    }
+
+    @Override
+    public String externalApiCall() {
+        return gateway.externalApiCall();
     }
 }

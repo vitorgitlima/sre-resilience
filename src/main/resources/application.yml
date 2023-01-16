@@ -89,8 +89,21 @@ jetty:
 
 resilience4j.retry:
   instances:
+    Default:
+      maxAttempts: 3
+      waitDuration: 3s
+      retryExceptions:
+        - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
     CosmoRetry:
       maxAttempts: 5
       waitDuration: 3s
+      retryExceptions:
+        - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
+        - org.springframework.dao.DataAccessResourceFailureException
+        - com.mongodb.MongoSocketOpenException
+        - java.net.ConnectException
+    ApiRetry:
+      maxAttempts: 3
+      waitDuration: 5s
       retryExceptions:
         - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
