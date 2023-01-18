@@ -50,7 +50,7 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     public String externalApiCall() {
         RestTemplate restTemplate = new RestTemplate();
 
-        restTemplate.exchange("", HttpMethod.POST, null, String.class);
+        restTemplate.exchange("http://localhost:8081/demo/nok503", HttpMethod.GET, null, String.class);
 
         return null;
     }
