@@ -1,4 +1,4 @@
-k8sapplicationname=opin-srv-re-produtos-chassis
+k8sapplicationname=opin-srv-sre-chassi
 k8snamespace=opin-holding
 k8scontainerPort=8080
 k8sserviceport=''
