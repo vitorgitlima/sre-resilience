@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="NAME" value="opin-srv-re-produtos-chassis" />
+    <property name="NAME" value="opin-srv-sre-chassi" />
     <property name="LOGS" value="/var/log/${NAME}" />
     <property name="ARCHIVED" value="archived" />
     <property name="FILESIZE" value="100MB" />
