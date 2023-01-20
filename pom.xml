@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>br.com.bradescoseguros.opin</groupId>
-    <artifactId>opin-srv-re-produtos-chassis</artifactId>
+    <artifactId>opin-srv-sre-chassi</artifactId>
     <version>1.0.13-SNAPSHOT</version>
 
-    <name>opin-srv-re-produtos-chassis</name>
+    <name>opin-srv-sre-chassi</name>
     <description>Fornecimento de Produtos Residenciais</description>
     <inceptionYear>2021</inceptionYear>
     <packaging>jar</packaging>
@@ -391,7 +391,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>opin-srv-re-produtos-chassis</finalName>
+        <finalName>opin-srv-sre-chassi</finalName>
         <plugins>
             <plugin>
                 <groupId>org.pitest</groupId>

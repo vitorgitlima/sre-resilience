@@ -102,8 +102,8 @@ resilience4j.retry:
             ignoreExceptions:
                 - io.github.resilience4j.circuitbreaker.CallNotPermittedException
         CosmoRetry:
-            maxAttempts: 2
-            waitDuration: 3s
+            maxAttempts: 10
+            waitDuration: 2s
             retryExceptions:
                 - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
                 - org.springframework.dao.DataAccessResourceFailureException
@@ -119,14 +119,16 @@ resilience4j.retry:
             ignoreExceptions:
                 - io.github.resilience4j.circuitbreaker.CallNotPermittedException
 
+resilience4j.circuitbreaker:
+        instances:
+            Default:
+                failure-rate-threshold: 50
+                minimum-number-of-calls: 5
+                automatic-transition-from-open-to-half-open-enabled: true
+                wait-duration-in-open-state: 5s
+                permitted-number-of-calls-in-half-open-state: 3
+                sliding-window-size: 10
+                sliding-window-type: count_based
 
-#resilience4j.circuitbreaker:
-#        instances:
-#            Default:
-#                failure-rate-threshold: 50
-#                minimum-number-of-calls: 5
-#                automatic-transition-from-open-to-half-open-enabled: true
-#                wait-duration-in-open-state: 5s
-#                permitted-number-of-calls-in-half-open-state: 3
-#                sliding-window-size: 10
-#                sliding-window-type: count_based
+#TEMP: Removes mongodb connection log
+logging.level.org.mongodb.driver: ERROR
