@@ -77,8 +77,6 @@ management:
     health:
         circuitbreakers:
             enabled: true
-        ratelimiters:
-            enanabled: true
 
 info:
     application:
@@ -93,15 +91,18 @@ jetty:
         idle-timeout: 15000
 
 resilience4j.retry:
-    instances:
-        Default:
+    configs:
+        default:
             maxAttempts: 3
             waitDuration: 3s
+            failAfterMaxAttempts: true
             retryExceptions:
                 - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
             ignoreExceptions:
                 - io.github.resilience4j.circuitbreaker.CallNotPermittedException
-        CosmoRetry:
+    instances:
+        cosmoRetry:
+            baseConfig: default
             maxAttempts: 10
             waitDuration: 2s
             retryExceptions:
@@ -109,26 +110,29 @@ resilience4j.retry:
                 - org.springframework.dao.DataAccessResourceFailureException
                 - com.mongodb.MongoSocketOpenException
                 - java.net.ConnectException
-            ignoreExceptions:
-                - io.github.resilience4j.circuitbreaker.CallNotPermittedException
-        ApiRetry:
-            maxAttempts: 3
+        apiRetry:
+            baseConfig: default
             waitDuration: 5s
             retryExceptions:
                 - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
-            ignoreExceptions:
-                - io.github.resilience4j.circuitbreaker.CallNotPermittedException
+                - org.springframework.web.client.HttpServerErrorException
 
 resilience4j.circuitbreaker:
-        instances:
-            Default:
-                failure-rate-threshold: 50
-                minimum-number-of-calls: 5
-                automatic-transition-from-open-to-half-open-enabled: true
-                wait-duration-in-open-state: 5s
-                permitted-number-of-calls-in-half-open-state: 3
-                sliding-window-size: 10
-                sliding-window-type: count_based
+    configs:
+        default:
+            registerHealthIndicator: true
+            failure-rate-threshold: 50
+            minimum-number-of-calls: 5
+            automatic-transition-from-open-to-half-open-enabled: true
+            wait-duration-in-open-state: 5s
+            permitted-number-of-calls-in-half-open-state: 3
+            sliding-window-size: 10
+            sliding-window-type: count_based
+    instances:
+        cosmoCircuitBreaker:
+            baseConfig: default
+        apiCircuitBreaker:
+            baseConfig: default
 
 #TEMP: Removes mongodb connection log
 logging.level.org.mongodb.driver: ERROR

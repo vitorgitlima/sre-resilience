@@ -3,11 +3,9 @@ package br.com.bradescoseguros.opin.external.exception.entities;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorCode;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorData;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -16,15 +14,12 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
-@RequiredArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class MetaDataEnvelope<T> implements Serializable {
+public class MetaDataEnvelope implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private final Set<ErrorData> errors = new HashSet<>();
     private final MetaData meta;
-    @JsonUnwrapped
-    private T successData;
 
     public MetaDataEnvelope(final String statusCode,
                             final ErrorCode code,

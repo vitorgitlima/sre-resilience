@@ -1,5 +1,6 @@
 package br.com.bradescoseguros.opin.external.exception;
 
+import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBadRequestException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREMaxRetriesExceededException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRENoContentException;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorCode;
@@ -67,6 +68,29 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
         }
 
         final String errorMessage = MessageFormat.format("handleDemoSREMaxRetriesExceededException: {0}", response);
+        log.error(errorMessage);
+        return handleExceptionInternal(exception, response, new HttpHeaders(),
+                httpStatus, request);
+    }
+
+    @ExceptionHandler(DemoSREBadRequestException.class)
+    public ResponseEntity<Object> handleDemoSREBadRequestException(final DemoSREBadRequestException exception, final WebRequest request) {
+        String exceptionMessage = exception.getMessage();
+
+        if(!StringUtils.hasText(exceptionMessage)) {
+            exceptionMessage = messageSourceService.getMessage("demo-sre.bad-request");
+        }
+
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        MetaDataEnvelope response =
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.DEMOSRE_MAX_RETRIES_EXCEEDED, exceptionMessage);
+
+        if (!isEmpty(exception.getErrors())) {
+            final MetaData meta = new MetaData(httpStatus.toString());
+            response = new MetaDataEnvelope(meta, exception.getErrors());
+        }
+
+        final String errorMessage = MessageFormat.format("handleDemoSREBadRequestException: {0}", response);
         log.error(errorMessage);
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);

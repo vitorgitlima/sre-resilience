@@ -2,6 +2,7 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
 import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSREUseCase;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
+import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
 import br.com.bradescoseguros.opin.interfaceadapter.controller.dto.demosre.DemoSREDTO;
 import br.com.bradescoseguros.opin.interfaceadapter.mapper.DemoSREMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,6 +57,11 @@ public class DemoSREController {
     public ResponseEntity<DemoSRE> removeDemoSRE(@PathVariable final Integer id) {
         this.demoSREUseCase.removeDemoSRE(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/externalApiCall/{status}")
+    public ResponseEntity<String> externalApiCall(@PathVariable final String status) {
+        return ResponseEntity.ok(this.demoSREUseCase.externalApiCall(ExtraStatusCode.fromString(status)));
     }
 
 }

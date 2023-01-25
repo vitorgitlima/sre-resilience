@@ -1,6 +1,7 @@
 package br.com.bradescoseguros.opin.businessrule.usecase.demosre;
 
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
+import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
 
 public interface DemoSREUseCase {
     DemoSRE getDemoSRE(final Integer id);
@@ -11,5 +12,5 @@ public interface DemoSREUseCase {
 
     void removeDemoSRE(final Integer id);
 
-    String externalApiCall();
+    String externalApiCall(final ExtraStatusCode status);
 }
