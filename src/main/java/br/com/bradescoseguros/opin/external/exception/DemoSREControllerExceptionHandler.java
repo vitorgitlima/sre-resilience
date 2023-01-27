@@ -3,7 +3,9 @@ package br.com.bradescoseguros.opin.external.exception;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBadRequestException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREMaxRetriesExceededException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRENoContentException;
+import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRERegistryAlreadyExistsException;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorCode;
+import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorData;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaData;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
@@ -20,6 +22,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -33,7 +36,7 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
 
     @ExceptionHandler(DemoSRENoContentException.class)
     public ResponseEntity<Object> handleDemoSRENoContentException(final DemoSRENoContentException exception,
-                                                         final WebRequest request) {
+                                                                  final WebRequest request) {
         MetaDataEnvelope response =
                 new MetaDataEnvelope(HttpStatus.NO_CONTENT.toString(), ErrorCode.DEMOSRE_NO_CONTENT, exception.getMessage());
 
@@ -50,11 +53,11 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
 
     @ExceptionHandler(DemoSREMaxRetriesExceededException.class)
     public ResponseEntity<Object> handleDemoSREMaxRetriesExceededException(final DemoSREMaxRetriesExceededException exception,
-                                                                  final WebRequest request) {
+                                                                           final WebRequest request) {
 
         String exceptionMessage = exception.getMessage();
 
-        if(!StringUtils.hasText(exceptionMessage)) {
+        if (!StringUtils.hasText(exceptionMessage)) {
             exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable");
         }
 
@@ -77,7 +80,7 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
     public ResponseEntity<Object> handleDemoSREBadRequestException(final DemoSREBadRequestException exception, final WebRequest request) {
         String exceptionMessage = exception.getMessage();
 
-        if(!StringUtils.hasText(exceptionMessage)) {
+        if (!StringUtils.hasText(exceptionMessage)) {
             exceptionMessage = messageSourceService.getMessage("demo-sre.bad-request");
         }
 
@@ -96,4 +99,19 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 httpStatus, request);
     }
 
+    @ExceptionHandler(DemoSRERegistryAlreadyExistsException.class)
+    public ResponseEntity<Object> handleDemoSRERegistryAlreadyExistsException(final DemoSRERegistryAlreadyExistsException exception, final WebRequest request) {
+        String exceptionMessage = messageSourceService.getMessage("demo-sre.registry-already-exists");
+        HttpStatus httpStatus = HttpStatus.CONFLICT;
+
+        ErrorData errorData = new ErrorData(exceptionMessage, exception.getMessage(), httpStatus.toString());
+
+        final MetaData meta = new MetaData(httpStatus.toString());
+        MetaDataEnvelope response = new MetaDataEnvelope(meta, Collections.singleton(errorData));
+
+        final String errorMessage = MessageFormat.format("handleDemoSRERegistryAlreadyExistsException: {0}", response);
+        log.info(errorMessage);
+        return handleExceptionInternal(exception, response, new HttpHeaders(),
+                httpStatus, request);
+    }
 }

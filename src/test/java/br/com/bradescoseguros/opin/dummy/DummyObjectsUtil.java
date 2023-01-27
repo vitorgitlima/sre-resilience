@@ -195,7 +195,7 @@ public class DummyObjectsUtil {
         } else if (isCollectionOf(parameterizedType, 0, ImplementedCollections.MAP)) {
             Class<?> contentKeyClass = (Class<?>) ((ParameterizedType) parameterizedType.getActualTypeArguments()[0]).getActualTypeArguments()[0];
             Class<?> contentValueClass = (Class<?>) ((ParameterizedType) parameterizedType.getActualTypeArguments()[0]).getActualTypeArguments()[1];
-            field.set(instance, Arrays.asList(ObjectRandomUtil.nextMap(contentKeyClass, contentValueClass, ONE_ELEMENT, selfReferenceHandler)));
+            field.set(instance, Collections.singletonList(nextMap(contentKeyClass, contentValueClass, ONE_ELEMENT, selfReferenceHandler)));
         } else {
             Class<?> contentClass = (Class<?>) parameterizedType.getActualTypeArguments()[0];
             field.set(instance, ObjectRandomUtil.nextList(contentClass, ONE_ELEMENT, selfReferenceHandler));
@@ -298,12 +298,10 @@ public class DummyObjectsUtil {
             final Long min = field.isAnnotationPresent(Min.class) ? field.getAnnotation(Min.class).value() : 1L;
             final Long max = field.getAnnotation(Max.class).value();
             field.set(instance, nextBigDecimal(min.longValue(), max.longValue(), 0));
-            return;
         } else if (field.isAnnotationPresent(Digits.class)) {
             final Integer maxInteger = field.getAnnotation(Digits.class).integer();
             final Integer fraction = field.getAnnotation(Digits.class).fraction();
             field.set(instance, nextBigDecimal(1, maxInteger, fraction));
-            return;
         } else {
             field.set(instance, nextBigDecimal(1, 10, 0));
         }

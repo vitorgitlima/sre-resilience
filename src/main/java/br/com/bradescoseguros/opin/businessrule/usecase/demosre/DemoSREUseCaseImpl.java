@@ -3,7 +3,7 @@ package br.com.bradescoseguros.opin.businessrule.usecase.demosre;
 import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBadRequestException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRENoContentException;
-import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorData;
+import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRERegistryAlreadyExistsException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
@@ -12,7 +12,6 @@ import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Objects;
 
 @Service
@@ -37,6 +36,11 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
     @Override
     public void insertDemoSRE(final DemoSRE payload) {
         validator.execute(payload);
+
+        if (gateway.findById(payload.getId()).isPresent()) {
+            throw new DemoSRERegistryAlreadyExistsException("O ID informado na inserção DemoSRE já existe na base de dados");
+        }
+
         gateway.insertDemoSRE(payload);
     }
 
@@ -64,7 +68,7 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
     @Override
     public String externalApiCall(final ExtraStatusCode status) {
         if (Objects.isNull(status)) {
-            throw new DemoSREBadRequestException();
+            throw new DemoSREBadRequestException("Já possui um registro com o ID informado.");
         }
 
         return gateway.externalApiCall(status);

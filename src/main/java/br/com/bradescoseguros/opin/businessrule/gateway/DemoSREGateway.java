@@ -2,7 +2,6 @@ package br.com.bradescoseguros.opin.businessrule.gateway;
 
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
-import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 

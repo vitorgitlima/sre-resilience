@@ -1,7 +1,5 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
-import br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREMaxRetriesExceededException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
@@ -12,9 +10,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,8 +27,7 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @CircuitBreaker(name = "cosmoCircuitBreaker")
     @Cacheable(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
     public Optional<DemoSRE> findById(final Integer id) {
-        throw new RetriableBaseException();
-        //return repository.findById(id);
+        return repository.findById(id);
     }
 
     @Override
