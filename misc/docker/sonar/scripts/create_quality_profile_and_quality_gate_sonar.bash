@@ -47,7 +47,7 @@ add_condition_to_quality_gate() {
 create_quality_gate() {
     printf "INFO creating quality gate.\n"
     res=$(curl -su "admin:dev!" \
-        --data-urlencode "name=Residential" \
+        --data-urlencode "name=ChassiSRE" \
         "${SONARURL}/qualitygates/create")
     if [ "$(echo "${res}" | jq '(.errors | length)')" == "0" ]; then
         printf "INFO successfully created quality gate... now configuring it.\n"
@@ -59,8 +59,8 @@ create_quality_gate() {
     # Retrieve quality gates ID
     printf "INFO retrieving quality gate ID."
     res=$(curl -su "admin:dev!" \
-        --data-urlencode "name=Residential" \
-        "${SONARURL}/qualitygates/show")
+        -X GET \
+        "${SONARURL}/qualitygates/show?name=ChassiSRE")
     if [ "$(echo "${res}" | jq '(.errors | length)')" == "0" ]; then
         GATEID=$(echo ${res} | jq '.id' | tail -c +2 | head -c -2)
         printf "INFO successfully retrieved quality gate ID (ID=$GATEID).\n"
