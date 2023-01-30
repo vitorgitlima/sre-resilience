@@ -9,7 +9,7 @@ import javax.annotation.PreDestroy;
 
 @TestConfiguration
 public class TestRedisConfiguration {
-	private RedisServer redisServer;
+	private final RedisServer redisServer;
 
 	public TestRedisConfiguration(@Value("${spring.redis.port}") final int redisPort) {
 		this.redisServer = new RedisServer(redisPort);

@@ -1,9 +1,8 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
-import br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREMaxRetriesExceededException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
+import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.configuration.redis.RedisConstants;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -11,7 +10,6 @@ import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -25,11 +23,10 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     private DemoSRERepository repository;
 
     @Override
-    @Retry(name = "CosmoRetry", fallbackMethod = "fallbackCosmoRetry")
-    @CircuitBreaker(name = "Default")
+    @Retry(name = "cosmoRetry")
+    @CircuitBreaker(name = "cosmoCircuitBreaker")
     @Cacheable(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
     public Optional<DemoSRE> findById(final Integer id) {
-        // throw new RetriableBaseException();
         return repository.findById(id);
     }
 
@@ -49,16 +46,12 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     }
 
     @Override
-    @Retry(name = "ApiRetry")
-    public String externalApiCall() {
-        RestTemplate restTemplate = new RestTemplate();
+    @Retry(name = "apiRetry")
+    public String externalApiCall(final ExtraStatusCode statusCode) {
+        final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
+        final String fullURL = baseURL + statusCode.getStatusURL();
+        final RestTemplate restTemplate = new RestTemplate();
 
-        restTemplate.exchange("http://localhost:8081/demo/nok503", HttpMethod.GET, null, String.class);
-
-        return null;
-    }
-
-    private Optional<DemoSRE> fallbackCosmoRetry(final Integer id, DataAccessResourceFailureException e) {
-        throw new DemoSREMaxRetriesExceededException();
+        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
     }
 }

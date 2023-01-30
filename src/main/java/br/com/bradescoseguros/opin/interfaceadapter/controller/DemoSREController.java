@@ -2,6 +2,7 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
 import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSREUseCase;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
+import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
 import br.com.bradescoseguros.opin.interfaceadapter.controller.dto.demosre.DemoSREDTO;
 import br.com.bradescoseguros.opin.interfaceadapter.mapper.DemoSREMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +44,7 @@ public class DemoSREController {
     public ResponseEntity<DemoSRE> insertDemoSRE(@RequestBody final DemoSREDTO payload) {
         DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
         this.demoSREUseCase.insertDemoSRE(demoSRE);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/updateDemoSRE")
@@ -56,6 +58,11 @@ public class DemoSREController {
     public ResponseEntity<DemoSRE> removeDemoSRE(@PathVariable final Integer id) {
         this.demoSREUseCase.removeDemoSRE(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/externalApiCall/{status}")
+    public ResponseEntity<String> externalApiCall(@PathVariable final String status) {
+        return ResponseEntity.ok(this.demoSREUseCase.externalApiCall(ExtraStatusCode.fromString(status)));
     }
 
 }
