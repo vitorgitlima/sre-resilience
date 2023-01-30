@@ -61,9 +61,8 @@
 
         <!--Sonar -->
         <sonar.maven.version>3.7.0.1746</sonar.maven.version>
-        <sonar.exclusions>src/test/**/*,**/configuration/**,**/exception/**,**/external/**,**/domain/**
-        </sonar.exclusions>
-        <sonar.coverage.exclusions>**/*.*</sonar.coverage.exclusions>
+        <sonar.exclusions>src/test/**/*,**/configuration/**,**/exception/**,**/external/**,**/domain/**</sonar.exclusions>
+        <sonar.coverage.exclusions>src/test/**/*,**/configuration/**,**/exception/**,**/external/**,**/domain/**</sonar.coverage.exclusions>
         <sonar.test.exclusions>src/test/**/*</sonar.test.exclusions>
         <woodstox-core.version>6.2.6</woodstox-core.version>
     </properties>
