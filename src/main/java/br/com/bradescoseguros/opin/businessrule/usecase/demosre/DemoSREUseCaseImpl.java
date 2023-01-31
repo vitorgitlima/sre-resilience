@@ -68,7 +68,7 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
     @Override
     public String externalApiCall(final ExtraStatusCode status) {
         if (Objects.isNull(status)) {
-            throw new DemoSREBadRequestException("Já possui um registro com o ID informado.");
+            throw new DemoSREBadRequestException("O status informado não é suportado pela aplicação.");
         }
 
         return gateway.externalApiCall(status);
