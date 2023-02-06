@@ -58,12 +58,6 @@ class DemoSREControllerTest {
     public void initialize() {
         MockitoAnnotations.openMocks(this);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-
-
-//        doNothing().when(useCaseMock).insertDemoSRE(any(DemoSRE.class));
-//        doNothing().when(useCaseMock).updateDemoSRE(any(DemoSRE.class));
-//        doNothing().when(useCaseMock).removeDemoSRE(anyInt());
-//        when(useCaseMock.externalApiCall(any(ExtraStatusCode.class))).thenReturn("ok");
     }
 
     @Test
