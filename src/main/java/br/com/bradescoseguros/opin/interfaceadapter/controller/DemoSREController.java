@@ -3,20 +3,17 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSREUseCase;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
+import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.controller.dto.demosre.DemoSREDTO;
 import br.com.bradescoseguros.opin.interfaceadapter.mapper.DemoSREMapper;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping("/api/sre/v1")
@@ -28,25 +25,44 @@ public class DemoSREController {
     @Operation(summary = "Obtêm o registro de SRE.",
             description = "Obtêm o registro de SRE identificado através do ID.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Informações de SRE para o ID informado."),
-            @ApiResponse(responseCode = "204", description = "O recurso solicitado não existe, não foi localizado ou foi deletado.", content = @Content(schema = @Schema(hidden = true))),
-            @ApiResponse(responseCode = "400", description = "A requisição foi malformada, omitindo atributos obrigatórios, seja no payload ou através de atributos na URL.", content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = Error.class))}),
-            @ApiResponse(responseCode = "404", description = "O recurso solicitado não existe ou não foi implementado.", content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = Error.class))}),
-            @ApiResponse(responseCode = "405", description = "O consumidor tentou acessar o recurso com um método não suportado.", content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = Error.class))}),
-            @ApiResponse(responseCode = "500", description = "Ocorreu um erro no gateway da API ou no microsserviço.", content = {@Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = Error.class))}),
+            @ApiResponse(code = 200, message = "Informações de SRE para o ID informado.", response = DemoSRE.class),
+            @ApiResponse(code = 204, message = "O recurso solicitado não existe, não foi localizado ou foi deletado."),
+            @ApiResponse(code = 400, message = "A requisição foi malformada, omitindo atributos obrigatórios, seja no payload ou através de atributos na URL.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 404, message = "O recurso solicitado não existe ou não foi implementado.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 405, message = "O usuário tentou acessar o recurso com um método não suportado.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 423, message = "O servidor não está recebendo chamadas temporariamente.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/getDemoSRE/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
         return ResponseEntity.ok(this.demoSREUseCase.getDemoSRE(id));
     }
 
-    @PostMapping("/insertDemoSRE")
+    @Operation(summary = "Insere um novo registro de SRE.",
+            description = "Insere um novo registro de SRE.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 203, message = "O registrado foi criado com sucesso."),
+            @ApiResponse(code = 400, message = "A requisição foi malformada, omitindo atributos obrigatórios, seja no payload ou através de atributos na URL.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 409, message = "O registro já foi previamente inserido na base de dados.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 423, message = "O servidor não está recebendo chamadas temporariamente.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
+    })
+    @PostMapping(value = "/insertDemoSRE")
     public ResponseEntity<DemoSRE> insertDemoSRE(@RequestBody final DemoSREDTO payload) {
         DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
         this.demoSREUseCase.insertDemoSRE(demoSRE);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(summary = "Atualiza um registro existente de SRE.",
+            description = "Atualiza um registro existente de SRE substituindo as informações.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "O registrado foi atualizado com sucesso."),
+            @ApiResponse(code = 400, message = "A requisição foi malformada, omitindo atributos obrigatórios, seja no payload ou através de atributos na URL.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 404, message = "A registro solcitado não foi encontrado para atualização.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 423, message = "O servidor não está recebendo chamadas temporariamente.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
+    })
     @PutMapping("/updateDemoSRE")
     public ResponseEntity<DemoSRE> updateDemoSRE(@RequestBody final DemoSREDTO payload) {
         DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
@@ -54,13 +70,31 @@ public class DemoSREController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Remove um registro de SRE.",
+            description = "Insere um registro de SRE.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "O registrado foi removido com sucesso."),
+            @ApiResponse(code = 400, message = "A requisição foi malformada, omitindo atributos obrigatórios, seja no payload ou através de atributos na URL.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 404, message = "A registro solcitado não foi encontrado para remoção.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 423, message = "O servidor não está recebendo chamadas temporariamente.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
+    })
     @DeleteMapping("/removeDemoSRE/{id}")
     public ResponseEntity<DemoSRE> removeDemoSRE(@PathVariable final Integer id) {
         this.demoSREUseCase.removeDemoSRE(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/externalApiCall/{status}")
+    @Operation(summary = "Realiza uma chamada externa de API.",
+            description = "Realiza uma chamada externa de API retornando diversos tipos de resultados conforme informado no parâmetro STATUS.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "A API foi executada com sucesso."),
+            @ApiResponse(code = 400, message = "A requisição foi malformada, omitindo atributos obrigatórios, seja no payload ou através de atributos na URL.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 404, message = "A registro solcitado não foi encontrado para remoção.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 423, message = "O servidor não está recebendo chamadas temporariamente.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
+    })
+    @GetMapping(value = "/externalApiCall/{status}")
     public ResponseEntity<String> externalApiCall(@PathVariable final String status) {
         return ResponseEntity.ok(this.demoSREUseCase.externalApiCall(ExtraStatusCode.fromString(status)));
     }

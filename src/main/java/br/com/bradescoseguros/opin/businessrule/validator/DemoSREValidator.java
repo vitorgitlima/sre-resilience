@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Service
 public class DemoSREValidator {
-    private final Set<ErrorData> errors = new HashSet<>();
+    private Set<ErrorData> errors;
 
     private static final String ERROR_MESSAGE = "demo-sre.invalid-property";
 
@@ -22,6 +22,7 @@ public class DemoSREValidator {
     private MessageSourceService messageSourceService;
 
     public void execute(final DemoSRE payload) {
+        this.errors = new HashSet<>();
         this.validatePayload(this.errors, payload);
 
         if (!errors.isEmpty()) {

@@ -9,6 +9,7 @@ import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorData;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaData;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
         }
 
         final String errorMessage = MessageFormat.format("DemoSRENoContentException: {0}", response);
-        log.error(errorMessage);
+        log.info(errorMessage);
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 HttpStatus.NO_CONTENT, request);
     }
@@ -111,6 +112,21 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
 
         final String errorMessage = MessageFormat.format("handleDemoSRERegistryAlreadyExistsException: {0}", response);
         log.info(errorMessage);
+        return handleExceptionInternal(exception, response, new HttpHeaders(),
+                httpStatus, request);
+    }
+
+    @ExceptionHandler(CallNotPermittedException.class)
+    public ResponseEntity<Object> handleCallNotPermittedException(final CallNotPermittedException exception, final WebRequest request) {
+
+        String exceptionMessage = messageSourceService.getMessage("demo-sre.circuit-opened", exception.getCausingCircuitBreakerName());
+
+        HttpStatus httpStatus = HttpStatus.LOCKED;
+        MetaDataEnvelope response =
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.DEMOSRE_CIRCUIT_OPENED, exceptionMessage);
+
+        final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
+        log.error(errorMessage, exception);
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
     }

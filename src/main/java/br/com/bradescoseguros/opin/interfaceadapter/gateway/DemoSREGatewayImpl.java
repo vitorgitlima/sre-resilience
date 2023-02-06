@@ -47,6 +47,7 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
 
     @Override
     @Retry(name = "apiRetry")
+    @CircuitBreaker(name = "apiCircuitBreaker")
     public String externalApiCall(final ExtraStatusCode statusCode) {
         final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
         final String fullURL = baseURL + statusCode.getStatusURL();
