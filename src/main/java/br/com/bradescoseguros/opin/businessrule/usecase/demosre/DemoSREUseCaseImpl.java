@@ -9,11 +9,13 @@ import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class DemoSREUseCaseImpl implements DemoSREUseCase {
 
@@ -30,7 +32,11 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
 
     @Override
     public DemoSRE getDemoSRE(final Integer id) {
-        return gateway.findById(id).orElseThrow(() -> new DemoSRENoContentException(messageSourceService.getMessage(NOT_FOUND)));
+        return gateway.findById(id).orElseThrow(() -> {
+            log.warn(messageSourceService.getMessage(NOT_FOUND));
+
+            throw new DemoSRENoContentException(messageSourceService.getMessage(NOT_FOUND));
+        });
     }
 
     @Override
@@ -38,7 +44,10 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
         validator.execute(payload);
 
         if (gateway.findById(payload.getId()).isPresent()) {
-            throw new DemoSRERegistryAlreadyExistsException("O ID informado na inserção DemoSRE já existe na base de dados");
+            String error = "O ID informado na inserção DemoSRE já existe na base de dados";
+            log.warn(error);
+
+            throw new DemoSRERegistryAlreadyExistsException(error);
         }
 
         gateway.insertDemoSRE(payload);
@@ -49,6 +58,8 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
         validator.execute(payload);
 
         if (gateway.findById(payload.getId()).isEmpty()) {
+            log.warn(messageSourceService.getMessage(NOT_FOUND));
+
             throw new NotFoundException(messageSourceService.getMessage(NOT_FOUND));
         }
 
@@ -59,6 +70,8 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
     public void removeDemoSRE(final Integer id) {
 
         if (gateway.findById(id).isEmpty()) {
+            log.warn(messageSourceService.getMessage(NOT_FOUND));
+
             throw new NotFoundException(messageSourceService.getMessage(NOT_FOUND));
         }
 
@@ -68,7 +81,10 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
     @Override
     public String externalApiCall(final ExtraStatusCode status) {
         if (Objects.isNull(status)) {
-            throw new DemoSREBadRequestException("O status informado não é suportado pela aplicação.");
+            String error = "O status informado não é suportado pela aplicação.";
+            log.warn(error);
+
+            throw new DemoSREBadRequestException(error);
         }
 
         return gateway.externalApiCall(status);

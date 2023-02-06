@@ -9,12 +9,15 @@ import br.com.bradescoseguros.opin.interfaceadapter.mapper.DemoSREMapper;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/sre/v1")
 public class DemoSREController {
@@ -35,6 +38,9 @@ public class DemoSREController {
     })
     @GetMapping(value = "/getDemoSRE/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
+        MDC.put("TRACE_ID", "id");
+        log.info("ID={}", id);
+
         return ResponseEntity.ok(this.demoSREUseCase.getDemoSRE(id));
     }
 
@@ -49,6 +55,8 @@ public class DemoSREController {
     })
     @PostMapping(value = "/insertDemoSRE")
     public ResponseEntity<DemoSRE> insertDemoSRE(@RequestBody final DemoSREDTO payload) {
+        log.info("Payload={}", payload.toString());
+
         DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
         this.demoSREUseCase.insertDemoSRE(demoSRE);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -65,6 +73,8 @@ public class DemoSREController {
     })
     @PutMapping("/updateDemoSRE")
     public ResponseEntity<DemoSRE> updateDemoSRE(@RequestBody final DemoSREDTO payload) {
+        log.info("Payload={}", payload.toString());
+
         DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
         this.demoSREUseCase.updateDemoSRE(demoSRE);
         return ResponseEntity.noContent().build();
@@ -81,6 +91,8 @@ public class DemoSREController {
     })
     @DeleteMapping("/removeDemoSRE/{id}")
     public ResponseEntity<DemoSRE> removeDemoSRE(@PathVariable final Integer id) {
+        log.info("ID={}", id);
+
         this.demoSREUseCase.removeDemoSRE(id);
         return ResponseEntity.noContent().build();
     }
@@ -96,6 +108,8 @@ public class DemoSREController {
     })
     @GetMapping(value = "/externalApiCall/{status}")
     public ResponseEntity<String> externalApiCall(@PathVariable final String status) {
+        log.info("Status={}", status);
+
         return ResponseEntity.ok(this.demoSREUseCase.externalApiCall(ExtraStatusCode.fromString(status)));
     }
 
