@@ -109,9 +109,12 @@ public class DemoSREController {
     })
     @GetMapping(value = "/externalApiCall/{status}")
     public ResponseEntity<String> externalApiCall(@PathVariable final String status) {
-        log.info("Status={}", status);
 
-        return ResponseEntity.ok(this.demoSREUseCase.externalApiCall(ExtraStatusCode.fromString(status)));
+        ExtraStatusCode extraStatusCode = ExtraStatusCode.fromString(status);
+
+        log.info("Status={}", extraStatusCode.getStatusURL());
+
+        return ResponseEntity.ok(this.demoSREUseCase.externalApiCall(extraStatusCode));
     }
 
 }
