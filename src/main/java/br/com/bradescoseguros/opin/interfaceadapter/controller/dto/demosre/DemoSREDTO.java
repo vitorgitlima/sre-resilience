@@ -12,4 +12,7 @@ public class DemoSREDTO {
     private Integer id;
 
     private String value;
+
+    @ToString.Exclude
+    private String creditCard;
 }
