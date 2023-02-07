@@ -38,7 +38,6 @@ public class DemoSREController {
     })
     @GetMapping(value = "/getDemoSRE/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
-        MDC.put("TRACE_ID", "id");
         log.info("ID={}", id);
 
         return ResponseEntity.ok(this.demoSREUseCase.getDemoSRE(id));

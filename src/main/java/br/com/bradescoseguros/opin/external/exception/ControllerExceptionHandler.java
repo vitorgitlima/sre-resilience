@@ -8,6 +8,7 @@ import br.com.bradescoseguros.opin.external.exception.entities.MetaData;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   final HttpStatus status,
                                                                   final WebRequest request) {
         final MetaDataEnvelope response = new MetaDataEnvelope(BAD_REQUEST_CODE, processErrorsParameters(exception));
-        log.debug("ValidationException: {}", response);
+        log.warn("ValidationException: {}", response);
         return handleExceptionInternal(exception, response, headers, HttpStatus.BAD_REQUEST, request);
     }
 
@@ -60,7 +61,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   final HttpStatus status,
                                                                   final WebRequest request) {
         final MetaDataEnvelope response = new MetaDataEnvelope(BAD_REQUEST_CODE, processMethodNotReadableErrors(exception));
-        log.debug("HttpMessageNotReadableException: {}", response);
+        log.warn("HttpMessageNotReadableException: {}", response);
         return handleExceptionInternal(exception, response, headers, status, request);
     }
 
@@ -68,7 +69,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleValidationException(final Exception exception) {
         final ValidationException validationException = (ValidationException) exception;
         final MetaDataEnvelope response = new MetaDataEnvelope(BAD_REQUEST_CODE, validationException.getErrors());
-        log.debug("ValidationException: {}", response);
+        log.warn("ValidationException: {}", response);
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -77,7 +78,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                                                                 final WebRequest request) {
         final EntityNotFoundException entityNotFoundException = (EntityNotFoundException) exception;
         final MetaDataEnvelope response = new MetaDataEnvelope(NOT_FOUND_CODE, ErrorCode.NOT_FOUND, entityNotFoundException.getMessage());
-        log.error("EntityNotFoundException: {}", response);
+        log.warn("EntityNotFoundException: {}", response);
         return handleExceptionInternal(exception, response, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
@@ -88,11 +89,11 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         MetaDataEnvelope envelope =
                 new MetaDataEnvelope(UNPROCESSABLE_ENTITY_CODE, ErrorCode.BUSINESS_ERROR, businessException.getMessage());
         if (!isEmpty(businessException.getErrors())) {
-            final MetaData meta = new MetaData(UNPROCESSABLE_ENTITY_CODE);
+            final MetaData meta = new MetaData(UNPROCESSABLE_ENTITY_CODE, MDC.get("TRACE_ID"));
             envelope = new MetaDataEnvelope(meta, businessException.getErrors());
         }
         final String errorMessage = MessageFormat.format("BusinessException: {0}", envelope);
-        log.error(errorMessage, EXCEPTION, exception);
+        log.warn(errorMessage, EXCEPTION, exception);
         return handleExceptionInternal(exception, envelope, new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY, request);
     }
 
@@ -105,12 +106,12 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                 new MetaDataEnvelope(NOT_FOUND_CODE, ErrorCode.NOT_FOUND, notFoundException.getMessage());
 
         if (!isEmpty(notFoundException.getErrors())) {
-            final MetaData meta = new MetaData(NOT_FOUND_CODE);
+            final MetaData meta = new MetaData(NOT_FOUND_CODE, MDC.get("TRACE_ID"));
             envelope = new MetaDataEnvelope(meta, notFoundException.getErrors());
         }
 
         final String errorMessage = MessageFormat.format("NotFoundException: {0}", envelope);
-        log.error(errorMessage, EXCEPTION, exception);
+        log.warn(errorMessage, EXCEPTION, exception);
         return handleExceptionInternal(exception, envelope, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
@@ -122,7 +123,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                 new MetaDataEnvelope(SERVICE_UNAVAILABLE_CODE, ErrorCode.GATEWAY_ERROR, gatewayException.getMessage());
 
         if (!isEmpty(gatewayException.getErrors())) {
-            final MetaData meta = new MetaData(SERVICE_UNAVAILABLE_CODE);
+            final MetaData meta = new MetaData(SERVICE_UNAVAILABLE_CODE, MDC.get("TRACE_ID"));
             response = new MetaDataEnvelope(meta, gatewayException.getErrors());
         }
 
@@ -153,7 +154,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
                 .forEach(constraintViolation -> extractErrorValuesFrom(errors, constraintViolation));
 
         final MetaDataEnvelope response = new MetaDataEnvelope(HttpStatus.BAD_REQUEST.toString(), errors);
-        log.error("ConstraintViolationException: {}", response);
+        log.warn("ConstraintViolationException: {}", response);
         return handleExceptionInternal(exception, response, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
@@ -183,7 +184,6 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private Set<ErrorData> processMethodNotReadableErrors(final HttpMessageNotReadableException exception) {
-        log.debug("HttpMessageNotReadableException: {}", exception.getMessage());
         return Set.of(new ErrorData(ErrorCode.INVALID_PARAMETER.name(), exception.getMessage()));
     }
 }
