@@ -15,6 +15,12 @@ public class MongoCheckConfig {
 
     @Scheduled(fixedDelay = 60000)
     public void scheduleFixedDelayTask() {
-        log.info("Check connection mongo - " + demoSRERepository.count());
+        try {
+            demoSRERepository.count();
+            log.debug("Check connection mongo - " + demoSRERepository.count());
+        } catch (Exception e) {
+            log.error("Error on connection mongo check", e);
+        }
+
     }
 }

@@ -58,12 +58,10 @@ public class ResilienceConfig {
 
             @Override
             public void onEntryRemovedEvent(EntryRemovedEvent<CircuitBreaker> entryRemoveEvent) {
-
             }
 
             @Override
             public void onEntryReplacedEvent(EntryReplacedEvent<CircuitBreaker> entryReplacedEvent) {
-
             }
 
         };

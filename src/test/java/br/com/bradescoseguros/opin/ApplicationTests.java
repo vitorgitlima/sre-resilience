@@ -11,6 +11,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.TimeZone;
 
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 
@@ -23,6 +24,11 @@ class ApplicationTests {
 
     @Test
     void contextLoads() {
+        try {
+            Application.main(new String[] {});
+        } catch (Exception e) {
+            fail();
+        }
     }
 
     @Test

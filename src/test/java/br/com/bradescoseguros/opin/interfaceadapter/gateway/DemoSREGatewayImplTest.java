@@ -44,7 +44,7 @@ class DemoSREGatewayImplTest {
         Optional<DemoSRE> result = gateway.findById(id);
 
         //Assert
-        assertThat(result.isPresent()).isTrue();
+        assertThat(result).isPresent();
         assertThat(result.get().getId()).isNotNull();
         verify(repositoryMock, times(1)).findById(anyInt());
     }
@@ -100,6 +100,6 @@ class DemoSREGatewayImplTest {
 
         //Assert
         verify(restTemplateMock, times(1)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
-        assertThat(result).isEqualTo(result);
+        assertThat(result).isEqualTo(resultMock);
     }
 }
