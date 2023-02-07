@@ -54,9 +54,10 @@ public class DemoSREController {
     })
     @PostMapping(value = "/insertDemoSRE")
     public ResponseEntity<DemoSRE> insertDemoSRE(@RequestBody final DemoSREDTO payload) {
+        DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
+
         log.info("Payload={}", payload.toString());
 
-        DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
         this.demoSREUseCase.insertDemoSRE(demoSRE);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -72,9 +73,10 @@ public class DemoSREController {
     })
     @PutMapping("/updateDemoSRE")
     public ResponseEntity<DemoSRE> updateDemoSRE(@RequestBody final DemoSREDTO payload) {
+        DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
+
         log.info("Payload={}", payload.toString());
 
-        DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
         this.demoSREUseCase.updateDemoSRE(demoSRE);
         return ResponseEntity.noContent().build();
     }

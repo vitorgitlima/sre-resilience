@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="NAME" value="opin-srv-sre-chassi" />
+    <property name="NAME" value="opin-srv-re-produtos-chassis" />
 
     <appender name="Console"
               class="ch.qos.logback.core.ConsoleAppender">
@@ -17,6 +17,11 @@
         <root level="${ROOT_LOG_LEVEL:-ERROR}">
             <appender-ref ref="Console" />
         </root>
+
+        <logger name="br.com.bradescoseguros" level="INFO" additivity="false">
+            <appender-ref ref="Console" />
+        </logger>
+
     </springProfile>
     <!-- finish springProfile production !-->
 
