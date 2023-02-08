@@ -12,6 +12,7 @@ import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -42,12 +43,12 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 new MetaDataEnvelope(HttpStatus.NO_CONTENT.toString(), ErrorCode.DEMOSRE_NO_CONTENT, exception.getMessage());
 
         if (!isEmpty(exception.getErrors())) {
-            final MetaData meta = new MetaData(HttpStatus.NO_CONTENT.toString());
+            final MetaData meta = new MetaData(HttpStatus.NO_CONTENT.toString(), MDC.get("TRACE_ID"));
             response = new MetaDataEnvelope(meta, exception.getErrors());
         }
 
-        final String errorMessage = MessageFormat.format("DemoSRENoContentException: {0}", response);
-        log.info(errorMessage);
+        log.info("DemoSRENoContentException: {}", response);
+
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 HttpStatus.NO_CONTENT, request);
     }
@@ -67,12 +68,12 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 new MetaDataEnvelope(httpStatus.toString(), ErrorCode.DEMOSRE_MAX_RETRIES_EXCEEDED, exceptionMessage);
 
         if (!isEmpty(exception.getErrors())) {
-            final MetaData meta = new MetaData(httpStatus.toString());
+            final MetaData meta = new MetaData(httpStatus.toString(), MDC.get("TRACE_ID"));
             response = new MetaDataEnvelope(meta, exception.getErrors());
         }
 
-        final String errorMessage = MessageFormat.format("handleDemoSREMaxRetriesExceededException: {0}", response);
-        log.error(errorMessage);
+        log.error("handleDemoSREMaxRetriesExceededException: {}", response);
+
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
     }
@@ -87,15 +88,15 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
 
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         MetaDataEnvelope response =
-                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.DEMOSRE_MAX_RETRIES_EXCEEDED, exceptionMessage);
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.BAD_REQUEST, exceptionMessage);
 
         if (!isEmpty(exception.getErrors())) {
-            final MetaData meta = new MetaData(httpStatus.toString());
+            final MetaData meta = new MetaData(httpStatus.toString(), MDC.get("TRACE_ID"));
             response = new MetaDataEnvelope(meta, exception.getErrors());
         }
 
-        final String errorMessage = MessageFormat.format("handleDemoSREBadRequestException: {0}", response);
-        log.error(errorMessage);
+        log.warn("handleDemoSREBadRequestException: {}", response);
+
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
     }
@@ -107,11 +108,11 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
 
         ErrorData errorData = new ErrorData(exceptionMessage, exception.getMessage(), httpStatus.toString());
 
-        final MetaData meta = new MetaData(httpStatus.toString());
+        final MetaData meta = new MetaData(httpStatus.toString(), MDC.get("TRACE_ID"));
         MetaDataEnvelope response = new MetaDataEnvelope(meta, Collections.singleton(errorData));
 
-        final String errorMessage = MessageFormat.format("handleDemoSRERegistryAlreadyExistsException: {0}", response);
-        log.info(errorMessage);
+        log.warn("handleDemoSRERegistryAlreadyExistsException: {}", response);
+
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
     }
@@ -126,7 +127,8 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 new MetaDataEnvelope(httpStatus.toString(), ErrorCode.DEMOSRE_CIRCUIT_OPENED, exceptionMessage);
 
         final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
-        log.error(errorMessage, exception);
+        log.warn(errorMessage, exception);
+
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
     }

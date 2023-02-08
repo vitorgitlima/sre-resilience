@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import org.slf4j.MDC;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -24,7 +25,7 @@ public class MetaDataEnvelope implements Serializable {
     public MetaDataEnvelope(final String statusCode,
                             final ErrorCode code,
                             final String message) {
-        this.meta = new MetaData(statusCode);
+        this.meta = new MetaData(statusCode, MDC.get("TRACE_ID"));
         this.addErrorData(statusCode, code, message);
         this.updateErrorCode();
 
@@ -32,7 +33,7 @@ public class MetaDataEnvelope implements Serializable {
 
     public MetaDataEnvelope(final String statusCode,
                             final Set<ErrorData> errors) {
-        this.meta = new MetaData(statusCode);
+        this.meta = new MetaData(statusCode, MDC.get("TRACE_ID"));
         this.errors.addAll(errors);
         this.updateErrorCode();
     }
