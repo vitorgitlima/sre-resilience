@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 public enum ExtraStatusCode {
     OK("ok"),
+    NOT_FOUND("nok404"),
     LOCKED("nok423"),
     TOO_EARLY("nok425"),
     INTERNAL_SERVER_ERROR("nok500"),
@@ -24,6 +25,6 @@ public enum ExtraStatusCode {
         return Arrays.stream(ExtraStatusCode.values())
                 .filter(f -> f.getStatusURL().equalsIgnoreCase(statusStringValue))
                 .findFirst()
-                .orElse(null);
+                .orElse(ExtraStatusCode.NOT_FOUND);
     }
 }
