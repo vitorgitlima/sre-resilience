@@ -18,15 +18,16 @@ services:
       timeout: 3s
       retries: 30
     entrypoint: [ "bash", "./scripts/entrypoint.bash" ]
+
   redis:
-    image: redis
+    image: redis:7.0.8
     ports:
       - "6379:6379"
     networks:
       - vpcopeninsurance
 
   mongo:
-    image: mongo
+    image: mongo:6.0.4
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin!
@@ -41,7 +42,7 @@ services:
       - vpcopeninsurance
 
   mongo-express:
-    image: mongo-express
+    image: mongo-express:1.0.0-alpha.4
     ports:
       - "8086:8081"
     environment:
@@ -60,7 +61,7 @@ services:
       - mongo
 
   demo-sre-extra:
-    build: demo_sre_extra
+    build: ./demo_sre_extra
     ports:
       - "8081:8081"
     networks:

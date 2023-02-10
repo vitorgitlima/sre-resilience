@@ -1,4 +1,4 @@
-FROM node:lts
+FROM node:18.14.0-bullseye
 WORKDIR /app
 COPY index.js .
 RUN npm init -y
