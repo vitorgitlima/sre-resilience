@@ -9,6 +9,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,7 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     }
 
     @Override
+    @CacheEvict(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
     public void removeDemoSRE(final Integer id) {
         repository.deleteById(id);
     }
