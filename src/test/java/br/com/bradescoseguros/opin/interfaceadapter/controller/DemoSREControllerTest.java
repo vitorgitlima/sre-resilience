@@ -2,7 +2,7 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSREUseCase;
-import br.com.bradescoseguros.opin.configuration.TestMongoConfig;
+import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import br.com.bradescoseguros.opin.configuration.TestResilienceConfig;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;

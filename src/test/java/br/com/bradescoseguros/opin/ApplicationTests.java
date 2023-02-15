@@ -1,15 +1,9 @@
 package br.com.bradescoseguros.opin;
 
-import br.com.bradescoseguros.opin.configuration.TestMongoConfig;
-import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
@@ -23,8 +17,8 @@ import static org.mockito.Mockito.mockStatic;
 
 
 @SpringBootTest
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@Import({TestMongoConfig.class})
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+//@Import({TestMongoConfig.class})
 class ApplicationTests {
 
     @InjectMocks
