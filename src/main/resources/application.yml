@@ -133,10 +133,9 @@ resilience4j.circuitbreaker:
   instances:
     cosmoCircuitBreaker:
       baseConfig: default
+      failure-rate-threshold: 90
+      minimum-number-of-calls: 15
+      sliding-window-size: 20
     apiCircuitBreaker:
       baseConfig: default
       automatic-transition-from-open-to-half-open-enabled: false
-
-
-#TEMP: Removes mongodb connection log
-logging.level.org.mongodb.driver: ERROR

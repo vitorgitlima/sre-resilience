@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.slf4j.MDC;
 
 import java.io.Serializable;
@@ -15,12 +16,13 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MetaDataEnvelope implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private final Set<ErrorData> errors = new HashSet<>();
-    private final MetaData meta;
+    private Set<ErrorData> errors = new HashSet<>();
+    private MetaData meta;
 
     public MetaDataEnvelope(final String statusCode,
                             final ErrorCode code,

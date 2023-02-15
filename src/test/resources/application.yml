@@ -1,0 +1,19 @@
+spring:
+  redis:
+    host: ${REDIS_TEST_HOST:localhost}
+    port: ${REDIS_TEST_PORT:6378}
+    password: ${REDIS_TEST_PASSWORD:bla}
+  data:
+    mongodb:
+      port: ${MONGO_TEST_PORT:27020}
+      host: ${MONGO_TEST_HOST:localhost}
+      database: ${MONGO_TEST_DB:opin-db-test-apis}
+      username: ${MONGO_TEST_USER:change}
+      password: ${MONGO_TEST_PASS:change}
+
+application:
+  timeZone: GMT-3
+
+info:
+  application:
+    swaggerVersion: 1.1.0
