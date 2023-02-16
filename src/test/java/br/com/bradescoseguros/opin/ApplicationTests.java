@@ -17,8 +17,6 @@ import static org.mockito.Mockito.mockStatic;
 
 
 @SpringBootTest
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-//@Import({TestMongoConfig.class})
 class ApplicationTests {
 
     @InjectMocks
