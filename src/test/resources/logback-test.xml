@@ -27,7 +27,7 @@
 
 
     <!-- init springProfile development !-->
-    <springProfile name="dev, development">
+    <springProfile name="dev, development, test">
         <root level="${ROOT_LOG_LEVEL:-INFO}">
             <appender-ref ref="Console" />
         </root>

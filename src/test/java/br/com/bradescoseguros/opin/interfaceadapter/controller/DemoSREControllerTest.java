@@ -17,11 +17,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,9 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 
 @AutoConfigureMockMvc
-@EnableMongoRepositories
 @SpringBootTest
-@Import({TestResilienceConfig.class})
+@Import({TestResilienceConfig.class, TestRedisConfiguration.class})
 class DemoSREControllerTest {
 
     private static final String BASE_URL = "/api/sre/v1";
@@ -73,6 +72,9 @@ class DemoSREControllerTest {
     @MockBean
     private Logger log;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
     private final static String RETRY_COSMO_CONFIG = "cosmoRetry";
     private final static String RETRY_API_CONFIG = "apiRetry";
     private final static String CB_COSMO_CONFIG = "cosmoCircuitBreaker";
@@ -80,6 +82,7 @@ class DemoSREControllerTest {
 
     @BeforeEach
     public void setUp() {
+        System.out.println("Active profile: " + activeProfile);
         circuitBreakerRegistry.circuitBreaker(CB_COSMO_CONFIG).reset();
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).reset();
         Mockito.reset(demoSRERepositoryMock);
