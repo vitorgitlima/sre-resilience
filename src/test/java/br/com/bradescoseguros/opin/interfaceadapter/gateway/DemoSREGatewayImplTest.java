@@ -1,5 +1,6 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
+import br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,7 @@ class DemoSREGatewayImplTest {
     private DemoSREGateway gateway = new DemoSREGatewayImpl();
 
     @Test
-    void findById() {
+    void findById_ReturnValidValue() {
         //Arrange
         final int id = 1;
         Optional<DemoSRE> demoSREMock = Optional.of(DummyObjectsUtil.newInstance(DemoSRE.class));
@@ -44,13 +46,13 @@ class DemoSREGatewayImplTest {
         Optional<DemoSRE> result = gateway.findById(id);
 
         //Assert
-        assertThat(result.isPresent()).isTrue();
+        assertThat(result).isPresent();
         assertThat(result.get().getId()).isNotNull();
         verify(repositoryMock, times(1)).findById(anyInt());
     }
 
     @Test
-    void insertDemoSRE() {
+    void insertDemoSRE_InsertValueWithSuccess() {
         //Arrange
         DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
         when(repositoryMock.insert(any(DemoSRE.class))).thenReturn(demoSREMock);
@@ -63,7 +65,7 @@ class DemoSREGatewayImplTest {
     }
 
     @Test
-    void updateDemoSRE() {
+    void updateDemoSRE_UpdateValueWithSuccess() {
         //Arrange
         DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
         when(repositoryMock.save(any(DemoSRE.class))).thenReturn(demoSREMock);
@@ -76,7 +78,7 @@ class DemoSREGatewayImplTest {
     }
 
     @Test
-    void removeDemoSRE() {
+    void removeDemoSRE_RemoveValueWithSuccess() {
         //Arrange
         final int id = 1;
         doNothing().when(repositoryMock).deleteById(anyInt());
@@ -89,17 +91,17 @@ class DemoSREGatewayImplTest {
     }
 
     @Test
-    void externalApiCall() {
+    void externalApiCall_ExecuteSuccessfully() {
         //Arrange
         final String resultMock = "ok";
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenReturn(new ResponseEntity<>(resultMock, HttpStatus.OK));
 
         //Act
-        String result = restTemplateMock.exchange("", HttpMethod.GET, null, String.class).getBody();
+        String result = gateway.externalApiCall(ExtraStatusCode.OK);
 
         //Assert
         verify(restTemplateMock, times(1)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
-        assertThat(result).isEqualTo(result);
+        assertThat(result).isEqualTo(resultMock);
     }
 }

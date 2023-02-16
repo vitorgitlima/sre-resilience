@@ -23,6 +23,9 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @Autowired
     private DemoSRERepository repository;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     @Override
     @Retry(name = "cosmoRetry")
     @CircuitBreaker(name = "cosmoCircuitBreaker")
@@ -53,7 +56,6 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     public String externalApiCall(final ExtraStatusCode statusCode) {
         final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
         final String fullURL = baseURL + statusCode.getStatusURL();
-        final RestTemplate restTemplate = new RestTemplate();
 
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
     }

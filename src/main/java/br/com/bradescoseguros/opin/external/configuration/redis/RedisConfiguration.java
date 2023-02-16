@@ -32,9 +32,8 @@ public class RedisConfiguration extends CachingConfigurerSupport {
 	@Bean
 	public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
 		log.info("TTL: " + timeToLeave);
-		return (builder) -> builder
-						.withCacheConfiguration(RedisConstants.RESIDENTIAL_RANGE_CEP_CACHE_NAME, RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(timeToLeave)))
-						.withCacheConfiguration(RedisConstants.RESIDENTIAL_CACHE_NAME, RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(timeToLeave)));
+		return builder -> builder
+						.withCacheConfiguration(RedisConstants.DERMOSRE_CACHE_NAME, RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(timeToLeave)));
 	}
 
 	@Override

@@ -66,11 +66,11 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({ValidationException.class})
-    public ResponseEntity<Object> handleValidationException(final Exception exception) {
+    public ResponseEntity<MetaDataEnvelope> handleValidationException(final Exception exception) {
         final ValidationException validationException = (ValidationException) exception;
         final MetaDataEnvelope response = new MetaDataEnvelope(BAD_REQUEST_CODE, validationException.getErrors());
         log.warn("ValidationException: {}", response);
-        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -150,7 +150,6 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
         final Set<ErrorData> errors = new HashSet<>();
 
         constraintViolations
-                .stream()
                 .forEach(constraintViolation -> extractErrorValuesFrom(errors, constraintViolation));
 
         final MetaDataEnvelope response = new MetaDataEnvelope(HttpStatus.BAD_REQUEST.toString(), errors);

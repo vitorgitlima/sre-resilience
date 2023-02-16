@@ -2,10 +2,12 @@ package br.com.bradescoseguros.opin.businessrule.exception.entities;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
+@NoArgsConstructor
 @Builder
 public class ErrorData implements Serializable {
 

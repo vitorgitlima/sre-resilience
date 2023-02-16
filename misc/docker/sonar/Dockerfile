@@ -7,5 +7,5 @@ RUN LATEST_RELEASE=$(curl -L -s -H 'Accept: application/json' https://github.com
     ARTIFACT_URL="https://github.com/devcon5io/mutation-analysis-plugin/releases/download/$LATEST_VERSION/mutation-analysis-plugin-${LATEST_VERSION/v/""}.jar"; \
     wget -O mutation-analysis-plugin.jar "$ARTIFACT_URL" -P ./;
 
-FROM sonarqube:latest
+FROM sonarqube:9.6.1-community
 COPY --from=0 /root/mutation-analysis-plugin.jar /opt/sonarqube/extensions/plugins
