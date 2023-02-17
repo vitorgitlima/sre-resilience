@@ -13,3 +13,5 @@ k8sredishost=az-bsredis-tu-opin-001.redis.cache.windows.net
 k8sredisport=6380
 k8sredisssl=true
 k8sredisenabled=true
+k8sdeploymentcpu_max=0.75
+k8sdeploymentmemory_max=0.50Mi
