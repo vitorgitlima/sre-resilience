@@ -124,6 +124,7 @@ class DemoSREControllerTest {
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
                         .get(url)
+                        .header("trace-id", "a_huge_trace_id")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
                 .andDo(print())
@@ -131,6 +132,7 @@ class DemoSREControllerTest {
 
         //Assert
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
+        assertThat(result.getResponse().getContentAsString()).contains("a_huge_trace_id");
         verify(demoSRERepositoryMock, times(retriesAttemps)).findById(anyInt());
     }
 
@@ -251,6 +253,7 @@ class DemoSREControllerTest {
 
         //Assert
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        Mockito.verify(demoSRERepositoryMock).deleteById(anyInt());
     }
 
     @Test

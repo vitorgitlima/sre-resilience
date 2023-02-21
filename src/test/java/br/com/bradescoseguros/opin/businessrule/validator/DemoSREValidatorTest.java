@@ -41,6 +41,21 @@ class DemoSREValidatorTest {
 
     @Test
     @Tag("unit")
+    void execute_throwsValidadeExceptionWhenIdZero() {
+        //Arrange
+        final DemoSRE demoSREMock = DemoSRE.builder().id(0).value("teste").build();
+
+        //Act
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> validator.execute(null));
+
+        //Assert
+        assertThat(exception.getErrors()).isNotEmpty();
+        assertThat(exception.getErrors()).hasSize(1);
+        verify(messageSourceService, times(1)).getMessage(anyString());
+    }
+
+    @Test
+    @Tag("unit")
     void execute_ThrowsValidadeExceptionWhenPayloadIsNull() {
         //Arrange
         final String errorMessage = "Mensagem teste";
