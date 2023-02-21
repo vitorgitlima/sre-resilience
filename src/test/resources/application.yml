@@ -17,6 +17,8 @@ spring:
     host: ${REDIS_TEST_HOST:localhost}
     port: ${REDIS_TEST_PORT:6378}
     password: ${REDIS_TEST_PASSWORD:}
+  cache:
+    type: none
 
 mongo-properties:
   url: ${MONGODB_URL:mongodb://${mongo-properties.username}:${mongo-properties.password}@${mongo-properties.host}:${mongo-properties.port}/${mongo-properties.database}?${mongo-properties.query-string}}

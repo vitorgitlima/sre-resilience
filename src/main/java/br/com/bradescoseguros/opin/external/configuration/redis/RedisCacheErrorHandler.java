@@ -11,11 +11,11 @@ public class RedisCacheErrorHandler extends SimpleCacheErrorHandler {
 
 	@Override
 	public void handleCacheGetError(final RuntimeException exception, final Cache cache, final Object key) {
-		log.error("Error getting from cache: " + exception.getMessage());
+		log.warn("Error getting from cache: " + exception.getMessage());
 	}
 
 	@Override
 	public void handleCachePutError(final RuntimeException exception, final Cache cache, final Object key, final Object value) {
-		log.error("Unable to put into cache " + cache.getName() + " : " + exception.getMessage());
+		log.warn("Unable to put into cache " + cache.getName() + " : " + exception.getMessage());
 	}
 }

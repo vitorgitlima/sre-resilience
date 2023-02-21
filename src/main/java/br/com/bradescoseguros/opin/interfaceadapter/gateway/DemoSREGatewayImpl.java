@@ -35,11 +35,13 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     }
 
     @Override
+    @CacheEvict(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
     public void insertDemoSRE(final DemoSRE payload) {
         repository.insert(payload);
     }
 
     @Override
+    @CacheEvict(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
     public void updateDemoSRE(final DemoSRE payload) {
         repository.save(payload);
     }
