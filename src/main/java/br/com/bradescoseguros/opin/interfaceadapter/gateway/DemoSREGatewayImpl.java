@@ -29,7 +29,7 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @Override
     @Retry(name = "cosmoRetry")
     @CircuitBreaker(name = "cosmoCircuitBreaker")
-    @Cacheable(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
+    @Cacheable(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME, unless = "#result == null")
     public Optional<DemoSRE> findById(final Integer id) {
         return repository.findById(id);
     }
