@@ -12,6 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document("demo_sre")
+@ToString
 public class DemoSRE implements Serializable {
 
     @Id
