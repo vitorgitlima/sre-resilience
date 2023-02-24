@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# ***************************************************************************************************************************
+# Uso:
+# -m: Quantidade máxima de memória que será disponibilizada ao POD e a JVM (Default: 512m)
+# -r: Quantidade inicial de memória (Memória reservada) que será disponibilizada ao POD e a JVM (Default: 256m)
+# -b: Informa se a imagem deve ser construída durante a execução do script. Caso deseje modificar algum dos outros parâmetros (exemplo memória) esta opção deverá ser TRUE (Default: false)
+# -c: Limita a quantidade de CPU do POD, a quantidade máxima não poderá exceder o número de núcleos da maquina host (Default: sem limitação)
+# ***************************************************************************************************************************
+
 max_memory=512m
 reservation=256m
 build_image=true;
@@ -72,7 +80,9 @@ docker run -id \
   --cpus="$max_cpus" \
 	$container_image
 
-#container_id=$(docker ps -q -f "name=$container_name")
+container_id=$(docker ps -q -f "name=$container_name")
+
+echo -e "\033[32mContainer '$container_name' rodando com sucesso. Container ID: '$container_id'\033[0m"
 
 # Executa o script de carga da aplicação
 #timeout 60 "./client_test.sh" &
