@@ -9,7 +9,6 @@ import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.flapdoodle.embed.mongo.MongodExecutable;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +22,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,7 +32,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,20 +80,15 @@ class DemoSREControllerTest {
     private final static String CB_COSMO_CONFIG = "cosmoCircuitBreaker";
     private final static String CB_API_CONFIG = "apiCircuitBreaker";
 
-
-    private static final String CONNECTION_STRING = "mongodb://%s:%d";
-
-    private MongodExecutable mongodExecutable;
-    private MongoTemplate mongoTemplate;
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp() {
         System.out.println("Active profile: " + activeProfile);
         circuitBreakerRegistry.circuitBreaker(CB_COSMO_CONFIG).reset();
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).reset();
         Mockito.reset(demoSRERepositoryMock);
         Mockito.reset(restTemplateMock);
 
-       }
+    }
 
 
     @Test
