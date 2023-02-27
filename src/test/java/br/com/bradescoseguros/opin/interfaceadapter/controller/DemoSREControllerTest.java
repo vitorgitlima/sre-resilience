@@ -2,6 +2,7 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSREUseCase;
+import br.com.bradescoseguros.opin.configuration.MongoConf;
 import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import br.com.bradescoseguros.opin.configuration.TestResilienceConfig;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
@@ -9,8 +10,17 @@ import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.client.MongoClients;
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.ImmutableMongodConfig;
+import de.flapdoodle.embed.mongo.config.MongodConfig;
+import de.flapdoodle.embed.mongo.config.Net;
+import de.flapdoodle.embed.mongo.distribution.Version;
+import de.flapdoodle.embed.process.runtime.Network;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -22,6 +32,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +43,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +56,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@Import({TestResilienceConfig.class, TestRedisConfiguration.class})
+@Import({TestResilienceConfig.class, TestRedisConfiguration.class, MongoConf.class})
 class DemoSREControllerTest {
 
     private static final String BASE_URL = "/api/sre/v1";
@@ -80,14 +93,40 @@ class DemoSREControllerTest {
     private final static String CB_COSMO_CONFIG = "cosmoCircuitBreaker";
     private final static String CB_API_CONFIG = "apiCircuitBreaker";
 
+
+    private static final String CONNECTION_STRING = "mongodb://%s:%d";
+
+    private MongodExecutable mongodExecutable;
+    private MongoTemplate mongoTemplate;
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         System.out.println("Active profile: " + activeProfile);
         circuitBreakerRegistry.circuitBreaker(CB_COSMO_CONFIG).reset();
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).reset();
         Mockito.reset(demoSRERepositoryMock);
         Mockito.reset(restTemplateMock);
+
+        // assim foi, mas ficou o mongo de pé, sem derrubar
+
+        String ip = "localhost";
+        int port = 27017;
+
+//        ImmutableMongodConfig mongodConfig = MongodConfig
+//                .builder()
+//                .version(Version.Main.PRODUCTION)
+//                .net(new Net(ip, port, Network.localhostIsIPv6()))
+//                .build();
+//
+//        MongodStarter starter = MongodStarter.getDefaultInstance();
+//        mongodExecutable = starter.prepare(mongodConfig);
+//        mongodExecutable.start();
+//        mongoTemplate = new MongoTemplate(MongoClients.create(String.format(CONNECTION_STRING, ip, port)), "test");
     }
+
+//    @AfterEach
+//    public void setDown() {
+//        mongodExecutable.stop();
+//    }
 
     @Test
     @Tag("comp")
