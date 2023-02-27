@@ -79,7 +79,7 @@ This will make sure your commit messages follow our Conventional Commits Specifi
 > git config core.hooksPath .githooks
 ```
 
-## Running apllication
+## Running application
 ```bash
 docker-compose -f misc/docker/docker-compose.yml up -d
 
@@ -149,6 +149,44 @@ mvn clean --batch-mode verify org.pitest:pitest-maven:mutationCoverage  sonar:so
 mvn clean --batch-mode verify org.pitest:pitest-maven:mutationCoverage sonar:sonar -Dsonar.host.url=http://localhost:9000 -Dsonar.login="admin" -Dsonar.password="dev!" 
 -DmutationThreshold=90
 ```
+
+## Running stress tests
+"In order to run the stress test, all Docker containers must be up and running ([Running application](#running-application)).
+
+Two separate scripts have been created for this purpose, 'docker_run.sh' and 'client_test.sh'.
+
+- **docker_run.sh**: Creates a new image of the current application, with memory and CPU limitations based on the provided parameters, enabling the determination of the best application configuration.
+
+- **client_test.sh**: Executes multiple concurrent calls to the application endpoint, putting it under maximum stress.
+
+### Docker run script
+Arguments
+- -m
+  * The maximum memory allocation for the POD and JVM.
+  * Default: 512m
+- -r
+  * The starting memory capacity (reserved memory) for the POD and JVM.
+  * Default: 256m
+- -b
+  * This flag determines whether to build the image during script execution. If you wish to modify any of the other parameters (e.g. memory), this option must be set to TRUE.
+  * Default: true
+- -c
+  * Limits the amount of CPU allocated to the POD, with the maximum amount not exceeding the number of cores on the host machine.
+  * Default: no limit
+
+Usage:
+```bash
+. misc/docker/docker_run.sh -b true -r 256m -m 512m -c 4
+```
+
+### Client tests script
+Once the 'docker_run.sh' script has been executed, the container will be up and running, ready for use. At this point, the 'client_test.sh' script can be modified to perform calls to the target address. Please note that the script is just an example and you are free to customize and adapt it to your specific application needs.
+
+Usage:
+```bash
+. misc/docker/client_test.sh
+```
+
 ## Troubleshooting
 
 - Install docker

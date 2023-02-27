@@ -10,11 +10,11 @@
 
 max_memory=512m
 reservation=256m
-build_image=true;
+build_image=true
 container_image=opin-srv-app
 container_name=$container_image-test
 container_id=""
-base_path=$(cd "$(dirname "$(pwd)")/.." || exit; pwd)
+base_path=$(dirname $(dirname "$(dirname $(readlink -f "$0"))"))
 max_cpus=0
 cpus_args=""
 
@@ -46,14 +46,14 @@ do
 done
 
 # Identifica se o parâmetro de cpus foi utilizado
-if [ "$max_cpus" -gt 0 ]; then
+if [ $max_cpus -gt 0 ]; then
   cpus_args="--cpus=$max_cpus"
 fi
 
 # Faz o build da imagem caso solicitado pelo usuário (através da flag -b)
-if [ "$build_image" == true ]; then
-  echo -e "\033[34mExecutando DOCKER BUILD com os parametros min_memory=$reservation max_memory=$max_memory\033[0m"
-  docker build --file ../../Dockerfile --build-arg min_memory="$reservation" --build-arg max_memory="$max_memory" -t "$container_image" "$base_path"
+if [ "$build_image" = true ]; then
+  echo -e "\033[34mExecutando DOCKER BUILD com os parametros  --file ${base_path}/Dockerfile min_memory=$reservation max_memory=$max_memory $cpus_args\033[0m"
+  docker build --file "${base_path}/Dockerfile" --build-arg min_memory="$reservation" --build-arg max_memory="$max_memory" -t "$container_image" "$base_path"
 
   if [ $? -ne 0 ]; then
     echo -e "\033[31mErro ao realizar o build da imagem '$container_image'.\033[0m"
