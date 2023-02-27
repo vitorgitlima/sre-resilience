@@ -10,6 +10,7 @@ import com.mongodb.connection.ConnectionPoolSettings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
@@ -23,6 +24,7 @@ public class MongoDbConfiguration {
     private final MongoDbProperties mongoDbProperties;
 
     @Bean
+    @Profile("!test")
     public MongoTemplate mongoTemplate() {
         var mongoCredential = MongoCredential.createCredential(mongoDbProperties.getUsername(), mongoDbProperties.getDatabase(), mongoDbProperties.getPassword().toCharArray());
         var mongoClientSettings = createMongoClientSettings(mongoCredential);

@@ -21,20 +21,8 @@ spring:
     type: none
 
 mongo-properties:
-  url: ${MONGODB_URL:mongodb://${mongo-properties.username}:${mongo-properties.password}@${mongo-properties.host}:${mongo-properties.port}/${mongo-properties.database}?${mongo-properties.query-string}}
   host: ${MONGO_HOST:localhost}
-  port: ${MONGO_PORT:27017}
-  database: ${MONGO_DB:opin-db-apis}
-  username: ${MONGO_USER:admin}
-  password: ${MONGO_PASS:admin!}
-  query-string: ${MONGO_QUERY_STRING:retryWrites=true&w=majority}
-  connection-pool-max-connection-life-time: 3
-  connection-pool-min-size: ${MONGO_MIN_CONNECTIONS:75}
-  connection-pool-max-size: ${MONGO_MAX_CONNECTIONS:150}
-  connection-pool-maintenance-frequency: 1
-  connection-pool-maintenance-initial-delay: 5
-  connection-pool-max-connection-idle-time: 1
-  connection-pool-max-wait-time: 15
+  port: ${MONGO_PORT:27020}
 
 info:
   application:
