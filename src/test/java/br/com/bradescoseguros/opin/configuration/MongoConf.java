@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class MongoConf {
     public MongoTemplate mongoTemplate() throws IOException {
 
         String ip = "localhost";
-        int port = 27017;
+        int port = 27020;
 
         ImmutableMongodConfig mongodConfig = MongodConfig
                 .builder()
