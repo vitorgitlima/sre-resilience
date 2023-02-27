@@ -1,6 +1,5 @@
 package br.com.bradescoseguros.opin.configuration;
 
-import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClients;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodStarter;
@@ -10,46 +9,47 @@ import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.annotation.DirtiesContext;
 
 import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 @RequiredArgsConstructor
 @Configuration
-public class MongoConf {
+public class MongoConfig {
 
     private static final String CONNECTION_STRING = "mongodb://%s:%d";
 
     private MongodExecutable mongodExecutable;
-    private MongoTemplate mongoTemplate;
+
+    @Value("${mongo-properties.host}")
+    private String databaseUrl;
+
+    @Value("${mongo-properties.port}")
+    private int port;
     @Bean
     @Primary
     public MongoTemplate mongoTemplate() throws IOException {
 
-        String ip = "localhost";
-        int port = 27020;
-
         ImmutableMongodConfig mongodConfig = MongodConfig
                 .builder()
                 .version(Version.Main.PRODUCTION)
-                .net(new Net(ip, port, Network.localhostIsIPv6()))
+                .net(new Net(databaseUrl, port, Network.localhostIsIPv6()))
                 .build();
 
         MongodStarter starter = MongodStarter.getDefaultInstance();
         mongodExecutable = starter.prepare(mongodConfig);
         mongodExecutable.start();
 
-        return new MongoTemplate(MongoClients.create(String.format(CONNECTION_STRING, ip, port)), "test");
+        return new MongoTemplate(MongoClients.create(String.format(CONNECTION_STRING, databaseUrl, port)), "test");
     }
 
     @PreDestroy
-    public void destroyMongo() {
+    public void stopMongo() {
         mongodExecutable.stop();
     }
 
