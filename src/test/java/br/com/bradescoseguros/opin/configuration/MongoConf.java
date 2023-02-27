@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
@@ -46,8 +47,9 @@ public class MongoConf {
         return new MongoTemplate(MongoClients.create(String.format(CONNECTION_STRING, ip, port)), "test");
     }
 
-//    public void destroyMongo() {
-//        mongodExecutable.stop();
-//    }
+    @PreDestroy
+    public void destroyMongo() {
+        mongodExecutable.stop();
+    }
 
 }
