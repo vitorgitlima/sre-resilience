@@ -176,7 +176,7 @@ Arguments
 
 Usage:
 ```bash
-. misc/docker/docker_run.sh -b true -r 256m -m 512m -c 4
+bash misc/docker/docker_run.sh -b true -r 256m -m 512m -c 4
 ```
 
 ### Client tests script
@@ -184,7 +184,7 @@ Once the 'docker_run.sh' script has been executed, the container will be up and 
 
 Usage:
 ```bash
-. misc/docker/client_test.sh
+bash misc/docker/client_test.sh
 ```
 
 ## Troubleshooting

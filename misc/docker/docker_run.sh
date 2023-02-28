@@ -14,7 +14,7 @@ build_image=true
 container_image=opin-srv-app
 container_name=$container_image-test
 container_id=""
-base_path=$(dirname $(dirname "$(dirname $(readlink -f "$0"))"))
+base_path=$(dirname "$(dirname "$(dirname $(readlink -f "$0"))")")
 max_cpus=0
 cpus_args=""
 
@@ -46,7 +46,7 @@ do
 done
 
 # Identifica se o parâmetro de cpus foi utilizado
-if [ $max_cpus -gt 0 ]; then
+if [ "$max_cpus" -gt 0 ]; then
   cpus_args="--cpus=$max_cpus"
 fi
 
@@ -83,16 +83,3 @@ docker run -id \
 container_id=$(docker ps -q -f "name=$container_name")
 
 echo -e "\033[32mContainer '$container_name' rodando com sucesso. Container ID: '$container_id'\033[0m"
-
-# Executa o script de carga da aplicação
-#timeout 60 "./client_test.sh" &
-
-# Armazena o ID do processo do script em uma variável
-#script_pid=$!
-
-#docker wait "$container_id"
-
-# if [ $? -ne 0 ]; then
-#   echo "O container $container_name foi encerrado com erro!"
-#   kill -STOP $script_pid
-# fi
