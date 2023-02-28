@@ -87,7 +87,9 @@ class DemoSREControllerTest {
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).reset();
         Mockito.reset(demoSRERepositoryMock);
         Mockito.reset(restTemplateMock);
+
     }
+
 
     @Test
     @Tag("comp")
