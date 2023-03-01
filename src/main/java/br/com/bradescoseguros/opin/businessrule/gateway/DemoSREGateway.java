@@ -15,4 +15,6 @@ public interface DemoSREGateway {
     void removeDemoSRE(final Integer id);
 
     String externalApiCall(final ExtraStatusCode status);
+
+    String externalApiCallBulkhead();
 }

@@ -221,6 +221,12 @@
             <version>1.7.1</version>
         </dependency>
 
+        <!-- BulkHead -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-bulkhead</artifactId>
+            <version>1.7.1</version>
+        </dependency>
 
         <!-- Utils -->
         <dependency>

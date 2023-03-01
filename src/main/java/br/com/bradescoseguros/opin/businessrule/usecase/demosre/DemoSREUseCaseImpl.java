@@ -89,4 +89,10 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
 
         return gateway.externalApiCall(status);
     }
+    
+    @Override
+    public String externalApiCallBulkhead() {
+
+        return gateway.externalApiCallBulkhead();
+    }
 }

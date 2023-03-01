@@ -5,6 +5,7 @@ import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.configuration.redis.RedisConstants;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,14 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     public String externalApiCall(final ExtraStatusCode statusCode) {
         final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
         final String fullURL = baseURL + statusCode.getStatusURL();
+
+        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+    }
+
+    @Override
+    @Bulkhead(name = "semaphoreBulkhead")
+    public String externalApiCallBulkhead() {
+        final String fullURL = "http://localhost:8081/api/sre/v1/extra/bulkhead";
 
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
     }

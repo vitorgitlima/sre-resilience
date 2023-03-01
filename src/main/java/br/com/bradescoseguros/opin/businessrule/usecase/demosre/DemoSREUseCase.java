@@ -13,4 +13,6 @@ public interface DemoSREUseCase {
     void removeDemoSRE(final Integer id);
 
     String externalApiCall(final ExtraStatusCode status);
+
+    String externalApiCallBulkhead();
 }

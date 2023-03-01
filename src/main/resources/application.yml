@@ -139,3 +139,9 @@ resilience4j.circuitbreaker:
     apiCircuitBreaker:
       baseConfig: default
       automatic-transition-from-open-to-half-open-enabled: false
+
+resilience4j.bulkhead:
+  instances:
+    semaphoreBulkhead:
+      maxConcurrentCalls: 2
+      maxWaitDuration: 1s

@@ -9,6 +9,7 @@ import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorData;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaData;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
+import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -125,6 +127,22 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
         HttpStatus httpStatus = HttpStatus.LOCKED;
         MetaDataEnvelope response =
                 new MetaDataEnvelope(httpStatus.toString(), ErrorCode.DEMOSRE_CIRCUIT_OPENED, exceptionMessage);
+
+        final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
+        log.warn(errorMessage, exception);
+
+        return handleExceptionInternal(exception, response, new HttpHeaders(),
+                httpStatus, request);
+    }
+
+    @ExceptionHandler(BulkheadFullException.class)
+    public ResponseEntity<Object> handleBulkheadFullException(final BulkheadFullException exception, final WebRequest request) {
+
+        String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable");
+
+        HttpStatus httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
+        MetaDataEnvelope response =
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.BULKHEAD_FULL, exceptionMessage);
 
         final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
         log.warn(errorMessage, exception);
