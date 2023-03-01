@@ -92,19 +92,20 @@ jetty:
     max: 300
     idle-timeout: 15000
 
+# Definições de Retry
 resilience4j.retry:
   configs:
     default:
-      maxAttempts: 3
-      waitDuration: 3s
-      failAfterMaxAttempts: true
-      retryExceptions:
+      maxAttempts: 3 # Máximo de tentativas de retry que serão feitas
+      waitDuration: 3s # Tempo de espera entre as tentativas de retry
+      failAfterMaxAttempts: true # Booleano para indicar se a exceção "MaxRetriesExceededException" será lançada ao atingir o valor definido em "maxAttempts"
+      retryExceptions: # Lista de exceções que, caso lançadas, será realizado o comportamento de retry
         - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
-      ignoreExceptions:
+      ignoreExceptions: # Lista de exceções que, caso lançadas, não será realizado o comportamento de retry
         - io.github.resilience4j.circuitbreaker.CallNotPermittedException
-  instances:
+  instances: # Define as instancias de retrys que teremos em nossa aplicação. Novas instancias podem ser criadas conforme necessário
     cosmoRetry:
-      baseConfig: default
+      baseConfig: default # Essa configuração indica que estamos herdando todas as configurações default. As definições seguintes sobrescrevem a configuração default e podem ser alteradas conforme necessário
       maxAttempts: 10
       waitDuration: 2s
       retryExceptions:
@@ -127,6 +128,7 @@ resilience4j.retry:
 
 
 
+# Definições de CircuitBreaker
 resilience4j.circuitbreaker:
   configs:
     default:
@@ -138,9 +140,9 @@ resilience4j.circuitbreaker:
       permitted-number-of-calls-in-half-open-state: 3 # Número máximo de requisições permitidas quando no estado "Semi-Aberto". As demais requisições serão rejeitadas com CallNotPermittedException, até que todas as chamadas permitidas sejam concluídas.
       sliding-window-size: 10 # Tamanho da janela que é usada para registrar o resultado das chamadas quando o circuito esta fechado (quantas chamadas ele memoriza). Esse valor precisa ser maior que os valores de análise. Caso seja menor, vai sobrescrever o valor de requisições minimas necessárias
       sliding-window-type: count_based # COUNT_BASED ou TIME_BASED. Se for TIME, os segundos das ultimas requisições serão armazenados para cálculos
-  instances:
+  instances: # Define as instancias de circuitBreakers que teremos em nossa aplicação. Novas instancias podem ser criadas conforme necessário
     cosmoCircuitBreaker:
-      baseConfig: default
+      baseConfig: default # Essa configuração indica que estamos herdando todas as configurações default. As definições seguintes sobrescrevem a configuração default e podem ser alteradas conforme necessário
       failure-rate-threshold: 90
       minimum-number-of-calls: 15
       sliding-window-size: 20
