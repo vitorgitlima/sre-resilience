@@ -15,4 +15,6 @@ public interface DemoSREUseCase {
     String externalApiCall(final ExtraStatusCode status);
 
     String externalApiCallBulkhead();
+
+    String externalApiCallBulkheadRetry();
 }

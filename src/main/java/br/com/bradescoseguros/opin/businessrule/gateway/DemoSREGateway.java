@@ -17,4 +17,6 @@ public interface DemoSREGateway {
     String externalApiCall(final ExtraStatusCode status);
 
     String externalApiCallBulkhead();
+
+    String externalApiCallBulkheadRetry();
 }

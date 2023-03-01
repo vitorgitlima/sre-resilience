@@ -70,4 +70,13 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
 
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
     }
+
+    @Override
+    @Bulkhead(name = "semaphoreBulkhead")
+    @Retry(name = "apiBulkhead")
+    public String externalApiCallBulkheadRetry() {
+        final String fullURL = "http://localhost:8081/api/sre/v1/extra/bulkhead";
+
+        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+    }
 }

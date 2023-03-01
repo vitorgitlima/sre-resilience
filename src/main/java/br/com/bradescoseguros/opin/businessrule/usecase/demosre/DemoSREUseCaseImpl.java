@@ -95,4 +95,10 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
 
         return gateway.externalApiCallBulkhead();
     }
+
+    @Override
+    public String externalApiCallBulkheadRetry() {
+
+        return gateway.externalApiCallBulkheadRetry();
+    }
 }
