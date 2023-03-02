@@ -87,18 +87,21 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
             throw new DemoSREBadRequestException(error);
         }
 
+        return getExternalApi(status);
+    }
+
+    private String getExternalApi(ExtraStatusCode status) {
+        String statusURL = status.getStatusURL();
+        String bulkheadUrl = ExtraStatusCode.BULKHEAD.getStatusURL();
+        String bulkheadRetryUrl = ExtraStatusCode.BULKHEAD_RETRY.getStatusURL();
+
+        if (statusURL.equals(bulkheadUrl)) {
+            return gateway.externalApiCallBulkhead();
+        }
+        if (statusURL.equals(bulkheadRetryUrl)) {
+            return gateway.externalApiCallBulkheadRetry();
+        }
+
         return gateway.externalApiCall(status);
-    }
-    
-    @Override
-    public String externalApiCallBulkhead() {
-
-        return gateway.externalApiCallBulkhead();
-    }
-
-    @Override
-    public String externalApiCallBulkheadRetry() {
-
-        return gateway.externalApiCallBulkheadRetry();
     }
 }

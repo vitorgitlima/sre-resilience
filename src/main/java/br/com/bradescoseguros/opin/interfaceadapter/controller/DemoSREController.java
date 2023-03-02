@@ -115,16 +115,4 @@ public class DemoSREController {
 
         return ResponseEntity.ok(this.demoSREUseCase.externalApiCall(extraStatusCode));
     }
-
-    @GetMapping(value = "/externalApiCallBulkHead")
-    public ResponseEntity<String> externalApiCallBulkhead() {
-
-        return ResponseEntity.ok(this.demoSREUseCase.externalApiCallBulkhead());
-    }
-
-    @GetMapping(value = "/externalApiCallBulkHeadRetry")
-    public ResponseEntity<String> externalApiCallBulkheadRetry() {
-
-        return ResponseEntity.ok(this.demoSREUseCase.externalApiCallBulkheadRetry());
-    }
 }

@@ -1,10 +1,8 @@
 package br.com.bradescoseguros.opin.domain.demosre;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public enum ExtraStatusCode {
     OK("ok"),
@@ -12,7 +10,10 @@ public enum ExtraStatusCode {
     LOCKED("nok423"),
     TOO_EARLY("nok425"),
     INTERNAL_SERVER_ERROR("nok500"),
-    GATEWAY_TIMEOUT("nok504");
+    GATEWAY_TIMEOUT("nok504"),
+    BULKHEAD("bulkhead"),
+    BULKHEAD_RETRY("bulkheadRetry");
+
 
     @Getter
     private final String statusURL;
