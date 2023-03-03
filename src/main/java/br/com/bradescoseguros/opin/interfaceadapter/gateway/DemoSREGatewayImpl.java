@@ -1,10 +1,12 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
+import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.configuration.redis.RedisConstants;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
+import io.github.resilience4j.bulkhead.ThreadPoolBulkhead;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Component
@@ -26,6 +30,9 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private ThreadPoolBulkhead registry;
 
     @Override
     @Retry(name = "cosmoRetry")
@@ -78,5 +85,20 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
         final String fullURL = "http://localhost:8081/api/sre/v1/extra/bulkhead";
 
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+    }
+
+    @Override
+    public String externalApiBulkheadThreadPool() {
+        final String fullURL = "http://localhost:8081/api/sre/v1/extra/bulkhead";
+
+        CompletionStage<String> completionStage = registry.executeCallable(() -> restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody());
+
+        try {
+            return completionStage.toCompletableFuture().get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new GatewayException(e);
+        }
+
+
     }
 }

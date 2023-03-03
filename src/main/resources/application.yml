@@ -155,3 +155,12 @@ resilience4j.bulkhead:
     semaphoreBulkhead:
       maxConcurrentCalls: 2
       maxWaitDuration: 1s
+
+resilience4j:
+    thread-pool-bulkhead:
+        configs:
+          default:
+              maxThreadPoolSize: 2 # Valor máximo do pool de threads
+              coreThreadPoolSize: 1 # O valor "core" do pool de threads
+              queueCapacity: 2 # Capacidade da fila de requisições que irão aguardar
+              keepAliveDuration: 20 # Quando o número de Threads for maior que o "core", representa o tempo maximo que as threads ociosas em excesso irão aguardar por novas tarefas antes de serem encerradas

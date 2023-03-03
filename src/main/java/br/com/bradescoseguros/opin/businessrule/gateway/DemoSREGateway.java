@@ -19,4 +19,6 @@ public interface DemoSREGateway {
     String externalApiCallBulkhead();
 
     String externalApiCallBulkheadRetry();
+
+    String externalApiBulkheadThreadPool();
 }

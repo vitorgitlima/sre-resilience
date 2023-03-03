@@ -94,12 +94,16 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
         String statusURL = status.getStatusURL();
         String bulkheadUrl = ExtraStatusCode.BULKHEAD.getStatusURL();
         String bulkheadRetryUrl = ExtraStatusCode.BULKHEAD_RETRY.getStatusURL();
+        String bulkheadThreadPool = ExtraStatusCode.BULKHEAD_THREAD_POOL.getStatusURL();
 
         if (statusURL.equals(bulkheadUrl)) {
             return gateway.externalApiCallBulkhead();
         }
         if (statusURL.equals(bulkheadRetryUrl)) {
             return gateway.externalApiCallBulkheadRetry();
+        }
+        if(statusURL.equals(bulkheadThreadPool)) {
+            return gateway.externalApiBulkheadThreadPool();
         }
 
         return gateway.externalApiCall(status);

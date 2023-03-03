@@ -12,7 +12,8 @@ public enum ExtraStatusCode {
     INTERNAL_SERVER_ERROR("nok500"),
     GATEWAY_TIMEOUT("nok504"),
     BULKHEAD("bulkhead"),
-    BULKHEAD_RETRY("bulkheadRetry");
+    BULKHEAD_RETRY("bulkheadRetry"),
+    BULKHEAD_THREAD_POOL("bulkheadThreadPool");
 
 
     @Getter
