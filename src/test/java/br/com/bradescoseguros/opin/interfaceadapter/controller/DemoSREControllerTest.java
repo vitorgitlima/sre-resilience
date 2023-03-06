@@ -394,6 +394,32 @@ class DemoSREControllerTest {
         assertThat(bodyResult.getErrors()).hasSize(1);
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
 
+    }
+
+    @Test
+    @Tag("comp")
+    public void externalApiCall_ShouldReturn503WhenTheThreadPoolBulkheadReturnsError() throws Exception {
+
+        final String url = BASE_URL + "/externalApiCall/bulkheadThreadPool";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
+
+        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead("bulkheadInstance");
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
+
+        //Assert
+        assertThat(bulkheadInstance.getMetrics().getRemainingQueueCapacity()).isEqualTo(1);
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
+        assertThat(bodyResult.getErrors()).hasSize(1);
 
     }
 
