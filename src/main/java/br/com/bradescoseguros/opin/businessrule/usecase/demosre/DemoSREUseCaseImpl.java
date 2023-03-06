@@ -103,7 +103,7 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
             return gateway.externalApiCallBulkheadRetry();
         }
         if(statusURL.equals(bulkheadThreadPool)) {
-            return gateway.externalApiBulkheadThreadPool();
+            return gateway.externalApiCallThreadPoolBulkhead();
         }
 
         return gateway.externalApiCall(status);

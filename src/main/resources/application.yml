@@ -164,3 +164,6 @@ resilience4j:
               coreThreadPoolSize: 1 # O valor "core" do pool de threads
               queueCapacity: 2 # Capacidade da fila de requisições que irão aguardar
               keepAliveDuration: 20 # Quando o número de Threads for maior que o "core", representa o tempo maximo que as threads ociosas em excesso irão aguardar por novas tarefas antes de serem encerradas
+        instances: # Define as instancias de bulkheads que teremos em nossa aplicação. Novas instancias podem ser criadas conforme necessário
+          bulkheadInstance:
+            baseConfig: default # Essa configuração indica que estamos herdando todas as configurações default. As definições seguintes sobrescrevem a configuração default e podem ser alteradas conforme necessário
