@@ -88,6 +88,7 @@ class DemoSREControllerTest {
     private final static String RETRY_API_CONFIG = "apiRetry";
     private final static String CB_COSMO_CONFIG = "cosmoCircuitBreaker";
     private final static String CB_API_CONFIG = "apiCircuitBreaker";
+    private final static String BULKHEAD_THREAD_POOL_CONFIG = "bulkheadInstance";
 
     @BeforeEach
     public void setUp() {
@@ -96,7 +97,7 @@ class DemoSREControllerTest {
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).reset();
         Mockito.reset(demoSRERepositoryMock);
         Mockito.reset(restTemplateMock);
-        threadPoolBulkheadRegistry.remove("bulkheadInstance");
+        threadPoolBulkheadRegistry.remove(BULKHEAD_THREAD_POOL_CONFIG);
 
     }
 
@@ -344,7 +345,7 @@ class DemoSREControllerTest {
     public void externalApiCall_ShouldReturn200WhenTheThreadPoolBulkheadIsEmpty() throws Exception {
         final String url = BASE_URL + "/externalApiCall/bulkheadThreadPool";
         final String response = "ok";
-        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead("bulkheadInstance");
+        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead(BULKHEAD_THREAD_POOL_CONFIG);
 
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
@@ -374,9 +375,10 @@ class DemoSREControllerTest {
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
 
-        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead("bulkheadInstance");
+        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead(BULKHEAD_THREAD_POOL_CONFIG);
         bulkheadInstance.executeRunnable(() -> runUselessTask() );
         bulkheadInstance.executeRunnable(() -> runUselessTask() );
+
 
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -404,7 +406,7 @@ class DemoSREControllerTest {
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
 
-        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead("bulkheadInstance");
+        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead(BULKHEAD_THREAD_POOL_CONFIG);
 
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
