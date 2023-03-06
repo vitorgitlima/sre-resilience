@@ -1,9 +1,6 @@
 package br.com.bradescoseguros.opin.external.exception;
 
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBadRequestException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREMaxRetriesExceededException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRENoContentException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRERegistryAlreadyExistsException;
+import br.com.bradescoseguros.opin.businessrule.exception.demosre.*;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorCode;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorData;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
@@ -137,6 +134,22 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
 
     @ExceptionHandler(BulkheadFullException.class)
     public ResponseEntity<Object> handleBulkheadFullException(final BulkheadFullException exception, final WebRequest request) {
+
+        String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable");
+
+        HttpStatus httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
+        MetaDataEnvelope response =
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.BULKHEAD_FULL, exceptionMessage);
+
+        final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
+        log.warn(errorMessage, exception);
+
+        return handleExceptionInternal(exception, response, new HttpHeaders(),
+                httpStatus, request);
+    }
+
+    @ExceptionHandler(DemoSREBulkheadFullException.class)
+    public ResponseEntity<Object> handleDemoSREBulkheadFullException(final DemoSREBulkheadFullException exception, final WebRequest request) {
 
         String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable");
 

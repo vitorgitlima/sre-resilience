@@ -1,11 +1,13 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
 import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
+import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBulkheadFullException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.configuration.redis.RedisConstants;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
+import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -90,6 +92,9 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
         try {
             return demoSREGatewayBulkheadThreadPool.externalApiBulkheadThreadPool().get();
         } catch (InterruptedException | ExecutionException e) {
+            if(e.getCause() instanceof BulkheadFullException) {
+                throw new DemoSREBulkheadFullException(e.getMessage());
+            }
             throw new GatewayException(e);
         }
     }

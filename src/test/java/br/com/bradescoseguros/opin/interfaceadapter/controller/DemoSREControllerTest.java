@@ -9,6 +9,10 @@ import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.bulkhead.ThreadPoolBulkhead;
+import io.github.resilience4j.bulkhead.ThreadPoolBulkheadRegistry;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,6 +66,12 @@ class DemoSREControllerTest {
 
     @Autowired
     private CircuitBreakerRegistry circuitBreakerRegistry;
+
+    @Autowired
+    private BulkheadRegistry bulkhead;
+
+    @Autowired
+    private ThreadPoolBulkheadRegistry bulkheadRegistry;
 
     @MockBean
     private DemoSRERepository demoSRERepositoryMock;
@@ -327,5 +337,72 @@ class DemoSREControllerTest {
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.LOCKED.value());
         assertThat(bodyResult.getErrors()).hasSize(1);
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
+    }
+
+    @Test
+    @Tag("comp")
+    public void externalApiCall_ShouldReturn200WhenTheThreadPoolBulkheadIsEmpty() throws Exception {
+        final String url = BASE_URL + "/externalApiCall/bulkheadThreadPool";
+        final String errorMessage = "BULKHEAD_FULL O serviço requisitado está indisponível.";
+        final String response = "ok";
+        ThreadPoolBulkhead bulkheadInstance = bulkheadRegistry.bulkhead("bulkheadInstance");
+
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(bulkheadInstance.getMetrics().getRemainingQueueCapacity()).isEqualTo(1);
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
+
+    }
+
+    @Test
+    @Tag("comp")
+    public void externalApiCall_ShouldReturn503WhenTheThreadPoolBulkheadIsFull() throws Exception {
+
+        final String url = BASE_URL + "/externalApiCall/bulkheadThreadPool";
+        final String errorMessage = "BULKHEAD_FULL O serviço requisitado está indisponível.";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
+
+        ThreadPoolBulkhead bulkheadInstance = bulkheadRegistry.bulkhead("bulkheadInstance");
+        bulkheadInstance.executeRunnable(() -> runUselessTask() );
+        bulkheadInstance.executeRunnable(() -> runUselessTask() );
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
+
+        //Assert
+        assertThat(bulkheadInstance.getMetrics().getRemainingQueueCapacity()).isEqualTo(0);
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
+        assertThat(bodyResult.getErrors()).hasSize(1);
+        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
+
+
+    }
+
+    private void runUselessTask() {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
