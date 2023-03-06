@@ -92,6 +92,8 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
         try {
             return demoSREGatewayBulkheadThreadPool.externalApiBulkheadThreadPool().get();
         } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage());
+
             if(e.getCause() instanceof BulkheadFullException) {
                 throw new DemoSREBulkheadFullException(e.getMessage());
             }

@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.bulkhead.ThreadPoolBulkhead;
 import io.github.resilience4j.bulkhead.ThreadPoolBulkheadRegistry;
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,10 +67,10 @@ class DemoSREControllerTest {
     private CircuitBreakerRegistry circuitBreakerRegistry;
 
     @Autowired
-    private BulkheadRegistry bulkhead;
+    private BulkheadRegistry bulkheadRegistry;
 
     @Autowired
-    private ThreadPoolBulkheadRegistry bulkheadRegistry;
+    private ThreadPoolBulkheadRegistry threadPoolBulkheadRegistry;
 
     @MockBean
     private DemoSRERepository demoSRERepositoryMock;
@@ -97,6 +96,7 @@ class DemoSREControllerTest {
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).reset();
         Mockito.reset(demoSRERepositoryMock);
         Mockito.reset(restTemplateMock);
+        threadPoolBulkheadRegistry.remove("bulkheadInstance");
 
     }
 
@@ -343,9 +343,8 @@ class DemoSREControllerTest {
     @Tag("comp")
     public void externalApiCall_ShouldReturn200WhenTheThreadPoolBulkheadIsEmpty() throws Exception {
         final String url = BASE_URL + "/externalApiCall/bulkheadThreadPool";
-        final String errorMessage = "BULKHEAD_FULL O serviço requisitado está indisponível.";
         final String response = "ok";
-        ThreadPoolBulkhead bulkheadInstance = bulkheadRegistry.bulkhead("bulkheadInstance");
+        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead("bulkheadInstance");
 
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
@@ -375,7 +374,7 @@ class DemoSREControllerTest {
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
 
-        ThreadPoolBulkhead bulkheadInstance = bulkheadRegistry.bulkhead("bulkheadInstance");
+        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead("bulkheadInstance");
         bulkheadInstance.executeRunnable(() -> runUselessTask() );
         bulkheadInstance.executeRunnable(() -> runUselessTask() );
 
