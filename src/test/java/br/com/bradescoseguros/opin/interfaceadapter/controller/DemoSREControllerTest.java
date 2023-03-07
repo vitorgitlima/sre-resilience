@@ -244,6 +244,7 @@ class DemoSREControllerTest {
 
         //Assert
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
+        verify(demoSRERepositoryMock, times(1)).save(any());
     }
 
     @Test
