@@ -46,12 +46,12 @@ class DemoSREValidatorTest {
         final DemoSRE demoSREMock = DemoSRE.builder().id(0).value("teste").build();
 
         //Act
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> validator.execute(null));
+        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> validator.execute(demoSREMock));
 
         //Assert
         assertThat(exception.getErrors()).isNotEmpty();
         assertThat(exception.getErrors()).hasSize(1);
-        verify(messageSourceService, times(1)).getMessage(anyString());
+        verify(messageSourceService, times(1)).getMessage(anyString(), anyString());
     }
 
     @Test
