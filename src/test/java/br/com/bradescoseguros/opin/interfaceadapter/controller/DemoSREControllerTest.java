@@ -501,6 +501,33 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
+    public void externalApiCall_ShouldReturn200WhenBulkheadRetryIsEmpty() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/externalApiCall/bulkheadRetry";
+        final String response = "ok";
+        Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
+
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class)))
+                .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(2);
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
+
+    }
+
+    @Test
+    @Tag("comp")
     public void externalApiCall_ShouldRetryWithBulkheadSemaphore() throws Exception {
         // Arrange
         final String urlChassi = BASE_URL + "/externalApiCall/bulkheadRetry";

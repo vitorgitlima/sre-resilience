@@ -73,18 +73,16 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @Override
     @Bulkhead(name = "semaphoreBulkhead")
     public String externalApiCallBulkhead() {
-        final String fullURL = "http://localhost:8081/api/sre/v1/extra/bulkhead";
 
-        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+        return callExternalApi("http://localhost:8081/api/sre/v1/extra/bulkhead");
     }
 
     @Override
     @Bulkhead(name = "semaphoreBulkhead")
     @Retry(name = "apiBulkhead")
     public String externalApiCallBulkheadRetry() {
-        final String fullURL = "http://localhost:8081/api/sre/v1/extra/bulkhead";
 
-        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+        return callExternalApi("http://localhost:8081/api/sre/v1/extra/bulkhead");
     }
 
     @Override
@@ -94,10 +92,16 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
         } catch (InterruptedException | ExecutionException e) {
             log.error(e.getMessage());
 
-            if(e.getCause() instanceof BulkheadFullException) {
+            if (e.getCause() instanceof BulkheadFullException) {
                 throw new DemoSREBulkheadFullException(e.getMessage());
             }
             throw new GatewayException(e);
         }
+    }
+
+    private String callExternalApi(String fullURL) {
+
+        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+
     }
 }
