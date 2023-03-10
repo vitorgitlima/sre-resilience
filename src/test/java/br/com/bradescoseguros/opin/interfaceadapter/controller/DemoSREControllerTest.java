@@ -9,12 +9,10 @@ import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.resilience4j.bulkhead.Bulkhead;
-import io.github.resilience4j.bulkhead.BulkheadRegistry;
-import io.github.resilience4j.bulkhead.ThreadPoolBulkhead;
-import io.github.resilience4j.bulkhead.ThreadPoolBulkheadRegistry;
+import io.github.resilience4j.bulkhead.*;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -59,7 +57,7 @@ class DemoSREControllerTest {
     @Autowired
     private DemoSREUseCase useCaseMock;
 
-    @SpyBean // confirmar uso do SpyBean - estava como @Autowired
+    @Autowired
     private DemoSREGateway demoSREGatewayMock;
 
     @Autowired
@@ -68,7 +66,7 @@ class DemoSREControllerTest {
     @Autowired
     private CircuitBreakerRegistry circuitBreakerRegistry;
 
-    @Autowired
+    @SpyBean
     private BulkheadRegistry bulkheadRegistry;
 
     @Autowired
@@ -83,8 +81,6 @@ class DemoSREControllerTest {
     @MockBean
     private Logger log;
 
-    @MockBean
-    Bulkhead bulkheadSemaphoreInstance;
 
     @Value("${spring.profiles.active}")
     private String activeProfile;
@@ -106,6 +102,12 @@ class DemoSREControllerTest {
         Mockito.reset(restTemplateMock);
         threadPoolBulkheadRegistry.remove(BULKHEAD_THREAD_POOL_CONFIG);
 
+    }
+
+    @AfterEach
+    public void tearsDown(){
+        BulkheadConfig bulkheadConfig = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG).getBulkheadConfig();
+        bulkheadRegistry.replace(BULKHEAD_SEMAPHORE_CONFIG, Bulkhead.of(BULKHEAD_SEMAPHORE_CONFIG, bulkheadConfig));
     }
 
 
@@ -445,7 +447,8 @@ class DemoSREControllerTest {
         Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
 
 
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class)))
+                .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
 
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -536,11 +539,10 @@ class DemoSREControllerTest {
         final String errorMessage = "DEMOSRE_MAX_RETRIES_EXCEEDED O serviço requisitado está indisponível.";
         final int retryBulkheadAttempts = retryRegistry.retry(RETRY_API_BULKHEAD).getRetryConfig().getMaxAttempts();
 
-        bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
+        Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
 
         bulkheadSemaphoreInstance.tryAcquirePermission();
         bulkheadSemaphoreInstance.tryAcquirePermission();
-
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class)))
                 .thenThrow(HttpServerErrorException.class);
@@ -558,8 +560,9 @@ class DemoSREControllerTest {
         //Assert
         assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(0);
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-        verify(bulkheadSemaphoreInstance, times(4)).tryAcquirePermission();
+        verify(bulkheadRegistry, times(retryBulkheadAttempts + 1)).bulkhead(eq(BULKHEAD_SEMAPHORE_CONFIG));
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
+
     }
 
     private void runUselessTask() {
