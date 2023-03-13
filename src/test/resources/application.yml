@@ -58,6 +58,14 @@ resilience4j.retry:
         - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
         - org.springframework.web.client.HttpServerErrorException
 
+    apiBulkhead:
+      baseConfig: default
+      maxAttempts: 2
+      waitDuration: 2s
+      retryExceptions:
+        - io.github.resilience4j.bulkhead.BulkheadFullException
+        - org.springframework.web.client.HttpServerErrorException
+
 resilience4j.circuitbreaker:
   configs:
     default:
@@ -78,3 +86,26 @@ resilience4j.circuitbreaker:
     apiCircuitBreaker:
       baseConfig: default
       automatic-transition-from-open-to-half-open-enabled: false
+
+
+resilience4j.bulkhead:
+  instances:
+    semaphoreBulkhead:
+      maxConcurrentCalls: 2
+      maxWaitDuration: 1s
+
+resilience4j:
+  thread-pool-bulkhead:
+    configs:
+      default:
+        maxThreadPoolSize: 1
+        coreThreadPoolSize: 1
+        queueCapacity: 1
+        keepAliveDuration: 20
+    instances:
+      bulkheadInstance:
+        baseConfig: default
+        maxThreadPoolSize: 1
+        coreThreadPoolSize: 1
+        queueCapacity: 1
+        keepAliveDuration: 20

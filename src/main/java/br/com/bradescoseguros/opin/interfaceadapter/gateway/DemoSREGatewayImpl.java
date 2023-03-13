@@ -1,10 +1,14 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
+import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
+import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBulkheadFullException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.configuration.redis.RedisConstants;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
+import io.github.resilience4j.bulkhead.BulkheadFullException;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Component
@@ -25,6 +30,9 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private DemoSREGatewayBulkheadThreadPool demoSREGatewayBulkheadThreadPool;
 
     @Override
     @Retry(name = "cosmoRetry")
@@ -60,5 +68,40 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
         final String fullURL = baseURL + statusCode.getStatusURL();
 
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+    }
+
+    @Override
+    @Bulkhead(name = "semaphoreBulkhead")
+    public String externalApiCallBulkhead() {
+
+        return callExternalApi("http://localhost:8081/api/sre/v1/extra/bulkhead");
+    }
+
+    @Override
+    @Bulkhead(name = "semaphoreBulkhead")
+    @Retry(name = "apiBulkhead")
+    public String externalApiCallBulkheadRetry() {
+
+        return callExternalApi("http://localhost:8081/api/sre/v1/extra/bulkhead");
+    }
+
+    @Override
+    public String externalApiCallThreadPoolBulkhead() {
+        try {
+            return demoSREGatewayBulkheadThreadPool.externalApiBulkheadThreadPool().get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage());
+
+            if (e.getCause() instanceof BulkheadFullException) {
+                throw new DemoSREBulkheadFullException(e.getMessage());
+            }
+            throw new GatewayException(e);
+        }
+    }
+
+    private String callExternalApi(String fullURL) {
+
+        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+
     }
 }

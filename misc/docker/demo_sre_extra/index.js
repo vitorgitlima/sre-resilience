@@ -13,6 +13,11 @@ app.get('/api/sre/v1/extra/ok', (req, res) => {
     res.status(200).send("ok");
 });
 
+app.get('/api/sre/v1/extra/bulkhead', async (req, res) => {
+    await new Promise(r => setTimeout(r, 20000));
+    res.status(200).send("ok");
+});
+
 app.get('/api/sre/v1/extra/nok404', (req, res) => {
     res.status(404).send("Erro 404 - Not Found");
 });
