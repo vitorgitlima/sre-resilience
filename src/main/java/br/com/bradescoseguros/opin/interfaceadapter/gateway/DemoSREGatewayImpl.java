@@ -121,6 +121,22 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
 
     }
 
+    @Retry(name = "apiTimeLimiter")
+    public String externalApiCallTimeLimiterWithRetry() {
+        try{
+            return demoSREGatewayTimeLimiter.externalApiTimeLimiterThreadPool().get();
+        } catch (InterruptedException | ExecutionException e){
+            log.error(e.getMessage());
+
+            if(e.getCause() instanceof TimeoutException){
+                throw new DemoSRETimeOutException(e.getMessage());
+            }
+            throw new GatewayException(e);
+        }
+
+    }
+
+
     private String callExternalApi(String fullURL) {
 
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();

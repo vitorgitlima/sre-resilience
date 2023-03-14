@@ -125,6 +125,11 @@ resilience4j.retry:
       waitDuration: 5s
       retryExceptions:
         - io.github.resilience4j.bulkhead.BulkheadFullException
+    apiTimeLimiter:
+      baseConfig: default
+      waitDuration: 5s
+      retryExceptions:
+        - br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRETimeOutException
 
 
 
