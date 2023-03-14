@@ -167,3 +167,11 @@ resilience4j:
         instances: # Define as instancias de bulkheads que teremos em nossa aplicação. Novas instancias podem ser criadas conforme necessário
           bulkheadInstance:
             baseConfig: default # Essa configuração indica que estamos herdando todas as configurações default. As definições seguintes sobrescrevem a configuração default e podem ser alteradas conforme necessário
+
+
+# Definições de Time Limiter
+resilience4j.timelimiter:
+  instances:
+    orderService:
+      timeoutDuration: 10s
+      cancelRunningFuture: true #whether cancel should be called on the running future

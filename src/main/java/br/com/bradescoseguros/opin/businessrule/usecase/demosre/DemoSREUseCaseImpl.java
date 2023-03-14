@@ -98,6 +98,8 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
         String bulkheadUrl = ExtraStatusCode.BULKHEAD.getStatusURL();
         String bulkheadRetryUrl = ExtraStatusCode.BULKHEAD_RETRY.getStatusURL();
         String bulkheadThreadPool = ExtraStatusCode.BULKHEAD_THREAD_POOL.getStatusURL();
+        String timeLimiter = ExtraStatusCode.TIME_LIMITER.getStatusURL();
+
 
         if (statusURL.equals(bulkheadUrl)) {
             log.info("Calling Bulkhead");
@@ -110,6 +112,10 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
         if(statusURL.equals(bulkheadThreadPool)) {
             log.info("Calling ThreadPoolBulkhead");
             return gateway.externalApiCallThreadPoolBulkhead();
+        }
+        if(statusURL.equals(timeLimiter)){
+            log.info("Calling TimeLimiter");
+            return gateway.externalApiCallTimeLimiter();
         }
 
         log.info("Calling ExternalApiCall");

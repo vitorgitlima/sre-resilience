@@ -2,6 +2,7 @@ package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
 import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBulkheadFullException;
+import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRETimeOutException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Component
@@ -33,6 +35,11 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
 
     @Autowired
     private DemoSREGatewayBulkheadThreadPool demoSREGatewayBulkheadThreadPool;
+
+    @Autowired
+    private DemoSREGatewayTimeLimiter demoSREGatewayTimeLimiter;
+
+
 
     @Override
     @Retry(name = "cosmoRetry")
@@ -97,6 +104,21 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
             }
             throw new GatewayException(e);
         }
+    }
+
+    @Override
+    public String externalApiCallTimeLimiter() {
+        try{
+            return demoSREGatewayTimeLimiter.externalApiTimeLimiterThreadPool().get();
+        } catch (InterruptedException | ExecutionException e){
+            log.error(e.getMessage());
+
+            if(e.getCause() instanceof TimeoutException){
+                throw new DemoSRETimeOutException(e.getMessage());
+            }
+            throw new GatewayException(e);
+        }
+
     }
 
     private String callExternalApi(String fullURL) {

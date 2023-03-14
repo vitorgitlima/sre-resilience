@@ -1,5 +1,6 @@
 package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
+import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSREUseCase;
 import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -589,6 +591,88 @@ class DemoSREControllerTest {
         assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(0);
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
         verify(bulkheadRegistry, times(retryBulkheadAttempts + 1)).bulkhead(eq(BULKHEAD_SEMAPHORE_CONFIG));
+        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
+
+    }
+
+    @Test
+    @Tag("comp")
+    public void TimeLimiter_ShouldReturn200WhenNotInvoked() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/externalApiCall/timeLimiter";
+        final String response = "ok";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
+            Thread.sleep(1000);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        });
+
+        // Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+
+        // Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
+
+    }
+
+    @Test
+    @Tag("comp")
+    public void TimeLimiter_ShouldReturn408WhenInvoked() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/externalApiCall/timeLimiter";
+        final String errorMessage = "TIME_OUT O serviço requisitado está indisponível.";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
+            Thread.sleep(3000);
+            return new ResponseEntity<>("response", HttpStatus.OK);
+        });
+
+        // Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
+
+        // Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.REQUEST_TIMEOUT.value());
+        assertThat(bodyResult.getErrors()).hasSize(1);
+        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
+
+    }
+
+    @Test
+    @Tag("comp")
+    public void TimeLimiter_ShouldReturn503whenGatewayException() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/externalApiCall/timeLimiter";
+        final String errorMessage = "GATEWAY_ERROR java.util.concurrent.ExecutionException: br.com.bradescoseguros.opin.businessrule.exception.GatewayException";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(GatewayException.class);
+
+        // Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
+
+        // Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
+        assertThat(bodyResult.getErrors()).hasSize(1);
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
 
     }

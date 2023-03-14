@@ -109,3 +109,10 @@ resilience4j:
         coreThreadPoolSize: 1
         queueCapacity: 1
         keepAliveDuration: 20
+
+
+resilience4j.timelimiter:
+  instances:
+    orderService:
+      timeoutDuration: 2s
+      cancelRunningFuture: true

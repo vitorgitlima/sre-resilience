@@ -142,7 +142,7 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 new MetaDataEnvelope(httpStatus.toString(), ErrorCode.BULKHEAD_FULL, exceptionMessage);
 
         final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
-        log.warn(errorMessage, exception);
+        log.error(errorMessage, exception);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
@@ -158,7 +158,23 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 new MetaDataEnvelope(httpStatus.toString(), ErrorCode.BULKHEAD_FULL, exceptionMessage);
 
         final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
-        log.warn(errorMessage, exception);
+        log.error(errorMessage, exception);
+
+        return handleExceptionInternal(exception, response, new HttpHeaders(),
+                httpStatus, request);
+    }
+
+    @ExceptionHandler(DemoSRETimeOutException.class)
+    public ResponseEntity<Object> handleDemoSRETimeOutException(final DemoSRETimeOutException exception, final WebRequest request) {
+
+        String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable", exception.getMessage());
+
+        HttpStatus httpStatus = HttpStatus.REQUEST_TIMEOUT;
+        MetaDataEnvelope response =
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.TIME_OUT, exceptionMessage);
+
+        final String errorMessage = MessageFormat.format("handleDemoSRETimeOutException: {0}", response);
+        log.error(errorMessage, exception);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
