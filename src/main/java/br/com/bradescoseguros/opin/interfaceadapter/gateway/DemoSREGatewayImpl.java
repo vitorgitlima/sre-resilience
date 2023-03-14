@@ -81,7 +81,7 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @Bulkhead(name = "semaphoreBulkhead")
     public String externalApiCallBulkhead() {
 
-        return callExternalApi("http://localhost:8081/api/sre/v1/extra/bulkhead");
+        return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
     }
 
     @Override
@@ -89,7 +89,7 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @Retry(name = "apiBulkhead")
     public String externalApiCallBulkheadRetry() {
 
-        return callExternalApi("http://localhost:8081/api/sre/v1/extra/bulkhead");
+        return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
     }
 
     @Override

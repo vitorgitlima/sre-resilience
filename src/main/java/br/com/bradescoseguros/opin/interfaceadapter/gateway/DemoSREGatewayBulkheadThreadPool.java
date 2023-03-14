@@ -16,7 +16,7 @@ public class DemoSREGatewayBulkheadThreadPool {
 
     @Bulkhead(name = "bulkheadInstance", type = Bulkhead.Type.THREADPOOL)
     public CompletableFuture<String> externalApiBulkheadThreadPool() {
-        final String fullURL = "http://localhost:8081/api/sre/v1/extra/bulkhead";
+        final String fullURL = "http://localhost:8081/api/sre/v1/extra/delay";
 
         return CompletableFuture.supplyAsync(() -> restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody());
     }

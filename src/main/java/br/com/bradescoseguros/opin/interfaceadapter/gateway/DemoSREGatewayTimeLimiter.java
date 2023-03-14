@@ -18,7 +18,7 @@ public class DemoSREGatewayTimeLimiter {
     @TimeLimiter(name = "orderService")
     public CompletableFuture<String> externalApiTimeLimiterThreadPool() {
 
-        final String fullURL = "http://localhost:8081/api/sre/v1/extra/timelimiter";
+        final String fullURL = "http://localhost:8081/api/sre/v1/extra/delay";
 
         return CompletableFuture.supplyAsync(() -> restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody());
     }

@@ -13,12 +13,7 @@ app.get('/api/sre/v1/extra/ok', (req, res) => {
     res.status(200).send("ok");
 });
 
-app.get('/api/sre/v1/extra/bulkhead', async (req, res) => {
-    await new Promise(r => setTimeout(r, 20000));
-    res.status(200).send("ok");
-});
-
-app.get('/api/sre/v1/extra/timeLimiter', async (req, res) => {
+app.get('/api/sre/v1/extra/delay', async (req, res) => {
     await new Promise(r => setTimeout(r, 20000));
     res.status(200).send("ok");
 });

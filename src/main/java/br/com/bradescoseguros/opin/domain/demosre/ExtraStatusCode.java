@@ -14,7 +14,6 @@ public enum ExtraStatusCode {
     BULKHEAD("bulkhead"),
     BULKHEAD_RETRY("bulkheadRetry"),
     BULKHEAD_THREAD_POOL("bulkheadThreadPool"),
-
     TIME_LIMITER("timeLimiter");
 
 
