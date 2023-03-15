@@ -166,7 +166,7 @@ class DemoSREControllerTest {
     void getDemoSRE_ShouldReturnExceptionWhenCircuitIsOpened() throws Exception {
         //Arrange
         final String url = BASE_URL + "/getDemoSRE/" + 2;
-        final String errorMessage = "DEMOSRE_CIRCUIT_OPENED O circuito cosmoCircuitBreaker que está registrado para esta operação está ABERTO, novas requisições estão temporariamente suspensas.";
+        final String errorMessage = "LOCKED O circuito cosmoCircuitBreaker que está registrado para esta operação está ABERTO, novas requisições estão temporariamente suspensas.";
         circuitBreakerRegistry.circuitBreaker(CB_COSMO_CONFIG).transitionToOpenState();
 
         when(demoSRERepositoryMock.findById(anyInt())).thenThrow(org.springframework.dao.DataAccessResourceFailureException.class);
@@ -331,7 +331,7 @@ class DemoSREControllerTest {
     void externalApiCall_ShouldReturnExceptionWhenCircuitIsOpened() throws Exception {
         //Arrange
         final String url = BASE_URL + "/externalApiCall/ok";
-        final String errorMessage = "DEMOSRE_CIRCUIT_OPENED O circuito apiCircuitBreaker que está registrado para esta operação está ABERTO, novas requisições estão temporariamente suspensas.";
+        final String errorMessage = "LOCKED O circuito apiCircuitBreaker que está registrado para esta operação está ABERTO, novas requisições estão temporariamente suspensas.";
 
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).transitionToOpenState();
 
@@ -355,7 +355,7 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
-    public void externalApiCall_ShouldReturn200WhenTheThreadPoolBulkheadIsEmpty() throws Exception {
+    void externalApiCall_ShouldReturn200WhenTheThreadPoolBulkheadIsEmpty() throws Exception {
         //Arrange
         final String url = BASE_URL + "/externalApiCall/bulkheadThreadPool";
         final String response = "ok";
@@ -382,7 +382,7 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
-    public void externalApiCall_ShouldReturn503WhenTheThreadPoolBulkheadIsFull() throws Exception {
+    void externalApiCall_ShouldReturn503WhenTheThreadPoolBulkheadIsFull() throws Exception {
 
         final String url = BASE_URL + "/externalApiCall/bulkheadThreadPool";
         final String errorMessage = "BULKHEAD_FULL O serviço requisitado está indisponível.";
@@ -392,8 +392,8 @@ class DemoSREControllerTest {
 
         ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead(BULKHEAD_THREAD_POOL_CONFIG);
 
-        bulkheadInstance.executeRunnable(() -> runUselessTask());
-        bulkheadInstance.executeRunnable(() -> runUselessTask());
+        bulkheadInstance.executeRunnable(this::runUselessTask);
+        bulkheadInstance.executeRunnable(this::runUselessTask);
 
 
         //Act
@@ -416,7 +416,7 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
-    public void externalApiCall_ShouldReturn503WhenTheThreadPoolBulkheadReturnsError() throws Exception {
+    void externalApiCall_ShouldReturn503WhenTheThreadPoolBulkheadReturnsError() throws Exception {
 
         final String url = BASE_URL + "/externalApiCall/bulkheadThreadPool";
 
@@ -443,7 +443,7 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
-    public void externalApiCall_ShouldReturn200WhenBulkheadSemaphoreIsEmpty() throws Exception {
+    void externalApiCall_ShouldReturn200WhenBulkheadSemaphoreIsEmpty() throws Exception {
         // Arrange
         final String url = BASE_URL + "/externalApiCall/bulkhead";
         final String response = "ok";
@@ -470,7 +470,7 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
-    public void externalApiCall_ShouldReturn503WhenBulkheadSemaphoreIsFull() throws Exception {
+    void externalApiCall_ShouldReturn503WhenBulkheadSemaphoreIsFull() throws Exception {
         // Arrange
         final String url = BASE_URL + "/externalApiCall/bulkhead";
         final String errorMessage = "BULKHEAD_FULL O serviço requisitado está indisponível.";
@@ -503,7 +503,7 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
-    public void externalApiCall_ShouldReturn200WhenBulkheadRetryIsEmpty() throws Exception {
+    void externalApiCall_ShouldReturn200WhenBulkheadRetryIsEmpty() throws Exception {
         // Arrange
         final String url = BASE_URL + "/externalApiCall/bulkheadRetry";
         final String response = "ok";
@@ -530,10 +530,10 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
-    public void externalApiCall_ShouldRetryWithBulkheadSemaphore() throws Exception {
+    void externalApiCall_ShouldRetryWithBulkheadSemaphore() throws Exception {
         // Arrange
         final String urlChassi = BASE_URL + "/externalApiCall/bulkheadRetry";
-        final String errorMessage = "DEMOSRE_MAX_RETRIES_EXCEEDED O serviço requisitado está indisponível.";
+        final String errorMessage = "MAX_RETRIES_EXCEEDED Número máximo de tentativas excedido.";
         final int retryBulkheadAttempts = retryRegistry.retry(RETRY_API_BULKHEAD).getRetryConfig().getMaxAttempts();
 
         Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
@@ -563,10 +563,10 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
-    public void externalApiCall_ShouldRetryWhenBulkheadSemaphoreisFull() throws Exception {
+    void externalApiCall_ShouldRetryWhenBulkheadSemaphoreisFull() throws Exception {
         // Arrange
         final String urlChassi = BASE_URL + "/externalApiCall/bulkheadRetry";
-        final String errorMessage = "DEMOSRE_MAX_RETRIES_EXCEEDED O serviço requisitado está indisponível.";
+        final String errorMessage = "MAX_RETRIES_EXCEEDED Número máximo de tentativas excedido.";
         final int retryBulkheadAttempts = retryRegistry.retry(RETRY_API_BULKHEAD).getRetryConfig().getMaxAttempts();
 
         Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
@@ -588,9 +588,9 @@ class DemoSREControllerTest {
         MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
 
         //Assert
-        assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(0);
+        assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isZero();
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-        verify(bulkheadRegistry, times(retryBulkheadAttempts + 1)).bulkhead(eq(BULKHEAD_SEMAPHORE_CONFIG));
+        verify(bulkheadRegistry, times(retryBulkheadAttempts + 1)).bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
 
     }
@@ -682,7 +682,7 @@ class DemoSREControllerTest {
     public void TimeLimiter_ShouldReturn503whenMaxRetriesExceeded() throws Exception {
 
         final String url = BASE_URL + "/externalApiCall/timeLimiterRetry";
-        final String errorMessage = "DEMOSRE_MAX_RETRIES_EXCEEDED O serviço requisitado está indisponível.";
+        final String errorMessage = "MAX_RETRIES_EXCEEDED Número máximo de tentativas excedido.";
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
             Thread.sleep(3000);

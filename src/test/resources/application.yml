@@ -71,6 +71,8 @@ resilience4j.retry:
         - br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRETimeOutException
 
 
+sre.resilience.retry.throw-sre-max-retries-exceed: true
+
 resilience4j.circuitbreaker:
   configs:
     default:
