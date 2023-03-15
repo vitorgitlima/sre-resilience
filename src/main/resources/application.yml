@@ -92,6 +92,8 @@ jetty:
     max: 300
     idle-timeout: 15000
 
+sre.resilience.retry.throw-sre-max-retries-exceed: true
+
 # Definições de Retry
 resilience4j.retry:
   configs:

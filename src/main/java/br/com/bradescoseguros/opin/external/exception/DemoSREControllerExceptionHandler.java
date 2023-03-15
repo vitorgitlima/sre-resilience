@@ -59,12 +59,12 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
         String exceptionMessage = exception.getMessage();
 
         if (!StringUtils.hasText(exceptionMessage)) {
-            exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable");
+            exceptionMessage = messageSourceService.getMessage("sre.max-retries-exceed");
         }
 
         HttpStatus httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
         MetaDataEnvelope response =
-                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.DEMOSRE_MAX_RETRIES_EXCEEDED, exceptionMessage);
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.MAX_RETRIES_EXCEEDED, exceptionMessage);
 
         if (!isEmpty(exception.getErrors())) {
             final MetaData meta = new MetaData(httpStatus.toString(), MDC.get("TRACE_ID"));
@@ -119,11 +119,11 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
     @ExceptionHandler(CallNotPermittedException.class)
     public ResponseEntity<Object> handleCallNotPermittedException(final CallNotPermittedException exception, final WebRequest request) {
 
-        String exceptionMessage = messageSourceService.getMessage("demo-sre.circuit-opened", exception.getCausingCircuitBreakerName());
+        String exceptionMessage = messageSourceService.getMessage("sre.circuit-opened", exception.getCausingCircuitBreakerName());
 
         HttpStatus httpStatus = HttpStatus.LOCKED;
         MetaDataEnvelope response =
-                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.DEMOSRE_CIRCUIT_OPENED, exceptionMessage);
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.LOCKED, exceptionMessage);
 
         final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
         log.warn(errorMessage, exception);

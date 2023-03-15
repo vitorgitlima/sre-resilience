@@ -70,7 +70,6 @@ docker container ls -aq -f "name=$container_name" | xargs docker rm -f "{}" 2> /
 echo -e "\033[34mExecutando DOCKER RUN com os parametros -m '$max_memory' --memory-reservation='$reservation' $cpus_args --name '$container_name' '$container_image'\033[0m"
 docker run -id \
 	-p 8080:8080 \
-	-p 9010:9010 \
 	-m "$max_memory" \
 	--memory-reservation="$reservation" \
 	-e MONGO_HOST='docker_mongo_1' \
@@ -79,6 +78,8 @@ docker run -id \
 	--name $container_name \
   --cpus="$max_cpus" \
 	$container_image
+
+#-p 9010:9010 \
 
 container_id=$(docker ps -q -f "name=$container_name")
 
