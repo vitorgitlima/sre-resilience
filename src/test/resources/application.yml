@@ -57,7 +57,6 @@ resilience4j.retry:
       retryExceptions:
         - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
         - org.springframework.web.client.HttpServerErrorException
-
     apiBulkhead:
       baseConfig: default
       maxAttempts: 2
@@ -65,6 +64,12 @@ resilience4j.retry:
       retryExceptions:
         - io.github.resilience4j.bulkhead.BulkheadFullException
         - org.springframework.web.client.HttpServerErrorException
+    apiTimeLimiter:
+      baseConfig: default
+      waitDuration: 2s
+      retryExceptions:
+        - br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRETimeOutException
+
 
 resilience4j.circuitbreaker:
   configs:

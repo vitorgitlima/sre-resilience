@@ -677,6 +677,38 @@ class DemoSREControllerTest {
 
     }
 
+    @Test
+    @Tag("comp")
+    public void TimeLimiter_ShouldReturn503whenMaxRetriesExceeded() throws Exception {
+
+        final String url = BASE_URL + "/externalApiCall/timeLimiterRetry";
+        final String errorMessage = "DEMOSRE_MAX_RETRIES_EXCEEDED O serviço requisitado está indisponível.";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
+            Thread.sleep(3000);
+            return new ResponseEntity<>("response", HttpStatus.OK);
+        });
+
+
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+
+        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
+
+
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
+        assertThat(bodyResult.getErrors()).hasSize(1);
+        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
+        verify(restTemplateMock, times(3)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
+    }
+
+
     private void runUselessTask() {
         try {
             Thread.sleep(10000);
