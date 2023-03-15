@@ -66,6 +66,8 @@ resilience4j.retry:
         - io.github.resilience4j.bulkhead.BulkheadFullException
         - org.springframework.web.client.HttpServerErrorException
 
+sre.resilience.retry.throw-sre-max-retries-exceed: true
+
 resilience4j.circuitbreaker:
   configs:
     default:

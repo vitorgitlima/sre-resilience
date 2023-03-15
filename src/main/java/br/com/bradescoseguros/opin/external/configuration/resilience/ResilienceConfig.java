@@ -8,6 +8,7 @@ import io.github.resilience4j.core.registry.EntryReplacedEvent;
 import io.github.resilience4j.core.registry.RegistryEventConsumer;
 import io.github.resilience4j.retry.Retry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,7 +19,7 @@ import java.text.MessageFormat;
 public class ResilienceConfig {
 
     @Bean
-    public RegistryEventConsumer<Retry> myRetryRegistryEventConsumer() {
+    public RegistryEventConsumer<Retry> myRetryRegistryEventConsumer(@Value("${sre.resilience.retry.throw-sre-max-retries-exceed:false}") boolean useSRERetryException) {
 
         return new RegistryEventConsumer<Retry>() {
             @Override
@@ -30,7 +31,7 @@ public class ResilienceConfig {
                                     event.getCreationTime(), event.getName(), event.getNumberOfRetryAttempts(), maxAttemps, event.getLastThrowable());
                             log.info(logMessage);
 
-                            if (event.getNumberOfRetryAttempts() >= maxAttemps) {
+                            if (useSRERetryException && event.getNumberOfRetryAttempts() >= maxAttemps) {
                                 throw new DemoSREMaxRetriesExceededException();
                             }
                         });
