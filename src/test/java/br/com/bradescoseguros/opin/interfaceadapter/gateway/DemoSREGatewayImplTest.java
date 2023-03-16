@@ -21,8 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
@@ -124,6 +123,7 @@ class DemoSREGatewayImplTest {
 
         GatewayException gatewayException = assertThrows(GatewayException.class, () -> gateway.externalApiCallTimeLimiter());
         assertEquals("teste", gatewayException.getMessage());
+        assertTrue(Thread.currentThread().isInterrupted());
     }
 
     @Test
@@ -136,5 +136,6 @@ class DemoSREGatewayImplTest {
 
         GatewayException gatewayException = assertThrows(GatewayException.class, () -> gateway.externalApiCallThreadPoolBulkhead());
         assertEquals("teste", gatewayException.getMessage());
+        assertTrue(Thread.currentThread().isInterrupted());
     }
 }
