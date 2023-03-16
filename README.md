@@ -29,10 +29,10 @@
 - docker-compose ([Install](https://docs.docker.com/compose/install/ "Install"))
 
 ### Clean Architecture
-![Alt text](docs/clean_architecture.png?raw=true "Clean Architecture Cone")
+![Alt text](./docs/clean_architecture.png "Clean Architecture Cone")
 
 ### Packages structure
-![Alt text](docs/packages_clean_architecture.png?raw=true "Clean Architecture Cone")
+![Alt text](./docs/packages_clean_architecture.png "Clean Architecture Cone")
 
 * businessrule -> Use case, i.e. the application's business rules.
     - dto -> Middle classes created to group multiple objects into one.
@@ -80,7 +80,7 @@ docker-compose -f misc/docker/docker-compose.yml up -d
     Add parameter in 'Environment variables:' 
       spring.profiles.active=development
   
-    ![Alt text](docs/application_environment.png?raw=true "Edit Configuration / Environment variables")
+    ![Alt text](./docs/application_environment.png "Edit Configuration / Environment variables")
 
 
 ### Removing apllication and reset data on Mongo
