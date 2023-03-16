@@ -96,9 +96,12 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     public String externalApiCallThreadPoolBulkhead() {
         try {
             return demoSREGatewayBulkheadThreadPool.externalApiBulkheadThreadPool().get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             log.error(e.getMessage());
-
+            Thread.currentThread().interrupt();
+            throw new GatewayException(e.getMessage());
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
             if (e.getCause() instanceof BulkheadFullException) {
                 throw new DemoSREBulkheadFullException(e.getMessage());
             }
@@ -127,13 +130,17 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     private String callExternalApiWithCompletableFuture() {
         try{
             return demoSREGatewayTimeLimiter.externalApiTimeLimiterThreadPool().get();
-        } catch (InterruptedException | ExecutionException e){
+        } catch (InterruptedException e) {
             log.error(e.getMessage());
-
+            Thread.currentThread().interrupt();
+            throw new GatewayException(e.getMessage());
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
             if(e.getCause() instanceof TimeoutException){
                 throw new DemoSRETimeOutException(e.getMessage());
             }
             throw new GatewayException(e);
         }
+
     }
 }

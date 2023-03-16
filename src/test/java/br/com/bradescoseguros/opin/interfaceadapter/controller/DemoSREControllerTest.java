@@ -680,7 +680,7 @@ class DemoSREControllerTest {
 
     @Test
     @Tag("comp")
-    public void TimeLimiter_ShouldReturn503whenMaxRetriesExceeded() throws Exception {
+    public void TimeLimiterWithRetry_ShouldReturn503whenMaxRetriesExceeded() throws Exception {
         // Arrange
         final String url = BASE_URL + "/externalApiCall/timeLimiterRetry";
         final String errorMessage = "MAX_RETRIES_EXCEEDED Número máximo de tentativas excedido.";
@@ -708,6 +708,33 @@ class DemoSREControllerTest {
         assertThat(bodyResult.getErrors()).hasSize(1);
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
         verify(restTemplateMock, times(retriesAttemps)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
+    }
+
+    @Test
+    @Tag("comp")
+    public void TimeLimiterWithRetry_ShouldReturn200WhenNotInvoked() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/externalApiCall/timeLimiterRetry";
+        final String response = "ok";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
+            Thread.sleep(1000);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        });
+
+        // Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+
+        // Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
+
     }
 
 
