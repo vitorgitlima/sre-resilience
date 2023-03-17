@@ -1,9 +1,8 @@
 # Chassi SRE
-
 ## Topics
 - Resilience
-  - [Retry &#x1F517;](README-RETRY.md "Readme for Retry Structure")
-  - [Circuit Breaker &#x1F517;](README-CB.md "Readme for Circuit Breaker Structure")
+  - [Retry](README-RETRY.md "Readme for Retry Structure") :link:
+  - [Circuit](README-CB.md "Readme for Circuit Breaker Structure") :link:
 - [Project Strutucre](#project-strutucre "Project Strutucre")
   - [Pre-Requires](#pre-requires "Pre-Requires")
   - [Clean Architecture](#clean-architecture "Clean Architecture")
@@ -190,17 +189,7 @@ sudo sh get-docker.sh
 sudo apt-get install docker-compose
 ```
 
-- Docker permission denied
-
-```bash
-sudo usermod -aG docker $(whoami)
-sudo chmod 777 /var/run/docker.sock
-docker ps
-
-  ```
-
-- With Redis UP, to access redis-cli inside container run the following command:
-
+- Docker permission denied:link:
 ```sh
 docker exec -it <nome_container> redis-cli
 ```
