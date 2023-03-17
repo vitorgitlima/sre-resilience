@@ -16,7 +16,7 @@ This pattern helps us to reduce the number of errors that are received by our us
 
 But be careful, we need to analyze each scenario. In some cases, if we get an error and keep retrying, we can get more errors and cause more problems in the external service, for example.
 
-To implement this pattern, we use resilience4j. More information can be found at [Resilience4 Retry Documentation](https://resilience4j.readme.io/docs/retry) :link:
+To implement this pattern, we use resilience4j. More information can be found at [Resilience4j Retry Documentation](https://resilience4j.readme.io/docs/retry) :link:
 
 ## Setting up
 
