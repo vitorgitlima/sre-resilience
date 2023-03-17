@@ -96,7 +96,6 @@ class DemoSREControllerTest {
     private final static String BULKHEAD_THREAD_POOL_CONFIG = "bulkheadInstance";
     private final static String BULKHEAD_SEMAPHORE_CONFIG = "semaphoreBulkhead";
     private final static String RETRY_API_BULKHEAD = "apiBulkhead";
-    private final static String RETRY_API_TIME_LIMITER = "apiTimeLimiter";
 
     @BeforeEach
     public void setUp() {
@@ -625,92 +624,11 @@ class DemoSREControllerTest {
 
     }
 
-    @Test
-    @Tag("comp")
-    public void TimeLimiter_ShouldReturn408WhenInvoked() throws Exception {
-        // Arrange
-        final String url = BASE_URL + "/externalApiCall/timeLimiter";
-        final String errorMessage = "TIME_OUT O serviço requisitado está indisponível.";
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
-            Thread.sleep(3000);
-            return new ResponseEntity<>("response", HttpStatus.OK);
-        });
-
-        // Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
-
-        // Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.REQUEST_TIMEOUT.value());
-        assertThat(bodyResult.getErrors()).hasSize(1);
-        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
-
-    }
-
-    @Test
-    @Tag("comp")
-    public void TimeLimiter_ShouldReturn503whenGatewayException() throws Exception {
-        // Arrange
-        final String url = BASE_URL + "/externalApiCall/timeLimiter";
-        final String errorMessage = "GATEWAY_ERROR java.util.concurrent.ExecutionException: br.com.bradescoseguros.opin.businessrule.exception.GatewayException";
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(GatewayException.class);
-
-        // Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
-
-        // Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-        assertThat(bodyResult.getErrors()).hasSize(1);
-        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
-
-    }
-
-    @Test
-    @Tag("comp")
-    public void TimeLimiterWithRetry_ShouldReturn503whenMaxRetriesExceeded() throws Exception {
-        // Arrange
-        final String url = BASE_URL + "/externalApiCall/timeLimiterRetry";
-        final String errorMessage = "MAX_RETRIES_EXCEEDED Número máximo de tentativas excedido.";
-        final int retriesAttemps = retryRegistry.retry(RETRY_API_TIME_LIMITER).getRetryConfig().getMaxAttempts();
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
-            Thread.sleep(3000);
-            return new ResponseEntity<>("response", HttpStatus.OK);
-        });
 
 
-        // Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
 
 
-        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
 
-        // Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-        assertThat(bodyResult.getErrors()).hasSize(1);
-        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
-        verify(restTemplateMock, times(retriesAttemps)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
-    }
 
     @Test
     @Tag("comp")

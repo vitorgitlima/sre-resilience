@@ -22,7 +22,4 @@ public interface DemoSREGateway {
 
     String externalApiCallThreadPoolBulkhead();
 
-    String externalApiCallTimeLimiter();
-
-    String externalApiCallTimeLimiterWithRetry();
 }

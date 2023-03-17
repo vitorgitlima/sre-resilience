@@ -13,9 +13,7 @@ public enum ExtraStatusCode {
     GATEWAY_TIMEOUT("nok504"),
     BULKHEAD("bulkhead"),
     BULKHEAD_RETRY("bulkheadRetry"),
-    BULKHEAD_THREAD_POOL("bulkheadThreadPool"),
-    TIME_LIMITER("timeLimiter"),
-    TIME_LIMITER_RETRY("timeLimiterRetry");
+    BULKHEAD_THREAD_POOL("bulkheadThreadPool");
 
 
     @Getter

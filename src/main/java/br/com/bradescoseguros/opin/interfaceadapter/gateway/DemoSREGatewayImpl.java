@@ -2,7 +2,6 @@ package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
 import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBulkheadFullException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRETimeOutException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
@@ -22,7 +21,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Component
@@ -34,10 +32,8 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     private RestTemplate restTemplate;
 
     @Autowired
-    private DemoSREGatewayBulkheadThreadPool demoSREGatewayBulkheadThreadPool;
+    private DemoSREGatewayBulkheadThreadPoolAnotation demoSREGatewayBulkheadThreadPoolAnotation;
 
-    @Autowired
-    private DemoSREGatewayTimeLimiter demoSREGatewayTimeLimiter;
 
 
 
@@ -95,7 +91,7 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @Override
     public String externalApiCallThreadPoolBulkhead() {
         try {
-            return demoSREGatewayBulkheadThreadPool.externalApiBulkheadThreadPool().get();
+            return demoSREGatewayBulkheadThreadPoolAnotation.externalApiBulkheadThreadPool().get();
         } catch (InterruptedException e) {
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
@@ -109,38 +105,9 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
         }
     }
 
-    @Override
-    public String externalApiCallTimeLimiter() {
-
-        return callExternalApiWithCompletableFuture();
-    }
-
-    @Override
-    @Retry(name = "apiTimeLimiter")
-    public String externalApiCallTimeLimiterWithRetry() {
-
-        return callExternalApiWithCompletableFuture();
-    }
 
     private String callExternalApi(String fullURL) {
 
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
-    }
-
-    private String callExternalApiWithCompletableFuture() {
-        try{
-            return demoSREGatewayTimeLimiter.externalApiTimeLimiterThreadPool().get();
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-            Thread.currentThread().interrupt();
-            throw new GatewayException(e.getMessage());
-        } catch (ExecutionException e) {
-            log.error(e.getMessage());
-            if(e.getCause() instanceof TimeoutException){
-                throw new DemoSRETimeOutException(e.getMessage());
-            }
-            throw new GatewayException(e);
-        }
-
     }
 }
