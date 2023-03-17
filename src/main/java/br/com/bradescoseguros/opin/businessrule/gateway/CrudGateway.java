@@ -16,10 +16,6 @@ public interface CrudGateway {
 
     String externalApiCall(final ExtraStatusCode status);
 
-    String externalApiCallBulkhead();
 
-    String externalApiCallBulkheadRetry();
-
-    String externalApiCallThreadPoolBulkhead();
 
 }

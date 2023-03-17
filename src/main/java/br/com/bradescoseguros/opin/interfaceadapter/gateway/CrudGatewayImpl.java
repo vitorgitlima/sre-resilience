@@ -30,9 +30,6 @@ public class CrudGatewayImpl implements CrudGateway {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Autowired
-    private BulkheadThreadPoolGatewayAnotation bulkheadThreadPoolGatewayAnotation;
-
 
 
 
@@ -72,41 +69,8 @@ public class CrudGatewayImpl implements CrudGateway {
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
     }
 
-    @Override
-    @Bulkhead(name = "semaphoreBulkhead")
-    public String externalApiCallBulkhead() {
-
-        return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
-    }
-
-    @Override
-    @Bulkhead(name = "semaphoreBulkhead")
-    @Retry(name = "apiBulkhead")
-    public String externalApiCallBulkheadRetry() {
-
-        return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
-    }
-
-    @Override
-    public String externalApiCallThreadPoolBulkhead() {
-        try {
-            return bulkheadThreadPoolGatewayAnotation.externalApiBulkheadThreadPool().get();
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
-            Thread.currentThread().interrupt();
-            throw new GatewayException(e.getMessage());
-        } catch (ExecutionException e) {
-            log.error(e.getMessage());
-            if (e.getCause() instanceof io.github.resilience4j.bulkhead.BulkheadFullException) {
-                throw new BulkheadFullException(e.getMessage());
-            }
-            throw new GatewayException(e);
-        }
-    }
 
 
-    private String callExternalApi(String fullURL) {
 
-        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
-    }
+
 }

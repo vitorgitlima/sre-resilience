@@ -95,23 +95,6 @@ public class CrudUseCaseImpl implements CrudUseCase {
         log.info("Status: " + status.getStatusURL());
 
         String statusURL = status.getStatusURL();
-        String bulkheadUrl = ExtraStatusCode.BULKHEAD.getStatusURL();
-        String bulkheadRetryUrl = ExtraStatusCode.BULKHEAD_RETRY.getStatusURL();
-        String bulkheadThreadPool = ExtraStatusCode.BULKHEAD_THREAD_POOL.getStatusURL();
-
-
-        if (statusURL.equals(bulkheadUrl)) {
-            log.info("Calling Bulkhead");
-            return gateway.externalApiCallBulkhead();
-        }
-        if (statusURL.equals(bulkheadRetryUrl)) {
-            log.info("Calling BulkheadRetry");
-            return gateway.externalApiCallBulkheadRetry();
-        }
-        if(statusURL.equals(bulkheadThreadPool)) {
-            log.info("Calling ThreadPoolBulkhead");
-            return gateway.externalApiCallThreadPoolBulkhead();
-        }
 
         log.info("Calling ExternalApiCall");
         return gateway.externalApiCall(status);
