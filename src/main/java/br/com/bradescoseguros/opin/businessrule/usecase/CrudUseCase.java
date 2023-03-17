@@ -1,9 +1,9 @@
-package br.com.bradescoseguros.opin.businessrule.usecase.demosre;
+package br.com.bradescoseguros.opin.businessrule.usecase;
 
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
-import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 
-public interface DemoSREUseCase {
+public interface CrudUseCase {
     DemoSRE getDemoSRE(final Integer id);
 
     void insertDemoSRE(final DemoSRE payload);

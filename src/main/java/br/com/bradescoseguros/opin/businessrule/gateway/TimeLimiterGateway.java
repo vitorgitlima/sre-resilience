@@ -1,6 +1,6 @@
 package br.com.bradescoseguros.opin.businessrule.gateway;
 
-public interface DemoSRETimeLimiterGateway {
+public interface TimeLimiterGateway {
 
     String externalApiCallTimeLimiter();
 

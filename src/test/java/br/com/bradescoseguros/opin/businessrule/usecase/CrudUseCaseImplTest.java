@@ -1,14 +1,14 @@
-package br.com.bradescoseguros.opin.businessrule.usecase.demosre;
+package br.com.bradescoseguros.opin.businessrule.usecase;
 
+import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBadRequestException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRENoContentException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRERegistryAlreadyExistsException;
-import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
+import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
+import br.com.bradescoseguros.opin.businessrule.exception.RegistryAlreadyExistsException;
+import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
-import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
@@ -26,10 +26,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class DemoSREUseCaseImplTest {
+class CrudUseCaseImplTest {
 
     @Mock
-    private DemoSREGateway mockGateway;
+    private CrudGateway mockGateway;
 
     @Mock
     private DemoSREValidator mockValidator;
@@ -38,7 +38,7 @@ class DemoSREUseCaseImplTest {
     private MessageSourceService mockMessageSourceService;
 
     @InjectMocks
-    private DemoSREUseCase useCase = new DemoSREUseCaseImpl();
+    private CrudUseCase useCase = new CrudUseCaseImpl();
 
     private static final String MESSAGE_MOCK = "teste";
 
@@ -70,7 +70,7 @@ class DemoSREUseCaseImplTest {
         when(mockGateway.findById(anyInt())).thenReturn(Optional.empty());
 
         //Act
-        DemoSRENoContentException exception = Assertions.assertThrows(DemoSRENoContentException.class, () -> useCase.getDemoSRE(id));
+        NoContentException exception = Assertions.assertThrows(NoContentException.class, () -> useCase.getDemoSRE(id));
 
         //Assert
         assertThat(exception.getMessage()).isEqualTo(MESSAGE_MOCK);
@@ -108,7 +108,7 @@ class DemoSREUseCaseImplTest {
         doNothing().when(mockValidator).execute(any());
 
         //Act
-        DemoSRERegistryAlreadyExistsException exception = Assertions.assertThrows(DemoSRERegistryAlreadyExistsException.class, () -> useCase.insertDemoSRE(demoSRE));
+        RegistryAlreadyExistsException exception = Assertions.assertThrows(RegistryAlreadyExistsException.class, () -> useCase.insertDemoSRE(demoSRE));
 
         //Assert
         assertThat(exception.getMessage()).isEqualTo(messageError);
@@ -211,7 +211,7 @@ class DemoSREUseCaseImplTest {
         final String messageError = "O status informado não é suportado pela aplicação.";
 
         //Act
-        DemoSREBadRequestException exception = Assertions.assertThrows(DemoSREBadRequestException.class, () -> useCase.externalApiCall(null));
+        BadRequestException exception = Assertions.assertThrows(BadRequestException.class, () -> useCase.externalApiCall(null));
 
         //Assert
         assertThat(exception.getMessage()).isEqualTo(messageError);

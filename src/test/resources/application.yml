@@ -68,7 +68,7 @@ resilience4j.retry:
       baseConfig: default
       waitDuration: 2s
       retryExceptions:
-        - br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRETimeOutException
+        - br.com.bradescoseguros.opin.interfaceadapter.exception.TimeOutException
 
 
 sre.resilience.retry.throw-sre-max-retries-exceed: true

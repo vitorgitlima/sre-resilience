@@ -1,6 +1,6 @@
 package br.com.bradescoseguros.opin.external.configuration.mongodb;
 
-import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
+import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
@@ -15,19 +15,19 @@ import java.util.Map;
 @Slf4j
 public class MongoCheckConfig {
 
-    private final DemoSRERepository demoSRERepository;
+    private final CrudRepository crudRepository;
 
     @Scheduled(fixedDelay = 60000)
     public void scheduleFixedDelayTask() {
 
         Map<String, String> countLog = new HashMap<>(Map.of(
-                "Check connection mongo - obfuscated", String.valueOf(demoSRERepository.count())
+                "Check connection mongo - obfuscated", String.valueOf(crudRepository.count())
         ));
 
         JSONObject countLogDetails = new JSONObject(countLog);
 
         log.info(String.valueOf(countLogDetails));
 
-        log.info("Check connection mongo - " + demoSRERepository.count());
+        log.info("Check connection mongo - " + crudRepository.count());
     }
 }

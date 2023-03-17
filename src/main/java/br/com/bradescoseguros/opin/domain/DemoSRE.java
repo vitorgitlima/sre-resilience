@@ -1,4 +1,4 @@
-package br.com.bradescoseguros.opin.domain.demosre;
+package br.com.bradescoseguros.opin.domain;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;

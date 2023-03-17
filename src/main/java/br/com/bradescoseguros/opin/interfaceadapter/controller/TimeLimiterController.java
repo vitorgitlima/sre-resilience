@@ -1,6 +1,6 @@
 package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
-import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSRETimeLimiterUsecase;
+import br.com.bradescoseguros.opin.businessrule.usecase.TimeLimiterUsecase;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/sre/v1/timelimiter")
-public class DemoSRETimeLimiterController {
+public class TimeLimiterController {
 
     @Autowired
-    private DemoSRETimeLimiterUsecase demoSRETimeLimiterUsecase;
+    private TimeLimiterUsecase timeLimiterUsecase;
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter.",
             description = "Realiza uma chamada externa de API com o padrão de projeto Time Limiter.")
@@ -32,7 +32,7 @@ public class DemoSRETimeLimiterController {
 
         log.info("Fluxo Time Limiter");
 
-        return ResponseEntity.ok(this.demoSRETimeLimiterUsecase.externalApiCall());
+        return ResponseEntity.ok(this.timeLimiterUsecase.externalApiCall());
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter e Retry.",
@@ -48,7 +48,7 @@ public class DemoSRETimeLimiterController {
 
         log.info("Fluxo Time Limiter com Retry");
 
-        return ResponseEntity.ok(this.demoSRETimeLimiterUsecase.externalApiCallWithRetry());
+        return ResponseEntity.ok(this.timeLimiterUsecase.externalApiCallWithRetry());
     }
 
 }

@@ -1,11 +1,11 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
 import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
-import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
-import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
+import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
-import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
+import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,22 +26,19 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class DemoSREGatewayImplTest {
+class CrudGatewayImplTest {
 
     @Mock
-    private DemoSRERepository repositoryMock;
+    private CrudRepository repositoryMock;
 
     @Mock
     private RestTemplate restTemplateMock;
 
     @Mock
-    private DemoSREGatewayTimeLimiterAnotation demoSREGatewayTimeLimiterAnotation;
-
-    @Mock
-    private DemoSREGatewayBulkheadThreadPoolAnotation demoSREGatewayBulkheadThreadPoolAnotation;
+    private BulkheadThreadPoolGatewayAnotation bulkheadThreadPoolGatewayAnotation;
 
     @InjectMocks
-    private DemoSREGateway gateway = new DemoSREGatewayImpl();
+    private CrudGateway gateway = new CrudGatewayImpl();
 
     @Test
     void findById_ReturnValidValue() {
@@ -113,18 +110,6 @@ class DemoSREGatewayImplTest {
         assertThat(result).isEqualTo(resultMock);
     }
 
-//    @Test
-//    void externalApiCallTimeLimiter_ThrowsInterruptedException() throws ExecutionException, InterruptedException {
-//
-//        CompletableFuture<String> mock = mock(CompletableFuture.class);
-//
-//        when(mock.get()).thenThrow(new InterruptedException("teste"));
-//        when(demoSREGatewayTimeLimiterAnotation.externalApiTimeLimiterThreadPool()).thenReturn(mock);
-//
-//        GatewayException gatewayException = assertThrows(GatewayException.class, () -> gateway.externalApiCallTimeLimiter());
-//        assertEquals("teste", gatewayException.getMessage());
-//        assertTrue(Thread.currentThread().isInterrupted());
-//    }
 
     @Test
     void externalApiCallBulkhead_ThrowsInterruptedException() throws ExecutionException, InterruptedException {
@@ -132,7 +117,7 @@ class DemoSREGatewayImplTest {
         CompletableFuture<String> mock = mock(CompletableFuture.class);
 
         when(mock.get()).thenThrow(new InterruptedException("teste"));
-        when(demoSREGatewayBulkheadThreadPoolAnotation.externalApiBulkheadThreadPool()).thenReturn(mock);
+        when(bulkheadThreadPoolGatewayAnotation.externalApiBulkheadThreadPool()).thenReturn(mock);
 
         GatewayException gatewayException = assertThrows(GatewayException.class, () -> gateway.externalApiCallThreadPoolBulkhead());
         assertEquals("teste", gatewayException.getMessage());

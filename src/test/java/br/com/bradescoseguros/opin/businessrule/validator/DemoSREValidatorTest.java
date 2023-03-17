@@ -2,7 +2,7 @@ package br.com.bradescoseguros.opin.businessrule.validator;
 
 import br.com.bradescoseguros.opin.businessrule.exception.ValidationException;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
@@ -12,11 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 

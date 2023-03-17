@@ -1,8 +1,8 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
 import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRETimeOutException;
-import br.com.bradescoseguros.opin.businessrule.gateway.DemoSRETimeLimiterGateway;
+import br.com.bradescoseguros.opin.interfaceadapter.exception.TimeOutException;
+import br.com.bradescoseguros.opin.businessrule.gateway.TimeLimiterGateway;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +13,10 @@ import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
-public class DemoSRETimeLimiterGatewayImpl implements DemoSRETimeLimiterGateway {
+public class TimeLimiterGatewayImpl implements TimeLimiterGateway {
 
     @Autowired
-    private DemoSREGatewayTimeLimiterAnotation demoSREGatewayTimeLimiterAnotation;
+    private TimeLimiterGatewayAnotation timeLimiterGatewayAnotation;
 
 
     @Override
@@ -32,7 +32,7 @@ public class DemoSRETimeLimiterGatewayImpl implements DemoSRETimeLimiterGateway 
 
     private String callExternalApiWithCompletableFuture() {
         try{
-            return demoSREGatewayTimeLimiterAnotation.externalApiTimeLimiterThreadPool().get();
+            return timeLimiterGatewayAnotation.externalApiTimeLimiterThreadPool().get();
         } catch (InterruptedException e) {
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
@@ -40,7 +40,7 @@ public class DemoSRETimeLimiterGatewayImpl implements DemoSRETimeLimiterGateway 
         } catch (ExecutionException e) {
             log.error(e.getMessage());
             if(e.getCause() instanceof TimeoutException){
-                throw new DemoSRETimeOutException(e.getMessage());
+                throw new TimeOutException(e.getMessage());
             }
             throw new GatewayException(e);
         }

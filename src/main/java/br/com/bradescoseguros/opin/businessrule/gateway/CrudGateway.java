@@ -1,11 +1,11 @@
 package br.com.bradescoseguros.opin.businessrule.gateway;
 
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
-import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 
 import java.util.Optional;
 
-public interface DemoSREGateway {
+public interface CrudGateway {
     Optional<DemoSRE> findById(final Integer id);
 
     void insertDemoSRE(final DemoSRE payload);

@@ -1,14 +1,14 @@
-package br.com.bradescoseguros.opin.businessrule.usecase.demosre;
+package br.com.bradescoseguros.opin.businessrule.usecase;
 
+import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBadRequestException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRENoContentException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRERegistryAlreadyExistsException;
-import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
+import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
+import br.com.bradescoseguros.opin.businessrule.exception.RegistryAlreadyExistsException;
+import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
-import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,10 +17,10 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-public class DemoSREUseCaseImpl implements DemoSREUseCase {
+public class CrudUseCaseImpl implements CrudUseCase {
 
     @Autowired
-    private DemoSREGateway gateway;
+    private CrudGateway gateway;
 
     @Autowired
     private DemoSREValidator validator;
@@ -35,7 +35,7 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
         return gateway.findById(id).orElseThrow(() -> {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
-            throw new DemoSRENoContentException(messageSourceService.getMessage(NOT_FOUND));
+            throw new NoContentException(messageSourceService.getMessage(NOT_FOUND));
         });
     }
 
@@ -47,7 +47,7 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
             String error = "O ID informado na inserção DemoSRE já existe na base de dados";
             log.warn(error);
 
-            throw new DemoSRERegistryAlreadyExistsException(error);
+            throw new RegistryAlreadyExistsException(error);
         }
 
         gateway.insertDemoSRE(payload);
@@ -84,7 +84,7 @@ public class DemoSREUseCaseImpl implements DemoSREUseCase {
             String error = "O status informado não é suportado pela aplicação.";
             log.warn(error);
 
-            throw new DemoSREBadRequestException(error);
+            throw new BadRequestException(error);
         }
 
         return getExternalApi(status);

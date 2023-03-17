@@ -1,13 +1,12 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
 import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBulkheadFullException;
-import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
-import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
+import br.com.bradescoseguros.opin.interfaceadapter.exception.BulkheadFullException;
+import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.configuration.redis.RedisConstants;
-import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
-import io.github.resilience4j.bulkhead.BulkheadFullException;
+import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -24,15 +23,15 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Component
-public class DemoSREGatewayImpl implements DemoSREGateway {
+public class CrudGatewayImpl implements CrudGateway {
     @Autowired
-    private DemoSRERepository repository;
+    private CrudRepository repository;
 
     @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
-    private DemoSREGatewayBulkheadThreadPoolAnotation demoSREGatewayBulkheadThreadPoolAnotation;
+    private BulkheadThreadPoolGatewayAnotation bulkheadThreadPoolGatewayAnotation;
 
 
 
@@ -91,15 +90,15 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @Override
     public String externalApiCallThreadPoolBulkhead() {
         try {
-            return demoSREGatewayBulkheadThreadPoolAnotation.externalApiBulkheadThreadPool().get();
+            return bulkheadThreadPoolGatewayAnotation.externalApiBulkheadThreadPool().get();
         } catch (InterruptedException e) {
             log.error(e.getMessage());
             Thread.currentThread().interrupt();
             throw new GatewayException(e.getMessage());
         } catch (ExecutionException e) {
             log.error(e.getMessage());
-            if (e.getCause() instanceof BulkheadFullException) {
-                throw new DemoSREBulkheadFullException(e.getMessage());
+            if (e.getCause() instanceof io.github.resilience4j.bulkhead.BulkheadFullException) {
+                throw new BulkheadFullException(e.getMessage());
             }
             throw new GatewayException(e);
         }

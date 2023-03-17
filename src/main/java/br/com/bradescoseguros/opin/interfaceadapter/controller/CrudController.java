@@ -1,8 +1,8 @@
 package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
-import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSREUseCase;
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
-import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
+import br.com.bradescoseguros.opin.businessrule.usecase.CrudUseCase;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.controller.dto.demosre.DemoSREDTO;
 import br.com.bradescoseguros.opin.interfaceadapter.mapper.DemoSREMapper;
@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/sre/v1")
-public class DemoSREController {
+public class CrudController {
 
     @Autowired
-    private DemoSREUseCase demoSREUseCase;
+    private CrudUseCase crudUseCase;
 
     @Operation(summary = "Obtêm o registro de SRE.",
             description = "Obtêm o registro de SRE identificado através do ID.")
@@ -39,7 +39,7 @@ public class DemoSREController {
     public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
         log.info("ID={}", id);
 
-        return ResponseEntity.ok(this.demoSREUseCase.getDemoSRE(id));
+        return ResponseEntity.ok(this.crudUseCase.getDemoSRE(id));
     }
 
     @Operation(summary = "Insere um novo registro de SRE.",
@@ -57,7 +57,7 @@ public class DemoSREController {
 
         log.info("Payload={}", payload.toString());
 
-        this.demoSREUseCase.insertDemoSRE(demoSRE);
+        this.crudUseCase.insertDemoSRE(demoSRE);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -76,7 +76,7 @@ public class DemoSREController {
 
         log.info("Payload={}", payload.toString());
 
-        this.demoSREUseCase.updateDemoSRE(demoSRE);
+        this.crudUseCase.updateDemoSRE(demoSRE);
         return ResponseEntity.noContent().build();
     }
 
@@ -93,7 +93,7 @@ public class DemoSREController {
     public ResponseEntity<DemoSRE> removeDemoSRE(@PathVariable final Integer id) {
         log.info("ID={}", id);
 
-        this.demoSREUseCase.removeDemoSRE(id);
+        this.crudUseCase.removeDemoSRE(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -113,6 +113,6 @@ public class DemoSREController {
 
         log.info("Status={}", extraStatusCode.getStatusURL());
 
-        return ResponseEntity.ok(this.demoSREUseCase.externalApiCall(extraStatusCode));
+        return ResponseEntity.ok(this.crudUseCase.externalApiCall(extraStatusCode));
     }
 }

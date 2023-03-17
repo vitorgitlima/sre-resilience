@@ -1,14 +1,13 @@
 package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
-import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
-import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
-import br.com.bradescoseguros.opin.businessrule.usecase.demosre.DemoSREUseCase;
+import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
+import br.com.bradescoseguros.opin.businessrule.usecase.CrudUseCase;
 import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import br.com.bradescoseguros.opin.configuration.TestResilienceConfig;
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
-import br.com.bradescoseguros.opin.interfaceadapter.repository.DemoSRERepository;
+import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.bulkhead.*;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -51,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Import({TestResilienceConfig.class, TestRedisConfiguration.class})
-class DemoSREControllerTest {
+class CrudControllerTest {
 
     private static final String BASE_URL = "/api/sre/v1";
 
@@ -59,10 +58,10 @@ class DemoSREControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private DemoSREUseCase useCaseMock;
+    private CrudUseCase useCaseMock;
 
     @Autowired
-    private DemoSREGateway demoSREGatewayMock;
+    private CrudGateway crudGatewayMock;
 
     @Autowired
     private RetryRegistry retryRegistry;
@@ -77,7 +76,7 @@ class DemoSREControllerTest {
     private ThreadPoolBulkheadRegistry threadPoolBulkheadRegistry;
 
     @MockBean
-    private DemoSRERepository demoSRERepositoryMock;
+    private CrudRepository crudRepositoryMock;
 
     @MockBean
     private RestTemplate restTemplateMock;
@@ -102,7 +101,7 @@ class DemoSREControllerTest {
         System.out.println("Active profile: " + activeProfile);
         circuitBreakerRegistry.circuitBreaker(CB_COSMO_CONFIG).reset();
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).reset();
-        Mockito.reset(demoSRERepositoryMock);
+        Mockito.reset(crudRepositoryMock);
         Mockito.reset(restTemplateMock);
         threadPoolBulkheadRegistry.remove(BULKHEAD_THREAD_POOL_CONFIG);
 
@@ -123,7 +122,7 @@ class DemoSREControllerTest {
         String demoSREMockJson = new ObjectMapper().writeValueAsString(demoSREMock);
         final String url = BASE_URL + "/getDemoSRE/" + demoSREMock.getId();
 
-        when(demoSRERepositoryMock.findById(anyInt())).thenReturn(Optional.of(demoSREMock));
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.of(demoSREMock));
 
 
         //Act
@@ -146,7 +145,7 @@ class DemoSREControllerTest {
         final String url = BASE_URL + "/getDemoSRE/" + 1;
         final int retriesAttemps = retryRegistry.retry(RETRY_COSMO_CONFIG).getRetryConfig().getMaxAttempts();
 
-        when(demoSRERepositoryMock.findById(anyInt())).thenThrow(org.springframework.dao.DataAccessResourceFailureException.class);
+        when(crudRepositoryMock.findById(anyInt())).thenThrow(org.springframework.dao.DataAccessResourceFailureException.class);
 
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -160,7 +159,7 @@ class DemoSREControllerTest {
         //Assert
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
         assertThat(result.getResponse().getContentAsString()).contains("a_huge_trace_id");
-        verify(demoSRERepositoryMock, times(retriesAttemps)).findById(anyInt());
+        verify(crudRepositoryMock, times(retriesAttemps)).findById(anyInt());
     }
 
     @Test
@@ -171,7 +170,7 @@ class DemoSREControllerTest {
         final String errorMessage = "LOCKED O circuito cosmoCircuitBreaker que está registrado para esta operação está ABERTO, novas requisições estão temporariamente suspensas.";
         circuitBreakerRegistry.circuitBreaker(CB_COSMO_CONFIG).transitionToOpenState();
 
-        when(demoSRERepositoryMock.findById(anyInt())).thenThrow(org.springframework.dao.DataAccessResourceFailureException.class);
+        when(crudRepositoryMock.findById(anyInt())).thenThrow(org.springframework.dao.DataAccessResourceFailureException.class);
 
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -197,8 +196,8 @@ class DemoSREControllerTest {
         DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
         String demoSREMockJson = new ObjectMapper().writeValueAsString(demoSREMock);
 
-        when(demoSRERepositoryMock.findById(anyInt())).thenReturn(Optional.empty());
-        when(demoSRERepositoryMock.insert(any(DemoSRE.class))).thenReturn(null);
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.empty());
+        when(crudRepositoryMock.insert(any(DemoSRE.class))).thenReturn(null);
 
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -221,7 +220,7 @@ class DemoSREControllerTest {
         DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
         String demoSREMockJson = new ObjectMapper().writeValueAsString(demoSREMock);
 
-        when(demoSRERepositoryMock.findById(anyInt())).thenReturn(Optional.of(new DemoSRE()));
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.of(new DemoSRE()));
 
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -244,8 +243,8 @@ class DemoSREControllerTest {
         DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
         String demoSREMockJson = new ObjectMapper().writeValueAsString(demoSREMock);
 
-        when(demoSRERepositoryMock.findById(anyInt())).thenReturn(Optional.of(demoSREMock));
-        when(demoSRERepositoryMock.save(any())).thenReturn(null);
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.of(demoSREMock));
+        when(crudRepositoryMock.save(any())).thenReturn(null);
 
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -258,7 +257,7 @@ class DemoSREControllerTest {
 
         //Assert
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        verify(demoSRERepositoryMock, times(1)).save(any());
+        verify(crudRepositoryMock, times(1)).save(any());
     }
 
     @Test
@@ -268,8 +267,8 @@ class DemoSREControllerTest {
         final String url = BASE_URL + "/removeDemoSRE/" + 1;
         DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
 
-        when(demoSRERepositoryMock.findById(anyInt())).thenReturn(Optional.of(demoSREMock));
-        doNothing().when(demoSRERepositoryMock).deleteById(anyInt());
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.of(demoSREMock));
+        doNothing().when(crudRepositoryMock).deleteById(anyInt());
 
         //Act
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
@@ -281,7 +280,7 @@ class DemoSREControllerTest {
 
         //Assert
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
-        Mockito.verify(demoSRERepositoryMock).deleteById(anyInt());
+        Mockito.verify(crudRepositoryMock).deleteById(anyInt());
     }
 
     @Test

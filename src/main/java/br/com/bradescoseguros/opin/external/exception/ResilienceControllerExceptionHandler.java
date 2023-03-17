@@ -1,12 +1,15 @@
 package br.com.bradescoseguros.opin.external.exception;
 
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.*;
+import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
+import br.com.bradescoseguros.opin.businessrule.exception.RegistryAlreadyExistsException;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorCode;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorData;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaData;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
-import io.github.resilience4j.bulkhead.BulkheadFullException;
+import br.com.bradescoseguros.opin.interfaceadapter.exception.BulkheadFullException;
+import br.com.bradescoseguros.opin.interfaceadapter.exception.MaxRetriesExceededException;
+import br.com.bradescoseguros.opin.interfaceadapter.exception.TimeOutException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -30,30 +32,14 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Slf4j
 @ControllerAdvice
 @RequiredArgsConstructor
-public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHandler {
+public class ResilienceControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Autowired
     private MessageSourceService messageSourceService;
 
-    @ExceptionHandler(DemoSRENoContentException.class)
-    public ResponseEntity<Object> handleDemoSRENoContentException(final DemoSRENoContentException exception,
-                                                                  final WebRequest request) {
-        MetaDataEnvelope response =
-                new MetaDataEnvelope(HttpStatus.NO_CONTENT.toString(), ErrorCode.DEMOSRE_NO_CONTENT, exception.getMessage());
 
-        if (!isEmpty(exception.getErrors())) {
-            final MetaData meta = new MetaData(HttpStatus.NO_CONTENT.toString(), MDC.get("TRACE_ID"));
-            response = new MetaDataEnvelope(meta, exception.getErrors());
-        }
-
-        log.info("DemoSRENoContentException: {}", response);
-
-        return handleExceptionInternal(exception, response, new HttpHeaders(),
-                HttpStatus.NO_CONTENT, request);
-    }
-
-    @ExceptionHandler(DemoSREMaxRetriesExceededException.class)
-    public ResponseEntity<Object> handleDemoSREMaxRetriesExceededException(final DemoSREMaxRetriesExceededException exception,
+    @ExceptionHandler(MaxRetriesExceededException.class)
+    public ResponseEntity<Object> handleMaxRetriesExceededException(final MaxRetriesExceededException exception,
                                                                            final WebRequest request) {
 
         String exceptionMessage = exception.getMessage();
@@ -77,8 +63,8 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 httpStatus, request);
     }
 
-    @ExceptionHandler(DemoSREBadRequestException.class)
-    public ResponseEntity<Object> handleDemoSREBadRequestException(final DemoSREBadRequestException exception, final WebRequest request) {
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Object> handleBadRequestException(final BadRequestException exception, final WebRequest request) {
         String exceptionMessage = exception.getMessage();
 
         if (!StringUtils.hasText(exceptionMessage)) {
@@ -100,8 +86,8 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 httpStatus, request);
     }
 
-    @ExceptionHandler(DemoSRERegistryAlreadyExistsException.class)
-    public ResponseEntity<Object> handleDemoSRERegistryAlreadyExistsException(final DemoSRERegistryAlreadyExistsException exception, final WebRequest request) {
+    @ExceptionHandler(RegistryAlreadyExistsException.class)
+    public ResponseEntity<Object> handleRegistryAlreadyExistsException(final RegistryAlreadyExistsException exception, final WebRequest request) {
         String exceptionMessage = messageSourceService.getMessage("demo-sre.registry-already-exists");
         HttpStatus httpStatus = HttpStatus.CONFLICT;
 
@@ -132,6 +118,22 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 httpStatus, request);
     }
 
+    @ExceptionHandler(io.github.resilience4j.bulkhead.BulkheadFullException.class)
+    public ResponseEntity<Object> handleBulkheadFullException(final io.github.resilience4j.bulkhead.BulkheadFullException exception, final WebRequest request) {
+
+        String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable");
+
+        HttpStatus httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
+        MetaDataEnvelope response =
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.BULKHEAD_FULL, exceptionMessage);
+
+        final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
+        log.error(errorMessage, exception);
+
+        return handleExceptionInternal(exception, response, new HttpHeaders(),
+                httpStatus, request);
+    }
+
     @ExceptionHandler(BulkheadFullException.class)
     public ResponseEntity<Object> handleBulkheadFullException(final BulkheadFullException exception, final WebRequest request) {
 
@@ -148,24 +150,8 @@ public class DemoSREControllerExceptionHandler extends ResponseEntityExceptionHa
                 httpStatus, request);
     }
 
-    @ExceptionHandler(DemoSREBulkheadFullException.class)
-    public ResponseEntity<Object> handleDemoSREBulkheadFullException(final DemoSREBulkheadFullException exception, final WebRequest request) {
-
-        String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable");
-
-        HttpStatus httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
-        MetaDataEnvelope response =
-                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.BULKHEAD_FULL, exceptionMessage);
-
-        final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
-        log.error(errorMessage, exception);
-
-        return handleExceptionInternal(exception, response, new HttpHeaders(),
-                httpStatus, request);
-    }
-
-    @ExceptionHandler(DemoSRETimeOutException.class)
-    public ResponseEntity<Object> handleDemoSRETimeOutException(final DemoSRETimeOutException exception, final WebRequest request) {
+    @ExceptionHandler(TimeOutException.class)
+    public ResponseEntity<Object> handleTimeOutException(final TimeOutException exception, final WebRequest request) {
 
         String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable", exception.getMessage());
 

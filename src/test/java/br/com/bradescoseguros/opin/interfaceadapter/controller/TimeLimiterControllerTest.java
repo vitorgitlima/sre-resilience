@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Import({TestResilienceConfig.class, TestRedisConfiguration.class})
-public class DemoSRETimeLimiterControllerTest {
+public class TimeLimiterControllerTest {
 
     private static final String BASE_URL = "/api/sre/v1";
     @Autowired
