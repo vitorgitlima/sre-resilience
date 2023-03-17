@@ -11,6 +11,6 @@ we can flood the service and cause more problems. A circuit breaker can have 3 s
 
 The picture above can illustrate the 3 states and how it works:
 
-![Alt text](./docs/circuit_breaker_states.jpg? "Circuit Breaker states")
+![Alt text](./docs/circuit_breaker_states.jpg "Circuit Breaker states")
 
 To implement this pattern we use resilience4j. More information can be found at the link: https://resilience4j.readme.io/docs/circuitbreaker

@@ -55,7 +55,48 @@ resilience4j.retry:
   instances: # Allows defining Retry instances
     cosmoRetry: # The name of the Retry instance being defined
         maxAttempts: 5 # The maximum number of Retry attempts allowed for this instance. This property overrides the value defined in the default configuration, if any
+
+
+sre.resilience.retry.throw-sre-max-retries-exceed: true # Allows a custom Exception when the max attemps has been reached. This is a custom property.
 ```
+
+## Configuration
+
+After the initial configuration, it is possible to create an interceptor for Retry. In the example below, a log.info is triggered to register each Retry attempt, and if a property named `sre.resilience.retry.throw-sre-max-retries-exceed` is set to TRUE, a custom exception is thrown.
+
+```java
+    @Bean
+    public RegistryEventConsumer<Retry> myRetryRegistryEventConsumer(@Value("${sre.resilience.retry.throw-sre-max-retries-exceed:false}") boolean useSRERetryException) {
+
+        return new RegistryEventConsumer<Retry>() {
+            @Override
+            public void onEntryAddedEvent(EntryAddedEvent<Retry> entryAddedEvent) {
+                entryAddedEvent.getAddedEntry().getEventPublisher()
+                        .onEvent(event -> {
+                            int maxAttemps = entryAddedEvent.getAddedEntry().getRetryConfig().getMaxAttempts();
+                            String logMessage = MessageFormat.format("[RETRY][{2}/{3}] Time: {0}, Name: {1}, Exception: {4}",
+                                    event.getCreationTime(), event.getName(), event.getNumberOfRetryAttempts(), maxAttemps, event.getLastThrowable());
+                            log.info(logMessage);
+
+                            if (useSRERetryException && event.getNumberOfRetryAttempts() >= maxAttemps) {
+                                throw new DemoSREMaxRetriesExceededException();
+                            }
+                        });
+            }
+
+            @Override
+            public void onEntryRemovedEvent(EntryRemovedEvent<Retry> entryRemoveEvent) {
+            }
+
+            @Override
+            public void onEntryReplacedEvent(EntryReplacedEvent<Retry> entryReplacedEvent) {
+            }
+        };
+    }
+
+```
+
+## Usage
 
 Here's an example of how to use Retry in applications:
 
