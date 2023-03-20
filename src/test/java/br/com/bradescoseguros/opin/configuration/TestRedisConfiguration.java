@@ -12,7 +12,9 @@ public class TestRedisConfiguration {
 
     private static RedisServer redisServer;
 
-    public TestRedisConfiguration(@Value("${spring.redis.port}") int redisPort) {
+    public TestRedisConfiguration() {
+        final int redisPort = 6378;
+
         if (redisServer == null) {
             redisServer = new RedisServer(redisPort);
         }

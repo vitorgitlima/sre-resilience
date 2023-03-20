@@ -13,16 +13,8 @@ spring:
     name: Open Insurance - Fornecimento de Produtos Residenciais
   profiles:
     active: test
-  redis:
-    host: ${REDIS_TEST_HOST:localhost}
-    port: ${REDIS_TEST_PORT:6378}
-    password: ${REDIS_TEST_PASSWORD:}
   cache:
     type: none
-
-mongo-properties:
-  host: ${MONGO_HOST:localhost}
-  port: ${MONGO_PORT:27020}
 
 info:
   application:

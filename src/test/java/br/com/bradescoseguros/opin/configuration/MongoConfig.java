@@ -26,26 +26,24 @@ public class MongoConfig {
 
     private MongodExecutable mongodExecutable;
 
-    @Value("${mongo-properties.host}")
-    private String databaseUrl;
-
-    @Value("${mongo-properties.port}")
-    private int port;
     @Bean
     @Primary
     public MongoTemplate mongoTemplate() throws IOException {
 
+        final String mongoServer = "localhost";
+        final int mongoPort = 27020;
+
         ImmutableMongodConfig mongodConfig = MongodConfig
                 .builder()
                 .version(Version.Main.PRODUCTION)
-                .net(new Net(databaseUrl, port, Network.localhostIsIPv6()))
+            .net(new Net(mongoServer, mongoPort, Network.localhostIsIPv6()))
                 .build();
 
         MongodStarter starter = MongodStarter.getDefaultInstance();
         mongodExecutable = starter.prepare(mongodConfig);
         mongodExecutable.start();
 
-        return new MongoTemplate(MongoClients.create(String.format(CONNECTION_STRING, databaseUrl, port)), "test");
+        return new MongoTemplate(MongoClients.create(String.format(CONNECTION_STRING, mongoServer, mongoPort)), "test");
     }
 
     @PreDestroy
