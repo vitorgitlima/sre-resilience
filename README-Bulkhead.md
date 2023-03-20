@@ -41,7 +41,7 @@ First we need to add a new dependency on pom.xml
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-bulkhead</artifactId>
-            <version>1.7.1</version>
+            <version>1.7.1</version>  <!-- For best results, ensure that your application is always running on the same version of resilience4j -->
         </dependency>
 
         <dependency>
@@ -103,7 +103,7 @@ In this case, we have the annotation `@Bulkhead`  controlling the method, when r
 ### *ThreadPoolBulkhead*
 In this implementation, we also use annotations to control the methods as configured in yaml
 ```java
-      @Bulkhead(name = "bulkheadInstance", type = Bulkhead.Type.THREADPOOL)
+    @Bulkhead(name = "bulkheadInstance", type = Bulkhead.Type.THREADPOOL)
     public CompletableFuture<String> externalApiBulkheadThreadPool() {
         final String fullURL = "http://localhost:8081/api/sre/v1/extra/delay";
 
@@ -117,13 +117,13 @@ In this implementation, we also use annotations to control the methods as config
  By using a fallback with the Bulkhead Semaphore, we can gracefully handle failures and avoid overloading the external API with too many requests.
 
 ```java
-     @Bulkhead(name = "semaphoreBulkhead", fallbackMethod = "fallbackMethod")
+    @Bulkhead(name = "semaphoreBulkhead", fallbackMethod = "fallbackMethod")
     public String externalApiCallBulkhead() {
         return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
     }
 
 
-    // fallbackMethod() method is a simple fallback that returns a default response when the external API call fails. This can be any logic that you want to perform when the main call fails.
+    //fallbackMethod() method is a simple fallback that returns a default response when the external API call fails. This can be any logic that you want to perform when the main call fails.
      public String fallbackMethod(Throwable ex) {
         return "Fallback Response";
         
