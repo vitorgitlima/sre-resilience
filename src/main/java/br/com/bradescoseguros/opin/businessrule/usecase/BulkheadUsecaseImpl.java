@@ -14,16 +14,16 @@ public class BulkheadUsecaseImpl implements BulkheadUsecase {
 
     @Override
     public String externalApiCallWithSemaphoreBulkhead() {
-        return "";
+        return bulkheadGateway.externalApiCallWithBulkhead();
     }
 
     @Override
     public String externalApiCallWithSemaphoreBulkheadAndRetry() {
-        return "";
+        return bulkheadGateway.externalApiCallWithBulkheadAndRetry();
     }
 
     @Override
     public String externalApiCallWithThreadPoolBulkhead() {
-        return "";
+        return bulkheadGateway.externalApiCallWithThreadPoolBulkhead();
     }
 }

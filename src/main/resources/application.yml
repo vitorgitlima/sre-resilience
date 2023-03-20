@@ -64,6 +64,7 @@ mongo-properties:
   connection-pool-maintenance-initial-delay: 5
   connection-pool-max-connection-idle-time: 1
   connection-pool-max-wait-time: 15
+logging.level.org.mongodb.driver: ERROR
 
 management:
   info:

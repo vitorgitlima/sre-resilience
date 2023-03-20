@@ -24,8 +24,8 @@ public class BulkheadController {
             description = "Realiza uma chamada externa de API com o padrão de projeto Bulkhead.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "A API foi executada com sucesso."),
-            //@ApiResponse(code = 408, message = "O tempo de espera da resposta para a chamada externa foi excedido.", response = MetaDataEnvelope.class),
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 503, message = "O bulkhead esta cheio e não aceita nova requisições.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/semaphorebulkhead")
     public ResponseEntity<String> getWithSemaphoreBulkhead() {
@@ -34,5 +34,38 @@ public class BulkheadController {
 
         return ResponseEntity.ok(this.bulkheadUsecase.externalApiCallWithSemaphoreBulkhead());
     }
+
+
+    @Operation(summary = "Realiza uma chamada externa de API com Bulkhead do tipo Semáforo e Retry.",
+            description = "Realiza uma chamada externa de API com o padrão de projeto Bulkhead e Retry, onde o Retry irá realizar retentativas de execução antes de retornar um erro.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "A API foi executada com sucesso."),
+            @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 503, message = "A quantidade de retentativas foi excedida.", response = MetaDataEnvelope.class),
+    })
+    @GetMapping(value = "/semaphorebulkhead/retry")
+    public ResponseEntity<String> getWithSemaphoreBulkheadAndRetry() {
+
+        log.info("Fluxo Semaphore Bulkhead e Retry");
+
+        return ResponseEntity.ok(this.bulkheadUsecase.externalApiCallWithSemaphoreBulkheadAndRetry());
+    }
+
+
+    @Operation(summary = "Realiza uma chamada externa de API com Bulkhead do tipo Thread Pool.",
+            description = "Realiza uma chamada externa de API com o padrão de projeto Bulkhead.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "A API foi executada com sucesso."),
+        @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
+        @ApiResponse(code = 503, message = "O bulkhead esta cheio e não aceita nova requisições.", response = MetaDataEnvelope.class),
+    })
+    @GetMapping(value = "/threadpoolbulkhead")
+    public ResponseEntity<String> getWithThreadPoolBulkhead() {
+
+        log.info("Fluxo Thread Pool Bulkhead");
+
+        return ResponseEntity.ok(this.bulkheadUsecase.externalApiCallWithThreadPoolBulkhead());
+    }
+
 
 }
