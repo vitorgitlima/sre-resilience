@@ -52,4 +52,20 @@ public class RetryController {
 
         return ResponseEntity.ok(this.retryUseCase.externalApiCall(ExtraStatusCode.INTERNAL_SERVER_ERROR));
     }
+
+    @Operation(summary = "Realiza uma chamada externa de API com Time Limiter e Circuit Breaker.",
+            description = "Realiza uma chamada externa de API com o padrão de projeto Time Limiter e Circuit Breaker. O Circuit Breaker irá registrar os erros obtidos nas retentativas também")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "A API foi executada com sucesso."),
+            @ApiResponse(code = 423, message = "O circuito esta aberto e novas solicitações estão suspensas.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 503, message = "O limite de retentativas foi excedido ou o .", response = MetaDataEnvelope.class),
+    })
+    @GetMapping(value = "/circuitbreaker")
+    public ResponseEntity<String> getApiWithCircuitBreaker() {
+
+        log.info("Fluxo Retry with Circuit Breaker");
+
+        return ResponseEntity.ok(this.retryUseCase.externalApiCallWithCircuitBreaker(ExtraStatusCode.INTERNAL_SERVER_ERROR));
+    }
 }

@@ -3,6 +3,7 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import br.com.bradescoseguros.opin.configuration.TestResilienceConfig;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -43,11 +44,16 @@ public class RetryControllerTest {
     @Autowired
     private RetryRegistry retryRegistry;
 
+    @Autowired
+    private CircuitBreakerRegistry circuitBreakerRegistry;
+
     @MockBean
     private CrudRepository crudRepositoryMock;
 
     private final static String RETRY_API_CONFIG = "apiRetry";
     private final static String RETRY_COSMO_CONFIG = "cosmoRetry";
+
+    private final static String CB_API_CONFIG = "apiCircuitBreaker";
 
     @Test
     @Tag("comp")
@@ -93,6 +99,29 @@ public class RetryControllerTest {
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
         assertThat(result.getResponse().getContentAsString()).contains("a_huge_trace_id");
         verify(crudRepositoryMock, times(retriesAttemps)).findById(anyInt());
+    }
+
+    @Test
+    @Tag("comp")
+    void externalApiCall_ShouldReturnCircuitBreakerException() throws Exception {
+        //Arrange
+        final String url = BASE_URL + "/retry/circuitbreaker";
+
+        circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).transitionToOpenState();
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.LOCKED.value());
+        verify(restTemplateMock, times(0)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
     }
 
 }

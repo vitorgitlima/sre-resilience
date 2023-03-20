@@ -2,9 +2,6 @@ package br.com.bradescoseguros.opin.businessrule.usecase;
 
 import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
 import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
-import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
-import br.com.bradescoseguros.opin.businessrule.exception.RegistryAlreadyExistsException;
-import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
 import br.com.bradescoseguros.opin.businessrule.gateway.RetryGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
@@ -40,8 +37,6 @@ public class RetryUseCaseImpl implements RetryUseCase {
         });
     }
 
-
-
     @Override
     public String externalApiCall(final ExtraStatusCode status) {
         if (Objects.isNull(status)) {
@@ -51,9 +46,20 @@ public class RetryUseCaseImpl implements RetryUseCase {
             throw new BadRequestException(error);
         }
 
-        String statusURL = status.getStatusURL();
-
         log.info("Calling ExternalApiCall");
         return gateway.externalApiCall(status);
+    }
+
+    @Override
+    public String externalApiCallWithCircuitBreaker(final ExtraStatusCode status) {
+        if (Objects.isNull(status)) {
+            String error = "O status informado não é suportado pela aplicação.";
+            log.warn(error);
+
+            throw new BadRequestException(error);
+        }
+
+        log.info("Calling ExternalApiCall With Circuit Breaker");
+        return gateway.externalApiCallWithCircuitBreaker(status);
     }
 }

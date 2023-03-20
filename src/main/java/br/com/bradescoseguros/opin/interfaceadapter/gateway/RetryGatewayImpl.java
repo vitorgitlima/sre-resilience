@@ -1,6 +1,5 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
-import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
 import br.com.bradescoseguros.opin.businessrule.gateway.RetryGateway;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
@@ -10,7 +9,6 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -45,5 +43,13 @@ public class RetryGatewayImpl implements RetryGateway {
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
     }
 
-// EXMPLO COM CB
+    @Override
+    @Retry(name = "apiRetry")
+    @CircuitBreaker(name = "apiCircuitBreaker")
+    public String externalApiCallWithCircuitBreaker(final ExtraStatusCode statusCode) {
+        final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
+        final String fullURL = baseURL + statusCode.getStatusURL();
+
+        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+    }
 }

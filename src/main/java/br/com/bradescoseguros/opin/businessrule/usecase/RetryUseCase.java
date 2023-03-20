@@ -6,4 +6,5 @@ import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 public interface RetryUseCase {
     DemoSRE getDemoSRE(final Integer id);
     String externalApiCall(final ExtraStatusCode status);
+    String externalApiCallWithCircuitBreaker(ExtraStatusCode status);
 }
