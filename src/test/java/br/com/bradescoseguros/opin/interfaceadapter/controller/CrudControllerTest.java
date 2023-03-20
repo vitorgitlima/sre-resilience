@@ -9,10 +9,7 @@ import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.resilience4j.bulkhead.BulkheadRegistry;
-import io.github.resilience4j.bulkhead.ThreadPoolBulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
-import io.github.resilience4j.retry.RetryRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -23,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -63,9 +59,6 @@ class CrudControllerTest {
     private CrudGateway crudGatewayMock;
 
     @Autowired
-    private RetryRegistry retryRegistry;
-
-    @Autowired
     private CircuitBreakerRegistry circuitBreakerRegistry;
 
     @MockBean
@@ -81,8 +74,8 @@ class CrudControllerTest {
     @Value("${spring.profiles.active}")
     private String activeProfile;
 
-    private final static String RETRY_COSMO_CONFIG = "cosmoRetry";
-    private final static String RETRY_API_CONFIG = "apiRetry";
+
+
     private final static String CB_COSMO_CONFIG = "cosmoCircuitBreaker";
     private final static String CB_API_CONFIG = "apiCircuitBreaker";
 
@@ -121,29 +114,6 @@ class CrudControllerTest {
         assertThat(result.getResponse().getContentAsString()).isEqualTo(demoSREMockJson);
     }
 
-    @Test
-    @Tag("comp")
-    void getDemoSRE_ShouldRetryAndReturnException() throws Exception {
-        //Arrange
-        final String url = BASE_URL + "/getDemoSRE/" + 1;
-        final int retriesAttemps = retryRegistry.retry(RETRY_COSMO_CONFIG).getRetryConfig().getMaxAttempts();
-
-        when(crudRepositoryMock.findById(anyInt())).thenThrow(org.springframework.dao.DataAccessResourceFailureException.class);
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .header("trace-id", "a_huge_trace_id")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        //Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-        assertThat(result.getResponse().getContentAsString()).contains("a_huge_trace_id");
-        verify(crudRepositoryMock, times(retriesAttemps)).findById(anyInt());
-    }
 
     @Test
     @Tag("comp")
@@ -288,27 +258,7 @@ class CrudControllerTest {
         assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
     }
 
-    @Test
-    @Tag("comp")
-    void externalApiCall_RetryAndReturnException() throws Exception {
-        //Arrange
-        final String url = BASE_URL + "/externalApiCall/ok";
-        final int retryAttempts = retryRegistry.retry(RETRY_API_CONFIG).getRetryConfig().getMaxAttempts();
 
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        //Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-        verify(restTemplateMock, times(retryAttempts)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
-    }
 
     @Test
     @Tag("comp")
@@ -336,5 +286,5 @@ class CrudControllerTest {
         assertThat(bodyResult.getErrors()).hasSize(1);
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
     }
-    
+
 }

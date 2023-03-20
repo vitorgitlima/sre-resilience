@@ -1,6 +1,7 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
 import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
+import br.com.bradescoseguros.opin.businessrule.gateway.RetryGateway;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.configuration.redis.RedisConstants;
@@ -19,7 +20,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class CrudGatewayImpl implements CrudGateway {
+public class RetryGatewayImpl implements RetryGateway {
     @Autowired
     private CrudRepository repository;
 
@@ -29,32 +30,14 @@ public class CrudGatewayImpl implements CrudGateway {
 
 
     @Override
-    @CircuitBreaker(name = "cosmoCircuitBreaker")
+    @Retry(name = "cosmoRetry")
     @Cacheable(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME, unless = "#result == null")
     public Optional<DemoSRE> findById(final Integer id) {
         return repository.findById(id);
     }
 
     @Override
-    @CacheEvict(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
-    public void insertDemoSRE(final DemoSRE payload) {
-        repository.insert(payload);
-    }
-
-    @Override
-    @CacheEvict(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
-    public void updateDemoSRE(final DemoSRE payload) {
-        repository.save(payload);
-    }
-
-    @Override
-    @CacheEvict(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
-    public void removeDemoSRE(final Integer id) {
-        repository.deleteById(id);
-    }
-
-    @Override
-    @CircuitBreaker(name = "apiCircuitBreaker")
+    @Retry(name = "apiRetry")
     public String externalApiCall(final ExtraStatusCode statusCode) {
         final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
         final String fullURL = baseURL + statusCode.getStatusURL();
@@ -62,5 +45,5 @@ public class CrudGatewayImpl implements CrudGateway {
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
     }
 
-
+// EXMPLO COM CB
 }
