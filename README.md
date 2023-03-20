@@ -3,6 +3,7 @@
 - Resilience
   - [Retry](README-RETRY.md "Readme for Retry Structure") :link:
   - [Circuit](README-CB.md "Readme for Circuit Breaker Structure") :link:
+  - [Bulkhead](README-Bulkhead.md "Readme for Bulkhead") :link:
 - [Project Strutucre](#project-strutucre "Project Strutucre")
   - [Pre-Requires](#pre-requires "Pre-Requires")
   - [Clean Architecture](#clean-architecture "Clean Architecture")
