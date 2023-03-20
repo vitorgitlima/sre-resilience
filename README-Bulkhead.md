@@ -15,7 +15,7 @@ The Bulkhead Pattern is typically used to prevent failures in one area of the ap
 
 ![Alt text](./docs/bulkhead_example.png "Bulkhead pattern")
 
-To implement this pattern, we use resilience4j. More information can be found at [Resilience4j Retry Documentation](https://resilience4j.readme.io/docs/bulkhead) :link:
+To implement this pattern, we use resilience4j. More information can be found at [Resilience4j Bulkhead Documentation](https://resilience4j.readme.io/docs/bulkhead) :link:
 
 ## Implementation
 
@@ -46,13 +46,18 @@ First we need to add a new dependency on pom.xml
 
 Then add a new configuration in application.yml
 
+### Semaphore
+
 ```yaml
 resilience4j.bulkhead: # This line sets the root key for defining a Bulkhead configuration with Resilience4j library.
   instances: # Defining Bulkhead instances.
     semaphoreBulkhead: # Declares a specific instance of a Bulkhead with the name "semaphoreBulkhead".
       maxConcurrentCalls: 2 # These two lines set the maximum number of concurrent calls allowed for the "semaphoreBulkhead" Bulkhead instance to 2 and the maximum wait duration for acquiring the Bulkhead lock to 1 second.
       maxWaitDuration: 1s
+```
 
+### ThreadPoolBulkhead
+```yaml
 resilience4j: # This line sets the root key for defining a Thread Pool Bulkhead configuration with Resilience4j library.
   thread-pool-bulkhead: # This section declares a default Thread Pool Bulkhead configuration with the following parameters:
     configs:
@@ -108,13 +113,29 @@ After the initial configuration, it is possible to create an interceptor for Ret
 
 ## Usage
 
-Here's an example of how to use Bulkhead in applications:
+Here's an example of how to use Bulkhead in applications:\
 
-In this case, whenever the `findById` method or sub-method throws an exception that extends `RetriableBaseException` or is included in the `retryExceptions` property, a new attempt will be executed until the maximum limit is reached (in this case, 5 attempts)
+In this case, we have the annotation `@Bulkhead`  controlling the method, when requests exceed the configured thread limits, a `BulkheadFullException` will be thrown.
 
+### Bulkhead Semaphore
 ```java
-    @Retry(name = "cosmoRetry")
-    public Optional<DemoSRE> findById(final Integer id) {
-        return repository.findById(id);
+    @Override
+    @Bulkhead(name = "semaphoreBulkhead")
+    public String externalApiCallBulkhead() {
+
+    return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
+    }
+```
+
+
+
+
+### ThreadPoolBulkhead
+```java
+      @Bulkhead(name = "bulkheadInstance", type = Bulkhead.Type.THREADPOOL)
+    public CompletableFuture<String> externalApiBulkheadThreadPool() {
+        final String fullURL = "http://localhost:8081/api/sre/v1/extra/delay";
+
+        return CompletableFuture.supplyAsync(() -> restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody());
     }
 ```
