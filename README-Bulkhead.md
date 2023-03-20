@@ -25,6 +25,13 @@ There are two implementations of bulkhead patterns in Resilience4j.
 
 * ### *ThreadPoolBulkhead -* In this approach, we limit the number of concurrent requests to the service. It will reject the incoming requests once the limit is hit.
 
+## Difference - Bulkhead Semapore and Bulkhead Threadpool 
+
+* Bulkhead Semaphore divides your application into partitions and limits the number of concurrent threads or tasks that can access each partition using a Semaphore. This allows you to create separate "bulkheads" for different parts of the application and control access to shared resources.
+
+* Bulkhead Threadpool divides a fixed number of threads into separate "bulkheads," each with its own Semaphore that limits the number of threads or tasks that can access a particular resource or section of code. This allows you to better manage and optimize the use of resources in the system.
+
+
 ## How to set Bulkhead in your application
 
 First we need to add a new dependency on pom.xml
@@ -44,7 +51,9 @@ First we need to add a new dependency on pom.xml
         </dependency>
 ```
 
-Then add a new configuration in application.yml
+## Configuration
+
+add a new configuration in application.yml
 
 ### Semaphore
 
@@ -75,49 +84,12 @@ resilience4j: # This line sets the root key for defining a Thread Pool Bulkhead 
         keepAliveDuration: 20
 ```
 
-## Configuration
-
-After the initial configuration, it is possible to create an interceptor for Retry. In the example below, a log.info is triggered to register each Retry attempt, and if a property named `sre.resilience.retry.throw-sre-max-retries-exceed` is set to TRUE, a custom exception is thrown.
-
-```java
-    @Bean
-    public RegistryEventConsumer<Retry> myRetryRegistryEventConsumer(@Value("${sre.resilience.retry.throw-sre-max-retries-exceed:false}") boolean useSRERetryException) {
-
-        return new RegistryEventConsumer<Retry>() {
-            @Override
-            public void onEntryAddedEvent(EntryAddedEvent<Retry> entryAddedEvent) {
-                entryAddedEvent.getAddedEntry().getEventPublisher()
-                        .onEvent(event -> {
-                            int maxAttemps = entryAddedEvent.getAddedEntry().getRetryConfig().getMaxAttempts();
-                            String logMessage = MessageFormat.format("[RETRY][{2}/{3}] Time: {0}, Name: {1}, Exception: {4}",
-                                    event.getCreationTime(), event.getName(), event.getNumberOfRetryAttempts(), maxAttemps, event.getLastThrowable());
-                            log.info(logMessage);
-
-                            if (useSRERetryException && event.getNumberOfRetryAttempts() >= maxAttemps) {
-                                throw new DemoSREMaxRetriesExceededException();
-                            }
-                        });
-            }
-
-            @Override
-            public void onEntryRemovedEvent(EntryRemovedEvent<Retry> entryRemoveEvent) {
-            }
-
-            @Override
-            public void onEntryReplacedEvent(EntryReplacedEvent<Retry> entryReplacedEvent) {
-            }
-        };
-    }
-
-```
-
 ## Usage
-
-Here's an example of how to use Bulkhead in applications:\
+Here's an example of how to use Bulkhead in applications:
 
 In this case, we have the annotation `@Bulkhead`  controlling the method, when requests exceed the configured thread limits, a `BulkheadFullException` will be thrown.
 
-### Bulkhead Semaphore
+### *Bulkhead Semaphore*
 ```java
     @Override
     @Bulkhead(name = "semaphoreBulkhead")
@@ -128,9 +100,8 @@ In this case, we have the annotation `@Bulkhead`  controlling the method, when r
 ```
 
 
-
-
-### ThreadPoolBulkhead
+### *ThreadPoolBulkhead*
+In this implementation, we also use annotations to control the methods as configured in yaml
 ```java
       @Bulkhead(name = "bulkheadInstance", type = Bulkhead.Type.THREADPOOL)
     public CompletableFuture<String> externalApiBulkheadThreadPool() {
@@ -139,3 +110,26 @@ In this case, we have the annotation `@Bulkhead`  controlling the method, when r
         return CompletableFuture.supplyAsync(() -> restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody());
     }
 ```
+
+### *FallbackMethod*
+ `@Bulkhead` annotation also supports fallbackMethod attribute and redirects the call to the fallback functions in case of failures observed by pattern. We would also need to define the implementation of the fallback method.
+
+ By using a fallback with the Bulkhead Semaphore, we can gracefully handle failures and avoid overloading the external API with too many requests.
+
+```java
+     @Bulkhead(name = "semaphoreBulkhead", fallbackMethod = "fallbackMethod")
+    public String externalApiCallBulkhead() {
+        return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
+    }
+
+
+    // fallbackMethod() method is a simple fallback that returns a default response when the external API call fails. This can be any logic that you want to perform when the main call fails.
+     public String fallbackMethod(Throwable ex) {
+        return "Fallback Response";
+        
+    }
+```
+
+## Conclusion
+
+In summary, both Bulkhead Semaphore and Bulkhead Threadpool are effective techniques for implementing the Bulkhead Pattern in your application. The main difference between the two is the level of granularity and control they provide over resources and access to them. Bulkhead Semaphore provides finer-grained control over resources, while Bulkhead Threadpool provides more control over the use of threads. Ultimately, the choice between the two techniques depends on the specific requirements and constraints of your application.
