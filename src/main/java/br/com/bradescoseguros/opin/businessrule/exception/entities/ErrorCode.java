@@ -11,5 +11,6 @@ public enum ErrorCode {
     DEMOSRE_NO_CONTENT,
     MAX_RETRIES_EXCEEDED,
     LOCKED,
-    BULKHEAD_FULL
+    BULKHEAD_FULL,
+    TIME_OUT
 }
