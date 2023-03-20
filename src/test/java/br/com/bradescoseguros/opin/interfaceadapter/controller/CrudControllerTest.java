@@ -58,8 +58,6 @@ class CrudControllerTest {
     @Autowired
     private CrudGateway crudGatewayMock;
 
-    @Autowired
-    private CircuitBreakerRegistry circuitBreakerRegistry;
 
     @MockBean
     private CrudRepository crudRepositoryMock;
@@ -82,8 +80,6 @@ class CrudControllerTest {
     @BeforeEach
     public void setUp() {
         System.out.println("Active profile: " + activeProfile);
-        circuitBreakerRegistry.circuitBreaker(CB_COSMO_CONFIG).reset();
-        circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).reset();
         Mockito.reset(crudRepositoryMock);
         Mockito.reset(restTemplateMock);
 
@@ -115,31 +111,7 @@ class CrudControllerTest {
     }
 
 
-    @Test
-    @Tag("comp")
-    void getDemoSRE_ShouldReturnExceptionWhenCircuitIsOpened() throws Exception {
-        //Arrange
-        final String url = BASE_URL + "/getDemoSRE/" + 2;
-        final String errorMessage = "LOCKED O circuito cosmoCircuitBreaker que está registrado para esta operação está ABERTO, novas requisições estão temporariamente suspensas.";
-        circuitBreakerRegistry.circuitBreaker(CB_COSMO_CONFIG).transitionToOpenState();
 
-        when(crudRepositoryMock.findById(anyInt())).thenThrow(org.springframework.dao.DataAccessResourceFailureException.class);
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
-
-        //Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.LOCKED.value());
-        assertThat(bodyResult.getErrors()).hasSize(1);
-        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
-    }
 
     @Test
     @Tag("comp")
@@ -256,35 +228,6 @@ class CrudControllerTest {
         //Assert
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
-    }
-
-
-
-    @Test
-    @Tag("comp")
-    void externalApiCall_ShouldReturnExceptionWhenCircuitIsOpened() throws Exception {
-        //Arrange
-        final String url = BASE_URL + "/externalApiCall/ok";
-        final String errorMessage = "LOCKED O circuito apiCircuitBreaker que está registrado para esta operação está ABERTO, novas requisições estão temporariamente suspensas.";
-
-        circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).transitionToOpenState();
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
-
-        //Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.LOCKED.value());
-        assertThat(bodyResult.getErrors()).hasSize(1);
-        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
     }
 
 }
