@@ -9,15 +9,14 @@ import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.resilience4j.bulkhead.*;
+import io.github.resilience4j.bulkhead.BulkheadRegistry;
+import io.github.resilience4j.bulkhead.ThreadPoolBulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.retry.RetryRegistry;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,12 +68,6 @@ class CrudControllerTest {
     @Autowired
     private CircuitBreakerRegistry circuitBreakerRegistry;
 
-    @SpyBean
-    private BulkheadRegistry bulkheadRegistry;
-
-    @Autowired
-    private ThreadPoolBulkheadRegistry threadPoolBulkheadRegistry;
-
     @MockBean
     private CrudRepository crudRepositoryMock;
 
@@ -92,9 +85,6 @@ class CrudControllerTest {
     private final static String RETRY_API_CONFIG = "apiRetry";
     private final static String CB_COSMO_CONFIG = "cosmoCircuitBreaker";
     private final static String CB_API_CONFIG = "apiCircuitBreaker";
-    private final static String BULKHEAD_THREAD_POOL_CONFIG = "bulkheadInstance";
-    private final static String BULKHEAD_SEMAPHORE_CONFIG = "semaphoreBulkhead";
-    private final static String RETRY_API_BULKHEAD = "apiBulkhead";
 
     @BeforeEach
     public void setUp() {
@@ -103,14 +93,7 @@ class CrudControllerTest {
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).reset();
         Mockito.reset(crudRepositoryMock);
         Mockito.reset(restTemplateMock);
-        threadPoolBulkheadRegistry.remove(BULKHEAD_THREAD_POOL_CONFIG);
 
-    }
-
-    @AfterEach
-    public void tearsDown(){
-        BulkheadConfig bulkheadConfig = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG).getBulkheadConfig();
-        bulkheadRegistry.replace(BULKHEAD_SEMAPHORE_CONFIG, Bulkhead.of(BULKHEAD_SEMAPHORE_CONFIG, bulkheadConfig));
     }
 
 
@@ -353,193 +336,5 @@ class CrudControllerTest {
         assertThat(bodyResult.getErrors()).hasSize(1);
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
     }
-
-    @Test
-    @Tag("comp")
-    void externalApiCall_ShouldReturn200WhenTheThreadPoolBulkheadIsEmpty() throws Exception {
-        //Arrange
-        final String url = BASE_URL + "/externalApiCall/bulkheadThreadPool";
-        final String response = "ok";
-        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead(BULKHEAD_THREAD_POOL_CONFIG);
-
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
-
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        //Assert
-        assertThat(bulkheadInstance.getMetrics().getRemainingQueueCapacity()).isEqualTo(1);
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
-
-    }
-
-
-
-
-    @Test
-    @Tag("comp")
-    void externalApiCall_ShouldReturn200WhenBulkheadSemaphoreIsEmpty() throws Exception {
-        // Arrange
-        final String url = BASE_URL + "/externalApiCall/bulkhead";
-        final String response = "ok";
-        Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
-
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class)))
-                .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        //Assert
-        assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(2);
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
-
-    }
-
-
-
-    @Test
-    @Tag("comp")
-    void externalApiCall_ShouldReturn200WhenBulkheadRetryIsEmpty() throws Exception {
-        // Arrange
-        final String url = BASE_URL + "/externalApiCall/bulkheadRetry";
-        final String response = "ok";
-        Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
-
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class)))
-                .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        //Assert
-        assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(2);
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
-
-    }
-
-    @Test
-    @Tag("comp")
-    void externalApiCall_ShouldRetryWithBulkheadSemaphore() throws Exception {
-        // Arrange
-        final String urlChassi = BASE_URL + "/externalApiCall/bulkheadRetry";
-        final String errorMessage = "MAX_RETRIES_EXCEEDED Número máximo de tentativas excedido.";
-        final int retryBulkheadAttempts = retryRegistry.retry(RETRY_API_BULKHEAD).getRetryConfig().getMaxAttempts();
-
-        Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
-
-        bulkheadSemaphoreInstance.tryAcquirePermission();
-
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class)))
-                .thenThrow(HttpServerErrorException.class);
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(urlChassi)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
-
-        //Assert
-        assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(1);
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
-        verify(restTemplateMock, times(retryBulkheadAttempts)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
-        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
-    }
-
-
-    @Test
-    @Tag("comp")
-    public void TimeLimiter_ShouldReturn200WhenNotInvoked() throws Exception {
-        // Arrange
-        final String url = BASE_URL + "/externalApiCall/timeLimiter";
-        final String response = "ok";
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
-            Thread.sleep(1000);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        });
-
-        // Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-
-        // Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
-
-    }
-
-
-
-
-
-
-
-    @Test
-    @Tag("comp")
-    public void TimeLimiterWithRetry_ShouldReturn200WhenNotInvoked() throws Exception {
-        // Arrange
-        final String url = BASE_URL + "/externalApiCall/timeLimiterRetry";
-        final String response = "ok";
-
-        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
-            Thread.sleep(1000);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        });
-
-        // Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-
-        // Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
-
-    }
-
-
-    private void runUselessTask() {
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    
 }

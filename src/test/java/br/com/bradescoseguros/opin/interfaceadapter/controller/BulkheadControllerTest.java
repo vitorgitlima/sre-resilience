@@ -205,6 +205,120 @@ public class BulkheadControllerTest {
 
     }
 
+    @Test
+    @Tag("comp")
+    void externalApiCall_ShouldReturn200WhenBulkheadSemaphoreIsEmpty() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/semaphorebulkhead";
+        final String response = "ok";
+        Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
+
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class)))
+                .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(2);
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
+
+    }
+
+    @Test
+    @Tag("comp")
+    void externalApiCall_ShouldReturn200WhenBulkheadRetryIsEmpty() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/semaphorebulkhead/retry";
+        final String response = "ok";
+        Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
+
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class)))
+                .thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(2);
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
+
+    }
+
+    @Test
+    @Tag("comp")
+    void externalApiCall_ShouldRetryWithBulkheadSemaphore() throws Exception {
+        // Arrange
+        final String urlChassi = BASE_URL + "/semaphorebulkhead/retry";
+        final String errorMessage = "MAX_RETRIES_EXCEEDED Número máximo de tentativas excedido.";
+        final int retryBulkheadAttempts = retryRegistry.retry(RETRY_API_BULKHEAD).getRetryConfig().getMaxAttempts();
+
+        Bulkhead bulkheadSemaphoreInstance = bulkheadRegistry.bulkhead(BULKHEAD_SEMAPHORE_CONFIG);
+
+        bulkheadSemaphoreInstance.tryAcquirePermission();
+
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class)))
+                .thenThrow(HttpServerErrorException.class);
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(urlChassi)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
+
+        //Assert
+        assertThat(bulkheadSemaphoreInstance.getMetrics().getAvailableConcurrentCalls()).isEqualTo(1);
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
+        verify(restTemplateMock, times(retryBulkheadAttempts)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
+        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
+    }
+
+    @Test
+    @Tag("comp")
+    void externalApiCall_ShouldReturn200WhenTheThreadPoolBulkheadIsEmpty() throws Exception {
+        //Arrange
+        final String url = BASE_URL + "/threadpoolbulkhead";
+        final String response = "ok";
+        ThreadPoolBulkhead bulkheadInstance = threadPoolBulkheadRegistry.bulkhead(BULKHEAD_THREAD_POOL_CONFIG);
+
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
+
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(bulkheadInstance.getMetrics().getRemainingQueueCapacity()).isEqualTo(1);
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(response);
+
+    }
+
     private void runUselessTask() {
         try {
             Thread.sleep(10000);

@@ -1,13 +1,10 @@
 package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
-import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
-import br.com.bradescoseguros.opin.interfaceadapter.exception.BulkheadFullException;
 import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.configuration.redis.RedisConstants;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
-import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Component
@@ -68,9 +64,6 @@ public class CrudGatewayImpl implements CrudGateway {
 
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
     }
-
-
-
 
 
 }
