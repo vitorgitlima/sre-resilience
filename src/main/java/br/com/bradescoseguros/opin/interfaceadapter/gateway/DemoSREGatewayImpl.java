@@ -2,6 +2,7 @@ package br.com.bradescoseguros.opin.interfaceadapter.gateway;
 
 import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
 import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREBulkheadFullException;
+import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSRETimeOutException;
 import br.com.bradescoseguros.opin.businessrule.gateway.DemoSREGateway;
 import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
 import br.com.bradescoseguros.opin.domain.demosre.ExtraStatusCode;
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Component
@@ -33,6 +35,11 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
 
     @Autowired
     private DemoSREGatewayBulkheadThreadPool demoSREGatewayBulkheadThreadPool;
+
+    @Autowired
+    private DemoSREGatewayTimeLimiter demoSREGatewayTimeLimiter;
+
+
 
     @Override
     @Retry(name = "cosmoRetry")
@@ -74,7 +81,7 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @Bulkhead(name = "semaphoreBulkhead")
     public String externalApiCallBulkhead() {
 
-        return callExternalApi("http://localhost:8081/api/sre/v1/extra/bulkhead");
+        return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
     }
 
     @Override
@@ -82,16 +89,19 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
     @Retry(name = "apiBulkhead")
     public String externalApiCallBulkheadRetry() {
 
-        return callExternalApi("http://localhost:8081/api/sre/v1/extra/bulkhead");
+        return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
     }
 
     @Override
     public String externalApiCallThreadPoolBulkhead() {
         try {
             return demoSREGatewayBulkheadThreadPool.externalApiBulkheadThreadPool().get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             log.error(e.getMessage());
-
+            Thread.currentThread().interrupt();
+            throw new GatewayException(e.getMessage());
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
             if (e.getCause() instanceof BulkheadFullException) {
                 throw new DemoSREBulkheadFullException(e.getMessage());
             }
@@ -99,9 +109,38 @@ public class DemoSREGatewayImpl implements DemoSREGateway {
         }
     }
 
+    @Override
+    public String externalApiCallTimeLimiter() {
+
+        return callExternalApiWithCompletableFuture();
+    }
+
+    @Override
+    @Retry(name = "apiTimeLimiter")
+    public String externalApiCallTimeLimiterWithRetry() {
+
+        return callExternalApiWithCompletableFuture();
+    }
+
     private String callExternalApi(String fullURL) {
 
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+    }
+
+    private String callExternalApiWithCompletableFuture() {
+        try{
+            return demoSREGatewayTimeLimiter.externalApiTimeLimiterThreadPool().get();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+            Thread.currentThread().interrupt();
+            throw new GatewayException(e.getMessage());
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
+            if(e.getCause() instanceof TimeoutException){
+                throw new DemoSRETimeOutException(e.getMessage());
+            }
+            throw new GatewayException(e);
+        }
 
     }
 }
