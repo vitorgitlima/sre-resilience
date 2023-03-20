@@ -5,8 +5,6 @@ import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.configuration.redis.RedisConstants;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;

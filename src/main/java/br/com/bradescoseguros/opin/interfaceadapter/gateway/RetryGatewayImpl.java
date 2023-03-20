@@ -37,16 +37,17 @@ public class RetryGatewayImpl implements RetryGateway {
     @Override
     @Retry(name = "apiRetry")
     public String externalApiCall(final ExtraStatusCode statusCode) {
-        final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
-        final String fullURL = baseURL + statusCode.getStatusURL();
-
-        return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
+        return getExternalApiCall(statusCode);
     }
 
     @Override
     @Retry(name = "apiRetry")
     @CircuitBreaker(name = "apiCircuitBreaker")
     public String externalApiCallWithCircuitBreaker(final ExtraStatusCode statusCode) {
+        return getExternalApiCall(statusCode);
+    }
+
+    private String getExternalApiCall(ExtraStatusCode statusCode) {
         final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
         final String fullURL = baseURL + statusCode.getStatusURL();
 

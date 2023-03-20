@@ -3,7 +3,6 @@ package br.com.bradescoseguros.opin.businessrule.usecase;
 import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
 import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.gateway.CircuitBreakerGateway;
-import br.com.bradescoseguros.opin.businessrule.gateway.RetryGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
 import br.com.bradescoseguros.opin.domain.DemoSRE;

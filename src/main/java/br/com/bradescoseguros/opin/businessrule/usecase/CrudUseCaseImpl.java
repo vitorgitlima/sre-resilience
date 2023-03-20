@@ -94,8 +94,6 @@ public class CrudUseCaseImpl implements CrudUseCase {
 
         log.info("Status: " + status.getStatusURL());
 
-        String statusURL = status.getStatusURL();
-
         log.info("Calling ExternalApiCall");
         return gateway.externalApiCall(status);
     }
