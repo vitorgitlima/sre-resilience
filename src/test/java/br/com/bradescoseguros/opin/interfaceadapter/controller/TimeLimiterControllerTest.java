@@ -17,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,6 +44,9 @@ public class TimeLimiterControllerTest {
     private RetryRegistry retryRegistry;
     @MockBean
     private RestTemplate restTemplateMock;
+
+    @MockBean
+    private MongoTemplate mongoTemplate;
 
     @Autowired
     private MockMvc mockMvc;

@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -58,6 +59,9 @@ public class RetryControllerTest {
 
     @MockBean
     private CrudRepository crudRepositoryMock;
+
+    @MockBean
+    private MongoTemplate mongoTemplate;
 
     private final static String RETRY_API_CONFIG = "apiRetry";
     private final static String RETRY_COSMO_CONFIG = "cosmoRetry";
