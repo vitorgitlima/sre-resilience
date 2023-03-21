@@ -110,17 +110,4 @@ class CrudGatewayImplTest {
         assertThat(result).isEqualTo(resultMock);
     }
 
-
-//    @Test
-//    void externalApiCallBulkhead_ThrowsInterruptedException() throws ExecutionException, InterruptedException {
-//
-//        CompletableFuture<String> mock = mock(CompletableFuture.class);
-//
-//        when(mock.get()).thenThrow(new InterruptedException("teste"));
-//        when(bulkheadThreadPoolGatewayAnotation.externalApiBulkheadThreadPool()).thenReturn(mock);
-//
-//        GatewayException gatewayException = assertThrows(GatewayException.class, () -> gateway.externalApiCallThreadPoolBulkhead());
-//        assertEquals("teste", gatewayException.getMessage());
-//        assertTrue(Thread.currentThread().isInterrupted());
-//    }
 }

@@ -142,7 +142,6 @@ public class BulkheadControllerTest {
         assertThat(bulkheadInstance.getMetrics().getRemainingQueueCapacity()).isEqualTo(1);
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
         assertThat(bodyResult.getErrors()).hasSize(1);
-        ////////////////////////////////////////////////////////////////////VALIDAR MENSAGEM E MAIS COISAS
 
     }
 
