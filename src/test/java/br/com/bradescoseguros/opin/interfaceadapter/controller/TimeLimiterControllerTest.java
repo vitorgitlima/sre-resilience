@@ -4,6 +4,7 @@ import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
 import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import br.com.bradescoseguros.opin.configuration.TestResilienceConfig;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
+import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.retry.RetryRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,9 @@ public class TimeLimiterControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private CrudRepository crudRepositoryMock;
 
     private final static String RETRY_API_TIME_LIMITER = "apiTimeLimiter";
 

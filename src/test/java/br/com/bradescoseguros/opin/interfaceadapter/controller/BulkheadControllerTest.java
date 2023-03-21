@@ -3,6 +3,7 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import br.com.bradescoseguros.opin.configuration.TestResilienceConfig;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
+import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.bulkhead.*;
 import io.github.resilience4j.retry.RetryRegistry;
@@ -56,6 +57,9 @@ public class BulkheadControllerTest {
 
     @MockBean
     private MongoTemplate mongoTemplate;
+
+    @MockBean
+    private CrudRepository crudRepositoryMock;
 
     @Autowired
     private MockMvc mockMvc;
