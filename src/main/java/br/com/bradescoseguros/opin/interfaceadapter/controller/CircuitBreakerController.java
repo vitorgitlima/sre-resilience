@@ -30,11 +30,11 @@ public class CircuitBreakerController {
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/db")
-    public ResponseEntity<DemoSRE> getDb() {
+    public ResponseEntity<DemoSRE> getDbWithCircuitBreaker() {
 
         log.info("Fluxo Circuit Breaker DB");
 
-        return ResponseEntity.ok(this.circuitBreakerUseCase.getDemoSRE(1));
+        return ResponseEntity.ok(this.circuitBreakerUseCase.getDemoSREWithCircuitBreaker(1));
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter.",
@@ -46,10 +46,10 @@ public class CircuitBreakerController {
             @ApiResponse(code = 503, message = "O limite de retentativas foi excedido.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/api")
-    public ResponseEntity<String> getApi() {
+    public ResponseEntity<String> getApiWithCircuitBreaker() {
 
         log.info("Fluxo Circuit Breaker API");
 
-        return ResponseEntity.ok(this.circuitBreakerUseCase.externalApiCall(ExtraStatusCode.INTERNAL_SERVER_ERROR));
+        return ResponseEntity.ok(this.circuitBreakerUseCase.externalApiCallWithCircuitBreaker(ExtraStatusCode.INTERNAL_SERVER_ERROR));
     }
 }

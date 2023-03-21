@@ -20,13 +20,13 @@ public class TimeLimiterGatewayImpl implements TimeLimiterGateway {
 
 
     @Override
-    public String externalApiCallTimeLimiter() {
+    public String externalApiCallWithTimeLimiter() {
         return callExternalApiWithCompletableFuture();
     }
 
     @Override
     @Retry(name = "apiTimeLimiter")
-    public String externalApiCallTimeLimiterWithRetry() {
+    public String externalApiCallWithTimeLimiterAndRetry() {
         return callExternalApiWithCompletableFuture();
     }
 

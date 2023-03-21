@@ -30,20 +30,20 @@ public class RetryGatewayImpl implements RetryGateway {
     @Override
     @Retry(name = "cosmoRetry")
     @Cacheable(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME, unless = "#result == null")
-    public Optional<DemoSRE> findById(final Integer id) {
+    public Optional<DemoSRE> findByIdWithRetry(final Integer id) {
         return repository.findById(id);
     }
 
     @Override
     @Retry(name = "apiRetry")
-    public String externalApiCall(final ExtraStatusCode statusCode) {
+    public String externalApiCallWithRetry(final ExtraStatusCode statusCode) {
         return getExternalApiCall(statusCode);
     }
 
     @Override
     @Retry(name = "apiRetry")
     @CircuitBreaker(name = "apiCircuitBreaker")
-    public String externalApiCallWithCircuitBreaker(final ExtraStatusCode statusCode) {
+    public String externalApiCallWithRetryAndCircuitBreaker(final ExtraStatusCode statusCode) {
         return getExternalApiCall(statusCode);
     }
 

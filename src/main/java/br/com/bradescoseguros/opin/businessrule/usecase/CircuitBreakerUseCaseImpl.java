@@ -29,8 +29,8 @@ public class CircuitBreakerUseCaseImpl implements CircuitBreakerUseCase {
     private static final String NOT_FOUND = "demo-sre.id-not-found";
 
     @Override
-    public DemoSRE getDemoSRE(final Integer id) {
-        return gateway.findById(id).orElseThrow(() -> {
+    public DemoSRE getDemoSREWithCircuitBreaker(final Integer id) {
+        return gateway.findByIdWithCircuitBreaker(id).orElseThrow(() -> {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
             throw new NoContentException(messageSourceService.getMessage(NOT_FOUND));
@@ -38,7 +38,7 @@ public class CircuitBreakerUseCaseImpl implements CircuitBreakerUseCase {
     }
 
     @Override
-    public String externalApiCall(final ExtraStatusCode status) {
+    public String externalApiCallWithCircuitBreaker(final ExtraStatusCode status) {
         if (Objects.isNull(status)) {
             String error = "O status informado não é suportado pela aplicação.";
             log.warn(error);
@@ -47,6 +47,6 @@ public class CircuitBreakerUseCaseImpl implements CircuitBreakerUseCase {
         }
 
         log.info("Calling ExternalApiCall");
-        return gateway.externalApiCall(status);
+        return gateway.externalApiCallWithCircuitBreaker(status);
     }
 }

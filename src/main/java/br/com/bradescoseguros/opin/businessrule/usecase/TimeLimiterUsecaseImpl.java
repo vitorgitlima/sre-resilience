@@ -12,12 +12,12 @@ public class TimeLimiterUsecaseImpl implements TimeLimiterUsecase {
 
 
     @Override
-    public String externalApiCall() {
-        return timeLimiterGateway.externalApiCallTimeLimiter();
+    public String externalApiCallWithTimeLimiter() {
+        return timeLimiterGateway.externalApiCallWithTimeLimiter();
     }
 
     @Override
-    public String externalApiCallWithRetry() {
-        return timeLimiterGateway.externalApiCallTimeLimiterWithRetry();
+    public String externalApiCallWithTimeLimiterAndRetry() {
+        return timeLimiterGateway.externalApiCallWithTimeLimiterAndRetry();
     }
 }

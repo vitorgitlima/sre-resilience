@@ -29,8 +29,8 @@ public class RetryUseCaseImpl implements RetryUseCase {
     private static final String NOT_FOUND = "demo-sre.id-not-found";
 
     @Override
-    public DemoSRE getDemoSRE(final Integer id) {
-        return gateway.findById(id).orElseThrow(() -> {
+    public DemoSRE getDemoSREWithRetry(final Integer id) {
+        return gateway.findByIdWithRetry(id).orElseThrow(() -> {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
             throw new NoContentException(messageSourceService.getMessage(NOT_FOUND));
@@ -38,28 +38,28 @@ public class RetryUseCaseImpl implements RetryUseCase {
     }
 
     @Override
-    public String externalApiCall(final ExtraStatusCode status) {
-        if (Objects.isNull(status)) {
-            String error = "O status informado não é suportado pela aplicação.";
-            log.warn(error);
-
-            throw new BadRequestException(error);
-        }
+    public String externalApiCallWithRetry(final ExtraStatusCode status) {
+        validaStatus(status);
 
         log.info("Calling ExternalApiCall");
-        return gateway.externalApiCall(status);
+        return gateway.externalApiCallWithRetry(status);
     }
 
+
     @Override
-    public String externalApiCallWithCircuitBreaker(final ExtraStatusCode status) {
+    public String externalApiCallWithRetryAndCircuitBreaker(final ExtraStatusCode status) {
+        validaStatus(status);
+
+        log.info("Calling ExternalApiCall With Circuit Breaker");
+        return gateway.externalApiCallWithRetryAndCircuitBreaker(status);
+    }
+
+    private static void validaStatus(ExtraStatusCode status) {
         if (Objects.isNull(status)) {
             String error = "O status informado não é suportado pela aplicação.";
             log.warn(error);
 
             throw new BadRequestException(error);
         }
-
-        log.info("Calling ExternalApiCall With Circuit Breaker");
-        return gateway.externalApiCallWithCircuitBreaker(status);
     }
 }

@@ -6,9 +6,9 @@ import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import java.util.Optional;
 
 public interface RetryGateway {
-    Optional<DemoSRE> findById(final Integer id);
+    Optional<DemoSRE> findByIdWithRetry(final Integer id);
 
-    String externalApiCall(final ExtraStatusCode status);
+    String externalApiCallWithRetry(final ExtraStatusCode status);
 
-    String externalApiCallWithCircuitBreaker(ExtraStatusCode statusCode);
+    String externalApiCallWithRetryAndCircuitBreaker(ExtraStatusCode statusCode);
 }

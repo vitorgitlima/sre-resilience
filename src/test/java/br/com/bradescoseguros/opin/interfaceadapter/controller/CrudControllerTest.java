@@ -6,10 +6,8 @@ import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import br.com.bradescoseguros.opin.configuration.TestResilienceConfig;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
-import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -29,7 +27,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
@@ -58,7 +55,6 @@ class CrudControllerTest {
     @Autowired
     private CrudGateway crudGatewayMock;
 
-
     @MockBean
     private CrudRepository crudRepositoryMock;
 
@@ -72,17 +68,11 @@ class CrudControllerTest {
     @Value("${spring.profiles.active}")
     private String activeProfile;
 
-
-
-    private final static String CB_COSMO_CONFIG = "cosmoCircuitBreaker";
-    private final static String CB_API_CONFIG = "apiCircuitBreaker";
-
     @BeforeEach
     public void setUp() {
         System.out.println("Active profile: " + activeProfile);
         Mockito.reset(crudRepositoryMock);
         Mockito.reset(restTemplateMock);
-
     }
 
 

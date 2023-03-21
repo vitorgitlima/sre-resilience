@@ -33,7 +33,7 @@ class TimeLimiterGatewayImplTest {
         when(mock.get()).thenThrow(new InterruptedException("teste"));
         when(timeLimiterGatewayAnotation.externalApiTimeLimiterThreadPool()).thenReturn(mock);
 
-        GatewayException gatewayException = assertThrows(GatewayException.class, () -> gateway.externalApiCallTimeLimiter());
+        GatewayException gatewayException = assertThrows(GatewayException.class, () -> gateway.externalApiCallWithTimeLimiter());
         assertEquals("teste", gatewayException.getMessage());
         assertTrue(Thread.currentThread().isInterrupted());
     }

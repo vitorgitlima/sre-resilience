@@ -32,7 +32,7 @@ public class TimeLimiterController {
 
         log.info("Fluxo Time Limiter");
 
-        return ResponseEntity.ok(this.timeLimiterUsecase.externalApiCall());
+        return ResponseEntity.ok(this.timeLimiterUsecase.externalApiCallWithTimeLimiter());
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter e Retry.",
@@ -48,7 +48,7 @@ public class TimeLimiterController {
 
         log.info("Fluxo Time Limiter com Retry");
 
-        return ResponseEntity.ok(this.timeLimiterUsecase.externalApiCallWithRetry());
+        return ResponseEntity.ok(this.timeLimiterUsecase.externalApiCallWithTimeLimiterAndRetry());
     }
 
 }

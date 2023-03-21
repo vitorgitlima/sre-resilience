@@ -1,7 +1,6 @@
 package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
 import br.com.bradescoseguros.opin.businessrule.usecase.RetryUseCase;
-import br.com.bradescoseguros.opin.businessrule.usecase.TimeLimiterUsecase;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
@@ -31,11 +30,11 @@ public class RetryController {
             @ApiResponse(code = 503, message = "O limite de retentativas foi excedido.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/db")
-    public ResponseEntity<DemoSRE> getDb() {
+    public ResponseEntity<DemoSRE> getDbWithRetry() {
 
         log.info("Fluxo Retry DB");
 
-        return ResponseEntity.ok(this.retryUseCase.getDemoSRE(1));
+        return ResponseEntity.ok(this.retryUseCase.getDemoSREWithRetry(1));
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter.",
@@ -46,11 +45,11 @@ public class RetryController {
             @ApiResponse(code = 503, message = "O limite de retentativas foi excedido.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/api")
-    public ResponseEntity<String> getApi() {
+    public ResponseEntity<String> getApiWithRetry() {
 
         log.info("Fluxo Retry API");
 
-        return ResponseEntity.ok(this.retryUseCase.externalApiCall(ExtraStatusCode.INTERNAL_SERVER_ERROR));
+        return ResponseEntity.ok(this.retryUseCase.externalApiCallWithRetry(ExtraStatusCode.INTERNAL_SERVER_ERROR));
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter e Circuit Breaker.",
@@ -62,10 +61,10 @@ public class RetryController {
             @ApiResponse(code = 503, message = "O limite de retentativas foi excedido ou o .", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/circuitbreaker")
-    public ResponseEntity<String> getApiWithCircuitBreaker() {
+    public ResponseEntity<String> getApiWithRetryAndCircuitBreaker() {
 
         log.info("Fluxo Retry with Circuit Breaker");
 
-        return ResponseEntity.ok(this.retryUseCase.externalApiCallWithCircuitBreaker(ExtraStatusCode.INTERNAL_SERVER_ERROR));
+        return ResponseEntity.ok(this.retryUseCase.externalApiCallWithRetryAndCircuitBreaker(ExtraStatusCode.INTERNAL_SERVER_ERROR));
     }
 }

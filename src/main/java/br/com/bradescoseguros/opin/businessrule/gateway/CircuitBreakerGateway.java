@@ -6,7 +6,7 @@ import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import java.util.Optional;
 
 public interface CircuitBreakerGateway {
-    Optional<DemoSRE> findById(final Integer id);
-    String externalApiCall(final ExtraStatusCode status);
+    Optional<DemoSRE> findByIdWithCircuitBreaker(final Integer id);
+    String externalApiCallWithCircuitBreaker(final ExtraStatusCode status);
 
 }
