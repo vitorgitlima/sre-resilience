@@ -10,18 +10,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class TimeLimiterGatewayImplTest {
+class BulkheadGatewayImplTest {
 
     @Mock
-    private TimeLimiterGatewayAnotation timeLimiterGatewayAnotation;
+    private BulkheadThreadPoolGatewayAnotation bulkheadThreadPoolGatewayAnotation;
 
     @InjectMocks
-    private TimeLimiterGatewayImpl gateway = new TimeLimiterGatewayImpl();
+    private BulkheadGatewayImpl gateway = new BulkheadGatewayImpl();
 
 
     @Test
@@ -30,9 +30,9 @@ class TimeLimiterGatewayImplTest {
         CompletableFuture<String> mock = mock(CompletableFuture.class);
 
         when(mock.get()).thenThrow(new InterruptedException("teste"));
-        when(timeLimiterGatewayAnotation.externalApiTimeLimiterThreadPool()).thenReturn(mock);
+        when(bulkheadThreadPoolGatewayAnotation.externalApiBulkheadThreadPool()).thenReturn(mock);
 
-        GatewayException gatewayException = assertThrows(GatewayException.class, () -> gateway.externalApiCallWithTimeLimiter());
+        GatewayException gatewayException = assertThrows(GatewayException.class, () -> gateway.externalApiCallWithThreadPoolBulkhead());
         assertEquals("teste", gatewayException.getMessage());
         assertTrue(Thread.currentThread().isInterrupted());
     }
