@@ -30,6 +30,8 @@ public class CircuitBreakerUseCaseImpl implements CircuitBreakerUseCase {
 
     @Override
     public DemoSRE getDemoSREWithCircuitBreaker(final Integer id) {
+        log.info("Calling findById with id {}", id);
+        
         return gateway.findByIdWithCircuitBreaker(id).orElseThrow(() -> {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
