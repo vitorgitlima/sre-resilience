@@ -30,6 +30,8 @@ public class RetryUseCaseImpl implements RetryUseCase {
 
     @Override
     public DemoSRE getDemoSREWithRetry(final Integer id) {
+        log.info("Calling findById with id {}", id);
+
         return gateway.findByIdWithRetry(id).orElseThrow(() -> {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 

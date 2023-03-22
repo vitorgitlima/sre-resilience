@@ -10,10 +10,7 @@ public enum ExtraStatusCode {
     LOCKED("nok423"),
     TOO_EARLY("nok425"),
     INTERNAL_SERVER_ERROR("nok500"),
-    GATEWAY_TIMEOUT("nok504"),
-    BULKHEAD("bulkhead"),
-    BULKHEAD_RETRY("bulkheadRetry"),
-    BULKHEAD_THREAD_POOL("bulkheadThreadPool");
+    GATEWAY_TIMEOUT("nok504");
 
 
     @Getter
