@@ -3,7 +3,7 @@ package br.com.bradescoseguros.opin.businessrule.validator;
 import br.com.bradescoseguros.opin.businessrule.exception.ValidationException;
 import br.com.bradescoseguros.opin.businessrule.exception.entities.ErrorData;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;

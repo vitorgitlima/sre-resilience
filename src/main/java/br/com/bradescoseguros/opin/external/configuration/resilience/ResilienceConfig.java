@@ -1,6 +1,6 @@
 package br.com.bradescoseguros.opin.external.configuration.resilience;
 
-import br.com.bradescoseguros.opin.businessrule.exception.demosre.DemoSREMaxRetriesExceededException;
+import br.com.bradescoseguros.opin.interfaceadapter.exception.MaxRetriesExceededException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.core.registry.EntryAddedEvent;
 import io.github.resilience4j.core.registry.EntryRemovedEvent;
@@ -32,7 +32,7 @@ public class ResilienceConfig {
                             log.info(logMessage);
 
                             if (useSRERetryException && event.getNumberOfRetryAttempts() >= maxAttemps) {
-                                throw new DemoSREMaxRetriesExceededException();
+                                throw new MaxRetriesExceededException();
                             }
                         });
             }

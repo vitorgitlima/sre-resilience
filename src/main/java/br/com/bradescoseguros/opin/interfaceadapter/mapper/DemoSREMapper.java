@@ -1,6 +1,6 @@
 package br.com.bradescoseguros.opin.interfaceadapter.mapper;
 
-import br.com.bradescoseguros.opin.domain.demosre.DemoSRE;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.interfaceadapter.controller.dto.demosre.DemoSREDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
