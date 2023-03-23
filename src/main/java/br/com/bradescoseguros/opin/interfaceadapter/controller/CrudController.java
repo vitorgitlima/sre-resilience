@@ -37,7 +37,7 @@ public class CrudController {
     })
     @GetMapping(value = "/getDemoSRE/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
-        log.info("ID={}", id);
+        log.info("/getDemoSRE com id {}", id);
 
         return ResponseEntity.ok(this.crudUseCase.getDemoSRE(id));
     }
@@ -55,7 +55,7 @@ public class CrudController {
     public ResponseEntity<DemoSRE> insertDemoSRE(@RequestBody final DemoSREDTO payload) {
         DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
 
-        log.info("Payload={}", payload.toString());
+        log.info("/insertDemoSRE com Payload {}", payload.toString());
 
         this.crudUseCase.insertDemoSRE(demoSRE);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -74,7 +74,7 @@ public class CrudController {
     public ResponseEntity<DemoSRE> updateDemoSRE(@RequestBody final DemoSREDTO payload) {
         DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
 
-        log.info("Payload={}", payload.toString());
+        log.info("/updateDemoSRE com Payload {}", payload.toString());
 
         this.crudUseCase.updateDemoSRE(demoSRE);
         return ResponseEntity.noContent().build();
@@ -91,7 +91,7 @@ public class CrudController {
     })
     @DeleteMapping("/removeDemoSRE/{id}")
     public ResponseEntity<DemoSRE> removeDemoSRE(@PathVariable final Integer id) {
-        log.info("ID={}", id);
+        log.info("/removeDemoSRE com id {}", id);
 
         this.crudUseCase.removeDemoSRE(id);
         return ResponseEntity.noContent().build();
@@ -111,7 +111,7 @@ public class CrudController {
 
         ExtraStatusCode extraStatusCode = ExtraStatusCode.fromString(status);
 
-        log.info("Status={}", extraStatusCode.getStatusURL());
+        log.info("/externalApiCall com Status {}", extraStatusCode.getStatusURL());
 
         return ResponseEntity.ok(this.crudUseCase.externalApiCall(extraStatusCode));
     }

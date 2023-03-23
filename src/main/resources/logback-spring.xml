@@ -14,7 +14,7 @@
               class="ch.qos.logback.core.ConsoleAppender">
         <layout class="br.com.bradescoseguros.opin.external.configuration.logback.MaskingPatternLayout">
             <maskPattern>\"Check connection mongo - obfuscated\"\s*:\s*\"(.*?)\"</maskPattern>
-            <Pattern>%black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] [TRACE: %X{TRACE_ID}] %yellow(%C{1.}) %green(%M): %msg%n%throwable{short}</Pattern>
+            <Pattern>%black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] [TRACE-ID: %X{TRACE_ID}] %yellow(%C{1.}) %green(%M): %msg%n%throwable{short}</Pattern>
         </layout>
     </appender>
 

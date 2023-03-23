@@ -28,12 +28,15 @@ public class CircuitBreakerGatewayImpl implements CircuitBreakerGateway {
     @CircuitBreaker(name = "cosmoCircuitBreaker")
     @Cacheable(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME, unless = "#result == null")
     public Optional<DemoSRE> findByIdWithCircuitBreaker(final Integer id) {
+        log.info("Objeto não encontrado no Cache. Chamando findById com id {}", id);
         return repository.findById(id);
     }
 
     @Override
     @CircuitBreaker(name = "apiCircuitBreaker")
     public String externalApiCallWithCircuitBreaker(final ExtraStatusCode statusCode) {
+        log.info("Chamando externalApiCall com status {}", statusCode);
+
         final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
         final String fullURL = baseURL + statusCode.getStatusURL();
 

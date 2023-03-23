@@ -27,6 +27,7 @@ public class BulkheadGatewayImpl implements BulkheadGateway {
     @Override
     @Bulkhead(name = "semaphoreBulkhead")
     public String externalApiCallWithBulkhead() {
+        log.info("Chamando externalApiCall com delay");
 
         return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
     }
@@ -35,12 +36,15 @@ public class BulkheadGatewayImpl implements BulkheadGateway {
     @Bulkhead(name = "semaphoreBulkhead")
     @Retry(name = "apiBulkhead")
     public String externalApiCallWithBulkheadAndRetry() {
+        log.info("Chamando externalApiCall com delay");
 
         return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
     }
 
     @Override
     public String externalApiCallWithThreadPoolBulkhead() {
+        log.info("Chamando externalApiCall com delay");
+
         try {
             return bulkheadThreadPoolGatewayAnotation.externalApiBulkheadThreadPool().get();
         } catch (InterruptedException e) {
