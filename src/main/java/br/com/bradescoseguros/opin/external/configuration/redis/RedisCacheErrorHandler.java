@@ -18,4 +18,9 @@ public class RedisCacheErrorHandler extends SimpleCacheErrorHandler {
 	public void handleCachePutError(final RuntimeException exception, final Cache cache, final Object key, final Object value) {
 		log.warn("Unable to put into cache " + cache.getName() + " : " + exception.getMessage());
 	}
+
+	@Override
+	public void handleCacheEvictError(RuntimeException exception, Cache cache, Object key) {
+		log.warn("Unable to cache evict into cache " + cache.getName() + " : " + exception.getMessage());
+	}
 }

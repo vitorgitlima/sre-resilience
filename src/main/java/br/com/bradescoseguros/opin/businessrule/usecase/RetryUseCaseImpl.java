@@ -30,30 +30,41 @@ public class RetryUseCaseImpl implements RetryUseCase {
 
     @Override
     public DemoSRE getDemoSREWithRetry(final Integer id) {
-        log.info("Calling findById with id {}", id);
+        log.info("Iniciando fluxo de recuperação de objeto por id com Retry");
 
-        return gateway.findByIdWithRetry(id).orElseThrow(() -> {
+        DemoSRE demoSRE = gateway.findByIdWithRetry(id).orElseThrow(() -> {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
             throw new NoContentException(messageSourceService.getMessage(NOT_FOUND));
         });
+
+        log.info("Finalizando fluxo de recuperação de objeto por id com Retry");
+        return demoSRE;
     }
 
     @Override
     public String externalApiCallWithRetry(final ExtraStatusCode status) {
+        log.info("Iniciando fluxo de consulta por status com Retry");
+
         validaStatus(status);
 
-        log.info("Calling ExternalApiCall");
-        return gateway.externalApiCallWithRetry(status);
+        String value = gateway.externalApiCallWithRetry(status);
+
+        log.info("Finalizando fluxo de consulta por status com Retry");
+        return value;
     }
 
 
     @Override
     public String externalApiCallWithRetryAndCircuitBreaker(final ExtraStatusCode status) {
+        log.info("Iniciando fluxo de consulta por status com Retry e Circuit Breaker");
+
         validaStatus(status);
 
-        log.info("Calling ExternalApiCall With Circuit Breaker");
-        return gateway.externalApiCallWithRetryAndCircuitBreaker(status);
+        String value = gateway.externalApiCallWithRetryAndCircuitBreaker(status);
+
+        log.info("Finalizando fluxo de consulta por status com Retry e Circuit Breaker");
+        return value;
     }
 
     private static void validaStatus(ExtraStatusCode status) {

@@ -30,17 +30,22 @@ public class CircuitBreakerUseCaseImpl implements CircuitBreakerUseCase {
 
     @Override
     public DemoSRE getDemoSREWithCircuitBreaker(final Integer id) {
-        log.info("Calling findById with id {}", id);
-        
-        return gateway.findByIdWithCircuitBreaker(id).orElseThrow(() -> {
+        log.info("Iniciando fluxo de recuperação de objeto por id com Circuit Breaker");
+
+        DemoSRE demoSRE = gateway.findByIdWithCircuitBreaker(id).orElseThrow(() -> {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
             throw new NoContentException(messageSourceService.getMessage(NOT_FOUND));
         });
+
+        log.info("Finalizando fluxo de recuperação de objeto por id com Circuit Breaker");
+        return demoSRE;
     }
 
     @Override
     public String externalApiCallWithCircuitBreaker(final ExtraStatusCode status) {
+        log.info("Iniciando fluxo de consulta por status com Circuit Breaker");
+
         if (Objects.isNull(status)) {
             String error = "O status informado não é suportado pela aplicação.";
             log.warn(error);
@@ -48,7 +53,7 @@ public class CircuitBreakerUseCaseImpl implements CircuitBreakerUseCase {
             throw new BadRequestException(error);
         }
 
-        log.info("Calling ExternalApiCall");
+        log.info("Finalizando fluxo de consulta por status com Circuit Breaker");
         return gateway.externalApiCallWithCircuitBreaker(status);
     }
 }

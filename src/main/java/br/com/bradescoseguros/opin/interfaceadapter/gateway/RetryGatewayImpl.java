@@ -31,12 +31,15 @@ public class RetryGatewayImpl implements RetryGateway {
     @Retry(name = "cosmoRetry")
     @Cacheable(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME, unless = "#result == null")
     public Optional<DemoSRE> findByIdWithRetry(final Integer id) {
+        log.info("Objeto não encontrado no Cache. Chamando findById com id {}", id);
         return repository.findById(id);
     }
 
     @Override
     @Retry(name = "apiRetry")
     public String externalApiCallWithRetry(final ExtraStatusCode statusCode) {
+        log.info("Chamando externalApiCall com status {}", statusCode);
+
         return getExternalApiCall(statusCode);
     }
 
@@ -44,6 +47,8 @@ public class RetryGatewayImpl implements RetryGateway {
     @Retry(name = "apiRetry")
     @CircuitBreaker(name = "apiCircuitBreaker")
     public String externalApiCallWithRetryAndCircuitBreaker(final ExtraStatusCode statusCode) {
+        log.info("Chamando externalApiCall com status {}", statusCode);
+
         return getExternalApiCall(statusCode);
     }
 

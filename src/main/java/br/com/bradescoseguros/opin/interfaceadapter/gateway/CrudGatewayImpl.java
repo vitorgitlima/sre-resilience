@@ -29,29 +29,35 @@ public class CrudGatewayImpl implements CrudGateway {
     @Override
     @Cacheable(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME, unless = "#result == null")
     public Optional<DemoSRE> findById(final Integer id) {
+        log.info("Objeto não encontrado no Cache. Chamando findById com id {}", id);
         return repository.findById(id);
     }
 
     @Override
     @CacheEvict(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
     public void insertDemoSRE(final DemoSRE payload) {
+        log.info("Chamando insert com payload {}", payload.toString());
         repository.insert(payload);
     }
 
     @Override
     @CacheEvict(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
     public void updateDemoSRE(final DemoSRE payload) {
+        log.info("Chamando save com payload {}", payload.toString());
         repository.save(payload);
     }
 
     @Override
     @CacheEvict(cacheNames = RedisConstants.DERMOSRE_CACHE_NAME)
     public void removeDemoSRE(final Integer id) {
+        log.info("Chamando deleteById com id {}", id);
         repository.deleteById(id);
     }
 
     @Override
     public String externalApiCall(final ExtraStatusCode statusCode) {
+        log.info("Chamando externalApiCall com status {}", statusCode);
+
         final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
         final String fullURL = baseURL + statusCode.getStatusURL();
 

@@ -14,16 +14,31 @@ public class BulkheadUsecaseImpl implements BulkheadUsecase {
 
     @Override
     public String externalApiCallWithSemaphoreBulkhead() {
-        return bulkheadGateway.externalApiCallWithBulkhead();
+        log.info("Iniciando fluxo de chamada externa com Bulkhead");
+
+        String value = bulkheadGateway.externalApiCallWithBulkhead();
+
+        log.info("Finalizando fluxo de chamada externa com Bulkhead");
+        return value;
     }
 
     @Override
     public String externalApiCallWithSemaphoreBulkheadAndRetry() {
-        return bulkheadGateway.externalApiCallWithBulkheadAndRetry();
+        log.info("Iniciando fluxo de chamada externa com Bulkhead e Retry");
+
+        String value = bulkheadGateway.externalApiCallWithBulkheadAndRetry();
+
+        log.info("Finalizando fluxo de chamada externa com Bulkhead e Retry");
+        return value;
     }
 
     @Override
     public String externalApiCallWithThreadPoolBulkhead() {
-        return bulkheadGateway.externalApiCallWithThreadPoolBulkhead();
+        log.info("Iniciando fluxo de chamada externa com Thread Pool Bulkhead");
+
+        String value = bulkheadGateway.externalApiCallWithThreadPoolBulkhead();
+
+        log.info("Finalizando fluxo de chamada externa com Thread Pool Bulkhead");
+        return value;
     }
 }
