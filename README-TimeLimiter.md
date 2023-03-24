@@ -1,0 +1,109 @@
+# TimeLimiter
+
+## Overview
+The TimeLimiter is a resilience pattern that allows you to add a timeout to a method call. It's particularly useful for protecting your application from long-running or stuck operations that could cause resource exhaustion or other issues.
+
+One main reason why we would do this is to ensure that we don’t make users or clients wait indefinitely. A slow service that does not give any feedback can be frustrating to the user.
+
+## Benefits
+
+* Improved application performance by preventing slow or hanging external services from blocking the calling thread
+
+* Enhanced resilience by providing more safety for your application when interacting with problematic external services
+
+* Flexibility to configure TimeLimiter to suit your specific use case, including custom timeout duration, cancellation of running tasks, and fallback behavior when triggered.
+
+* Better user experience by preventing users from waiting indefinitely for a response and returning meaningful error messages or default responses
+
+
+
+![Alt text](./docs/time_limiter.png "TimeLimiter")
+
+
+
+To implement this pattern, we use resilience4j. More information can be found at [Resilience4j TimeLimiter Documentation](https://resilience4j.readme.io/docs/timeout) :link:
+
+## Implementation
+
+`CopmpletableFuture`
+
+When using TimeLimiter from Resilience4j, it's common to use CompletableFuture in order to execute the operation asynchronously and apply the timeout. This is because CompletableFuture provides a built-in timeout mechanism that can be used to implement the timeout functionality of TimeLimiter. We will discuss more about this in the usage topic.
+
+## Setting up
+
+### How to set TimeLimiter in your application
+
+First we need to add a new dependency on pom.xml
+
+```xml
+        <!-- Resilience -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot2</artifactId>
+            <version>1.7.1</version> <!-- For best results, ensure that your application is always running on the most recent LTS version it can handle -->
+        </dependency>
+```
+## Configuration
+
+Then add a new configuration in application.yml
+
+```yaml
+resilience4j.timelimiter: # This line sets the root key for defining a TimeLimiter configuration with Resilience4j library.
+  instances: # Defining TimeLimiter instances.
+    orderService: # Declares a specific instance of a TimeLimiter with the name "orderService".
+      timeoutDuration: 10s #This line sets the timeout duration for the orderService TimeLimiter instance to 10 seconds. This means that if the protected method takes longer than 10 seconds to execute, the TimeLimiter will throw a TimeoutException.
+      cancelRunningFuture: true # This line specifies whether to cancel the running future when the timeout occurs. If set to true, the future will be cancelled when the timeout occurs, otherwise it will be allowed to continue running.
+```
+
+## Usage
+Here's an example of how to use TimeLimiter in applications:
+
+In this example, the method callExternalApiWithCompletableFuture() is using a CompletableFuture to call an external API with a TimeLimiter.
+
+The reason for using `CompletableFuture` is to execute the external API call asynchronously, which means that the calling thread can continue executing other tasks while waiting for the API response. This can improve the overall capacity and responsiveness of the application.
+
+
+```java
+  private String callExternalApiWithCompletableFuture() {
+        log.info("Chamando externalApiCall com delay");
+        try{
+            return timeLimiterGatewayAnotation.externalApiTimeLimiterThreadPool().get();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+            Thread.currentThread().interrupt();
+            throw new GatewayException(e.getMessage());
+        } catch (ExecutionException e) {
+            log.error(e.getMessage());
+            if(e.getCause() instanceof TimeoutException){
+                throw new TimeOutException(e.getMessage());
+            }
+            throw new GatewayException(e);
+        }
+
+    }
+```
+
+Here we have the annotation `@TimeLimiter`  controlling the method, when the request exceeded the `timeoutDuration` configured in yaml, a `TimeoutException` will be thrown
+
+```java
+  @TimeLimiter(name = "orderService")
+    public CompletableFuture<String> externalApiTimeLimiterThreadPool() {
+
+        final String fullURL = "http://localhost:8081/api/sre/v1/extra/delay";
+
+        return CompletableFuture.supplyAsync(() -> restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody());
+    }
+
+```
+
+## Conclusion
+
+A TimeLimiter is a powerful tool that ensures an application interacts with external services reliably and timely. It limits the amount of time the calling thread waits for a response, preventing slow or hanging services from impacting performance.
+
+This prevents slow or hanging services from impacting the performance of the entire application and allows the application to return meaningful error messages or default responses to the user in a timely manner.
