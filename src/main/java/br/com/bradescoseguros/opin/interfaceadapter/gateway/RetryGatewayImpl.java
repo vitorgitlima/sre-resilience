@@ -38,8 +38,6 @@ public class RetryGatewayImpl implements RetryGateway {
     @Override
     @Retry(name = "apiRetry")
     public String externalApiCallWithRetry(final ExtraStatusCode statusCode) {
-        log.info("Chamando externalApiCall com status {}", statusCode);
-
         return getExternalApiCall(statusCode);
     }
 
@@ -47,12 +45,12 @@ public class RetryGatewayImpl implements RetryGateway {
     @Retry(name = "apiRetry")
     @CircuitBreaker(name = "apiCircuitBreaker")
     public String externalApiCallWithRetryAndCircuitBreaker(final ExtraStatusCode statusCode) {
-        log.info("Chamando externalApiCall com status {}", statusCode);
-
         return getExternalApiCall(statusCode);
     }
 
     private String getExternalApiCall(ExtraStatusCode statusCode) {
+        log.info("Chamando externalApiCall com status {}", statusCode);
+
         final String baseURL = "http://localhost:8081/api/sre/v1/extra/";
         final String fullURL = baseURL + statusCode.getStatusURL();
 
