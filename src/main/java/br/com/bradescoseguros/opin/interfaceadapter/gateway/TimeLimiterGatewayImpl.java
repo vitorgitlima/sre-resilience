@@ -21,14 +21,12 @@ public class TimeLimiterGatewayImpl implements TimeLimiterGateway {
 
     @Override
     public String externalApiCallWithTimeLimiter() {
-        log.info("Chamando externalApiCall com delay");
         return callExternalApiWithCompletableFuture();
     }
 
     @Override
     @Retry(name = "apiTimeLimiter")
     public String externalApiCallWithTimeLimiterAndRetry() {
-        log.info("Chamando externalApiCall com delay");
         return callExternalApiWithCompletableFuture();
     }
 
