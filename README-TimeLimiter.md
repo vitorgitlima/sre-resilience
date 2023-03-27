@@ -56,43 +56,48 @@ Then add a new configuration in application.yml
 ```yaml
 resilience4j.timelimiter: # This line sets the root key for defining a TimeLimiter configuration with Resilience4j library.
   instances: # Defining TimeLimiter instances.
-    orderService: # Declares a specific instance of a TimeLimiter with the name "orderService".
-      timeoutDuration: 10s #This line sets the timeout duration for the orderService TimeLimiter instance to 10 seconds. This means that if the protected method takes longer than 10 seconds to execute, the TimeLimiter will throw a TimeoutException.
+    timeLimiterService: # Declares a specific instance of a TimeLimiter with the name "timeLimiterService".
+      timeoutDuration: 10s #This line sets the timeout duration for the timeLimiterService instance to 10 seconds. This means that if the protected method takes longer than 10 seconds to execute, the TimeLimiter will throw a TimeoutException.
       cancelRunningFuture: true # This line specifies whether to cancel the running future when the timeout occurs. If set to true, the future will be cancelled when the timeout occurs, otherwise it will be allowed to continue running.
 ```
 
-## Usage
+## Usage and Details
 Here's an example of how to use TimeLimiter in applications:
 
-In this example, the method callExternalApiWithCompletableFuture() is using a CompletableFuture to call an external API with a TimeLimiter.
+To understand the use of TimeLimiter, we need to talk a little more in detail about how to use `CompletableFuture`.
 
 The reason for using `CompletableFuture` is to execute the external API call asynchronously, which means that the calling thread can continue executing other tasks while waiting for the API response. This can improve the overall capacity and responsiveness of the application.
 
+### **Note**
+
+For this implementation, we use a separete class, named `TimeLimiterGatewayAnotation`, which has `externalApiTimeLimiterThreadPool`. This method implement TimeLimiter with `@TimeLimiter` annotation and have to be first call method on the class. 
+
+If the time limit is exceeded or an exception occurs during the execution of the API call, the method will throw a RuntimeException or InterruptedException
+
+
+### ***callExternalApiWithCompletableFuture***
+
+The `callExternalApiWithCompletableFuture()` method in this example uses a `CompletableFuture` instance returned by the `timeLimiterGatewayAnotation` class to call an external API with a TimeLimiter, ensuring that the API call is completed within the specified time limit.
 
 ```java
-  private String callExternalApiWithCompletableFuture() {
+   private String callExternalApiWithCompletableFuture() {
         log.info("Chamando externalApiCall com delay");
-        try{
+        try {
             return timeLimiterGatewayAnotation.externalApiTimeLimiterThreadPool().get();
-        } catch (InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             log.error(e.getMessage());
-            Thread.currentThread().interrupt();
-            throw new GatewayException(e.getMessage());
-        } catch (ExecutionException e) {
-            log.error(e.getMessage());
-            if(e.getCause() instanceof TimeoutException){
-                throw new TimeOutException(e.getMessage());
-            }
-            throw new GatewayException(e);
+            throw new RuntimeException(e);
         }
-
+        // you can also implement others Exceptions
     }
 ```
 
-Here we have the annotation `@TimeLimiter`  controlling the method, when the request exceeded the `timeoutDuration` configured in yaml, a `TimeoutException` will be thrown
+### ***externalApiTimeLimiterThreadPool***
+Here we have the annotation `@TimeLimiter` controlling the method, when the request exceeded the `timeoutDuration` configured in yaml, a `TimeoutException` will be thrown
+
 
 ```java
-  @TimeLimiter(name = "orderService")
+  @TimeLimiter(name = "timeLimiterService")
     public CompletableFuture<String> externalApiTimeLimiterThreadPool() {
 
         final String fullURL = "http://localhost:8081/api/sre/v1/extra/delay";
