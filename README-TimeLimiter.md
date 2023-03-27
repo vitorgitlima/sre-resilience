@@ -7,13 +7,13 @@ One main reason why we would do this is to ensure that we don’t make users or 
 
 ## Benefits
 
-* Improved application performance by preventing slow or hanging external services from blocking the calling thread
+* Improved application performance by preventing slow or hanging external services from blocking the calling thread.
 
-* Enhanced resilience by providing more safety for your application when interacting with problematic external services
+* Enhanced resilience by providing more safety for your application when interacting with problematic external services.
 
 * Flexibility to configure TimeLimiter to suit your specific use case, including custom timeout duration, cancellation of running tasks, and fallback behavior when triggered.
 
-* Better user experience by preventing users from waiting indefinitely for a response and returning meaningful error messages or default responses
+* Better user experience by preventing users from waiting indefinitely for a response and returning meaningful error messages or default responses.
 
 
 
@@ -81,7 +81,6 @@ The `callExternalApiWithCompletableFuture()` method in this example uses a `Comp
 
 ```java
    private String callExternalApiWithCompletableFuture() {
-        log.info("Chamando externalApiCall com delay");
         try {
             return timeLimiterGatewayAnotation.externalApiTimeLimiterThreadPool().get();
         } catch (ExecutionException | InterruptedException e) {
