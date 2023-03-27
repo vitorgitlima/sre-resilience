@@ -60,7 +60,7 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
             response = new MetaDataEnvelope(meta, exception.getErrors());
         }
 
-        log.error("handleDemoSREMaxRetriesExceededException: {}", response);
+        log.error("handleMaxRetriesExceededException: {}", response);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
@@ -83,7 +83,7 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
             response = new MetaDataEnvelope(meta, exception.getErrors());
         }
 
-        log.warn("handleDemoSREBadRequestException: {}", response);
+        log.warn("handleBadRequestException: {}", response);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
@@ -99,7 +99,7 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
         final MetaData meta = new MetaData(httpStatus.toString(), MDC.get("TRACE_ID"));
         MetaDataEnvelope response = new MetaDataEnvelope(meta, Collections.singleton(errorData));
 
-        log.warn("handleDemoSRERegistryAlreadyExistsException: {}", response);
+        log.warn("handleRegistryAlreadyExistsException: {}", response);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),
                 httpStatus, request);
@@ -121,8 +121,8 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
                 httpStatus, request);
     }
 
-    @ExceptionHandler(io.github.resilience4j.bulkhead.BulkheadFullException.class)
-    public ResponseEntity<Object> handleBulkheadFullException(final io.github.resilience4j.bulkhead.BulkheadFullException exception, final WebRequest request) {
+    @ExceptionHandler({BulkheadFullException.class, io.github.resilience4j.bulkhead.BulkheadFullException.class})
+    public ResponseEntity<Object> handleBulkheadFullException(final Exception exception, final WebRequest request) {
 
         String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable");
 
@@ -130,23 +130,7 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
         MetaDataEnvelope response =
                 new MetaDataEnvelope(httpStatus.toString(), ErrorCode.BULKHEAD_FULL, exceptionMessage);
 
-        final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
-        log.error(errorMessage, exception);
-
-        return handleExceptionInternal(exception, response, new HttpHeaders(),
-                httpStatus, request);
-    }
-
-    @ExceptionHandler(BulkheadFullException.class)
-    public ResponseEntity<Object> handleBulkheadFullException(final BulkheadFullException exception, final WebRequest request) {
-
-        String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable");
-
-        HttpStatus httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
-        MetaDataEnvelope response =
-                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.BULKHEAD_FULL, exceptionMessage);
-
-        final String errorMessage = MessageFormat.format("handleCallNotPermittedException: {0}", response);
+        final String errorMessage = MessageFormat.format("handleBulkheadFullException: {0}", response);
         log.error(errorMessage, exception);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),
@@ -156,13 +140,13 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
     @ExceptionHandler(TimeOutException.class)
     public ResponseEntity<Object> handleTimeOutException(final TimeOutException exception, final WebRequest request) {
 
-        String exceptionMessage = messageSourceService.getMessage("demo-sre.service-unavailable", exception.getMessage());
+        String exceptionMessage = messageSourceService.getMessage("sre.generic-error", exception.getMessage());
 
-        HttpStatus httpStatus = HttpStatus.REQUEST_TIMEOUT;
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         MetaDataEnvelope response =
-                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.TIME_OUT, exceptionMessage);
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.INTERNAL_SERVER_ERROR, exceptionMessage);
 
-        final String errorMessage = MessageFormat.format("handleDemoSRETimeOutException: {0}", response);
+        final String errorMessage = MessageFormat.format("handleTimeOutException: {0}", response);
         log.error(errorMessage, exception);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),
@@ -178,7 +162,7 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
         MetaDataEnvelope response =
                 new MetaDataEnvelope(httpStatus.toString(), ErrorCode.INTERNAL_SERVER_ERROR, exceptionMessage);
 
-        final String errorMessage = MessageFormat.format("handleDemoSRETimeOutException: {0}", response);
+        final String errorMessage = MessageFormat.format("handleConnectException: {0}", response);
         log.error(errorMessage, exception);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),
@@ -194,7 +178,7 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
         MetaDataEnvelope response =
                 new MetaDataEnvelope(httpStatus.toString(), ErrorCode.INTERNAL_SERVER_ERROR, exceptionMessage);
 
-        final String errorMessage = MessageFormat.format("handleDemoSRETimeOutException: {0}", response);
+        final String errorMessage = MessageFormat.format("handleHttpServerErrorException: {0}", response);
         log.error(errorMessage, exception);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),
@@ -210,7 +194,7 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
         MetaDataEnvelope response =
                 new MetaDataEnvelope(httpStatus.toString(), ErrorCode.INTERNAL_SERVER_ERROR, exceptionMessage);
 
-        final String errorMessage = MessageFormat.format("handleDemoSRETimeOutException: {0}", response);
+        final String errorMessage = MessageFormat.format("handleMongoTimeoutException: {0}", response);
         log.error(errorMessage, exception);
 
         return handleExceptionInternal(exception, response, new HttpHeaders(),

@@ -1,6 +1,9 @@
 package br.com.bradescoseguros.opin.businessrule.usecase;
 
+import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.gateway.TimeLimiterGateway;
+import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,25 @@ public class TimeLimiterUsecaseImpl implements TimeLimiterUsecase {
     @Autowired
     private TimeLimiterGateway timeLimiterGateway;
 
+    @Autowired
+    private MessageSourceService messageSourceService;
+
+    private static final String NOT_FOUND = "demo-sre.id-not-found";
+
+
+    @Override
+    public DemoSRE getDemoSRE() {
+        log.info("Iniciando fluxo de recuperação de objeto por id com Time Limiter");
+
+        DemoSRE demoSRE = timeLimiterGateway.findByIdWithTimeLimiter(2).orElseThrow(() -> {
+            log.warn(messageSourceService.getMessage(NOT_FOUND));
+
+            throw new NoContentException(messageSourceService.getMessage(NOT_FOUND));
+        });
+
+        log.info("Finalizando fluxo de recuperação de objeto por id com Time Limiter");
+        return demoSRE;
+    }
 
     @Override
     public String externalApiCallWithTimeLimiter() {

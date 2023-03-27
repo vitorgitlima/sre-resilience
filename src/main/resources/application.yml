@@ -164,22 +164,26 @@ resilience4j.bulkhead:
       maxConcurrentCalls: 2
       maxWaitDuration: 1s
 
-resilience4j:
-    thread-pool-bulkhead:
-        configs:
-          default:
-              maxThreadPoolSize: 2 # Valor máximo do pool de threads
-              coreThreadPoolSize: 1 # O valor "core" do pool de threads
-              queueCapacity: 2 # Capacidade da fila de requisições que irão aguardar
-              keepAliveDuration: 20 # Quando o número de Threads for maior que o "core", representa o tempo maximo que as threads ociosas em excesso irão aguardar por novas tarefas antes de serem encerradas
-        instances: # Define as instancias de bulkheads que teremos em nossa aplicação. Novas instancias podem ser criadas conforme necessário
-          bulkheadInstance:
-            baseConfig: default # Essa configuração indica que estamos herdando todas as configurações default. As definições seguintes sobrescrevem a configuração default e podem ser alteradas conforme necessário
+resilience4j.thread-pool-bulkhead:
+  configs:
+    default:
+        maxThreadPoolSize: 2 # Valor máximo do pool de threads
+        coreThreadPoolSize: 1 # O valor "core" do pool de threads
+        queueCapacity: 2 # Capacidade da fila de requisições que irão aguardar
+        keepAliveDuration: 20 # Quando o número de Threads for maior que o "core", representa o tempo maximo que as threads ociosas em excesso irão aguardar por novas tarefas antes de serem encerradas
+  instances: # Define as instancias de bulkheads que teremos em nossa aplicação. Novas instancias podem ser criadas conforme necessário
+    bulkheadInstance:
+      baseConfig: default # Essa configuração indica que estamos herdando todas as configurações default. As definições seguintes sobrescrevem a configuração default e podem ser alteradas conforme necessário
 
 
 # Definições de Time Limiter
 resilience4j.timelimiter:
+  configs:
+    default:
+      timeoutDuration: 10s # Duração limite da execução antes de lançar uma exceção
+      cancelRunningFuture: true # Indica que o cancelar deve ser invocado quando estiver executando um Future
   instances:
-    orderService:
-      timeoutDuration: 10s
-      cancelRunningFuture: true #whether cancel should be called on the running future
+    limiterApi:
+      baseConfig: default
+    limiterDb:
+      baseConfig: default
