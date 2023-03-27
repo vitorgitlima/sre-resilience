@@ -3,6 +3,8 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 import br.com.bradescoseguros.opin.businessrule.exception.GatewayException;
 import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import br.com.bradescoseguros.opin.configuration.TestResilienceConfig;
+import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.repository.CrudRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +30,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -67,9 +71,68 @@ public class TimeLimiterControllerTest {
 
     @Test
     @Tag("comp")
-    public void TimeLimiter_ShouldReturn503whenGatewayException() throws Exception {
+    public void getDbWithTimelimiter_ShouldReturn200WhenTimeLimiterNotInvoked() throws Exception {
         // Arrange
-        final String url = BASE_URL + "/timelimiter";
+        final String url = BASE_URL + "/timelimiter/db";
+        final String response = "ok";
+        DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
+        String demoSREMockJson = new ObjectMapper().writeValueAsString(demoSREMock);
+
+
+        when(crudRepositoryMock.findById(anyInt())).thenAnswer((Answer<Optional<DemoSRE>>) invocation -> {
+            Thread.sleep(1000);
+            return Optional.of(demoSREMock);
+        });
+
+        // Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+
+        // Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(result.getResponse().getContentAsString()).isEqualTo(demoSREMockJson);
+
+    }
+
+    @Test
+    @Tag("comp")
+    public void getDbWithTimelimiter_ShouldReturn500WhenTimeLimiterInvoked() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/timelimiter/db";
+        final String errorMessage = "INTERNAL_SERVER_ERROR Não foi possível concluir a requisição.";
+
+        when(crudRepositoryMock.findById(anyInt())).thenAnswer((Answer<Optional<DemoSRE>>) invocation -> {
+            Thread.sleep(3000);
+            return Optional.of(null);
+        });
+
+        // Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
+
+        // Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(bodyResult.getErrors()).hasSize(1);
+        assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
+
+    }
+
+    @Test
+    @Tag("comp")
+    public void getApiWithTimeLimiter_ShouldReturn503whenGatewayException() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/timelimiter/api";
         final String errorMessage = "GATEWAY_ERROR java.util.concurrent.ExecutionException: br.com.bradescoseguros.opin.businessrule.exception.GatewayException";
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(GatewayException.class);
@@ -94,10 +157,10 @@ public class TimeLimiterControllerTest {
 
     @Test
     @Tag("comp")
-    public void TimeLimiter_ShouldReturn408WhenInvoked() throws Exception {
+    public void getApiWithTimeLimiter_ShouldReturn500WhenTimeLimiterInvoked() throws Exception {
         // Arrange
-        final String url = BASE_URL + "/timelimiter";
-        final String errorMessage = "TIME_OUT O serviço requisitado está indisponível.";
+        final String url = BASE_URL + "/timelimiter/api";
+        final String errorMessage = "INTERNAL_SERVER_ERROR Não foi possível concluir a requisição.";
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
             Thread.sleep(3000);
@@ -115,7 +178,7 @@ public class TimeLimiterControllerTest {
         MetaDataEnvelope bodyResult = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MetaDataEnvelope.class);
 
         // Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.REQUEST_TIMEOUT.value());
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(bodyResult.getErrors()).hasSize(1);
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
 
@@ -123,7 +186,7 @@ public class TimeLimiterControllerTest {
 
     @Test
     @Tag("comp")
-    public void TimeLimiterWithRetry_ShouldReturn503whenMaxRetriesExceeded() throws Exception {
+    public void getApiWithTimeLimiterWithRetry_ShouldReturn503whenMaxRetriesExceeded() throws Exception {
         // Arrange
         final String url = BASE_URL + "/timelimiter/retry";
         final String errorMessage = "MAX_RETRIES_EXCEEDED Número máximo de tentativas excedido.";
@@ -155,9 +218,9 @@ public class TimeLimiterControllerTest {
 
     @Test
     @Tag("comp")
-    public void TimeLimiter_ShouldReturn200WhenNotInvoked() throws Exception {
+    public void getApiWithTimelimiter_ShouldReturn200WhenTimeLimiterNotInvoked() throws Exception {
         // Arrange
-        final String url = BASE_URL + "/timelimiter";
+        final String url = BASE_URL + "/timelimiter/api";
         final String response = "ok";
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenAnswer((Answer<ResponseEntity>) invocation -> {
@@ -183,7 +246,7 @@ public class TimeLimiterControllerTest {
 
     @Test
     @Tag("comp")
-    public void TimeLimiterWithRetry_ShouldReturn200WhenNotInvoked() throws Exception {
+    public void getApiWithTimeLimiterWithRetry_ShouldReturn200WhenTimeLimiterNotInvoked() throws Exception {
         // Arrange
         final String url = BASE_URL + "/timelimiter/retry";
         final String response = "ok";
