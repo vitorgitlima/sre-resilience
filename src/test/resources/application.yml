@@ -111,7 +111,12 @@ resilience4j:
 
 
 resilience4j.timelimiter:
-  instances:
-    orderService:
+  configs:
+    default:
       timeoutDuration: 2s
       cancelRunningFuture: true
+  instances:
+    limiterApi:
+      baseConfig: default
+    limiterDb:
+      baseConfig: default
