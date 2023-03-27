@@ -4,6 +4,7 @@
   - [Retry](README-RETRY.md "Readme for Retry Structure") :link:
   - [Circuit](README-CB.md "Readme for Circuit Breaker Structure") :link:
   - [Bulkhead](README-Bulkhead.md "Readme for Bulkhead") :link:
+  - [Time Limiter](README-TimeLimiter.md "Readme for Time Limiter") :link:
 - [Project Strutucre](#project-strutucre "Project Strutucre")
   - [Pre-Requires](#pre-requires "Pre-Requires")
   - [Clean Architecture](#clean-architecture "Clean Architecture")
