@@ -17,6 +17,8 @@ import java.util.concurrent.ExecutionException;
 @Component
 public class BulkheadGatewayImpl implements BulkheadGateway {
 
+    public static final String LOG_MSG_API_DELAY = "Chamando externalApiCall com delay";
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -27,8 +29,6 @@ public class BulkheadGatewayImpl implements BulkheadGateway {
     @Override
     @Bulkhead(name = "semaphoreBulkhead")
     public String externalApiCallWithBulkhead() {
-        log.info("Chamando externalApiCall com delay");
-
         return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
     }
 
@@ -36,14 +36,12 @@ public class BulkheadGatewayImpl implements BulkheadGateway {
     @Bulkhead(name = "semaphoreBulkhead")
     @Retry(name = "apiBulkhead")
     public String externalApiCallWithBulkheadAndRetry() {
-        log.info("Chamando externalApiCall com delay");
-
         return callExternalApi("http://localhost:8081/api/sre/v1/extra/delay");
     }
 
     @Override
     public String externalApiCallWithThreadPoolBulkhead() {
-        log.info("Chamando externalApiCall com delay");
+        log.info(LOG_MSG_API_DELAY);
 
         try {
             return bulkheadThreadPoolGatewayAnotation.externalApiBulkheadThreadPool().get();
@@ -60,7 +58,7 @@ public class BulkheadGatewayImpl implements BulkheadGateway {
         }
     }
     private String callExternalApi(String fullURL) {
-
+        log.info(LOG_MSG_API_DELAY);
         return restTemplate.exchange(fullURL, HttpMethod.GET, null, String.class).getBody();
     }
 
