@@ -5,6 +5,8 @@ The TimeLimiter is a resilience pattern that allows you to add a timeout to a me
 
 One main reason why we would do this is to ensure that we don’t make users or clients wait indefinitely. A slow service that does not give any feedback can be frustrating to the user.
 
+![Alt text](./docs/time_limiter.png "TimeLimiter")
+
 ## Benefits
 
 * Improved application performance by preventing slow or hanging external services from blocking the calling thread.
@@ -17,7 +19,7 @@ One main reason why we would do this is to ensure that we don’t make users or 
 
 
 
-![Alt text](./docs/time_limiter.png "TimeLimiter")
+
 
 
 
