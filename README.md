@@ -5,6 +5,7 @@
   - [Circuit](README-CB.md "Readme for Circuit Breaker Structure") :link:
   - [Bulkhead](README-Bulkhead.md "Readme for Bulkhead") :link:
   - [Time Limiter](README-TimeLimiter.md "Readme for Time Limiter") :link:
+  - [Trace-ID](README-TraceId.md "Readme for Trace Id") :link:
 - [Project Strutucre](#project-strutucre "Project Strutucre")
   - [Pre-Requires](#pre-requires "Pre-Requires")
   - [Clean Architecture](#clean-architecture "Clean Architecture")
