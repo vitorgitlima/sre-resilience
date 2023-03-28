@@ -12,7 +12,7 @@ In the picture below, we can see a scenario where an application tries to call a
 500 status. But, when it tries for the third time, it can get the resource that it was trying to reach.
 This pattern helps us to reduce the number of errors that are received by our users.
 
-![Alt text](./docs/time_limiter.png "Retry pattern")
+![Alt text](./docs/retry_example.png "Retry pattern")
 
 But be careful, we need to analyze each scenario. In some cases, if we get an error and keep retrying, we can get more errors and cause more problems in the external service, for example.
 

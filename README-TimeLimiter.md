@@ -70,7 +70,7 @@ The reason for using `CompletableFuture` is to execute the external API call asy
 
 ### **Note**
 
-For this implementation, we use a separete class, named `TimeLimiterGatewayAnotation`, which has `externalApiTimeLimiterThreadPool`. This method implement TimeLimiter with `@TimeLimiter` annotation and have to be first call method on the class. 
+For this implementation, we use a separete class, named `TimeLimiterGatewayAnotation`, which has `externalApiTimeLimiter`. This method implement TimeLimiter with `@TimeLimiter` annotation and have to be first call method on the class. 
 
 If the time limit is exceeded or an exception occurs during the execution of the API call, the method will throw a RuntimeException or InterruptedException
 
@@ -82,7 +82,7 @@ The `callExternalApiWithCompletableFuture()` method in this example uses a `Comp
 ```java
    private String callExternalApiWithCompletableFuture() {
         try {
-            return timeLimiterGatewayAnotation.externalApiTimeLimiterThreadPool().get();
+            return timeLimiterGatewayAnotation.externalApiTimeLimiter().get();
         } catch (ExecutionException | InterruptedException e) {
             log.error(e.getMessage());
             throw new RuntimeException(e);
@@ -91,13 +91,13 @@ The `callExternalApiWithCompletableFuture()` method in this example uses a `Comp
     }
 ```
 
-### ***externalApiTimeLimiterThreadPool***
+### ***externalApiTimeLimiter***
 Here we have the annotation `@TimeLimiter` controlling the method, when the request exceeded the `timeoutDuration` configured in yaml, a `TimeoutException` will be thrown
 
 
 ```java
   @TimeLimiter(name = "timeLimiterService")
-    public CompletableFuture<String> externalApiTimeLimiterThreadPool() {
+    public CompletableFuture<String> externalApiTimeLimiter() {
 
         final String fullURL = "http://localhost:8081/api/sre/v1/extra/delay";
 
