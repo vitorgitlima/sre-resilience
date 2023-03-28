@@ -14,14 +14,6 @@ When using the Trace-ID, it adds the possibility of tracing the history of the r
 * Faster error find and mitigate.
 
 
-[//]: # (
-)
-
-[//]: # (
-)
-[//]: # ()
-
-
 ![Alt text](./docs/trace_id_example.png "TimeLimiter")
 
 
