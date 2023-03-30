@@ -1,0 +1,627 @@
+{
+	"info": {
+		"_postman_id": "0c970464-a235-453d-8e3b-c929529b1a71",
+		"name": "SRE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "ExternalAPIMock",
+			"item": [
+				{
+					"name": "200 - Ok",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/sre/v1/extra/ok",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"extra",
+								"ok"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "200 - Ok [delay]",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/sre/v1/extra/delay",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"extra",
+								"delay"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "404 - Not Found",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/sre/v1/extra/nok404",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"extra",
+								"nok404"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "423 - Locked",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/sre/v1/extra/nok423",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"extra",
+								"nok423"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "425 - Too Early",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/sre/v1/extra/nok425",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"extra",
+								"nok425"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "500 - Internal Server Error Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/sre/v1/extra/nok500",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"extra",
+								"nok500"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "504 - Gatweway Timeout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8081/api/sre/v1/extra/nok504",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"extra",
+								"nok504"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Actuator",
+			"item": [
+				{
+					"name": "Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/actuator/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Circuit-Breakers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/actuator/health",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"actuator",
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Crud",
+			"item": [
+				{
+					"name": "GetDemoSRE",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/getDemoSRE/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"getDemoSRE",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "InsertDemoSRE",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 4,\n    \"value\": \"valor 4\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/insertDemoSRE",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"insertDemoSRE"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateDemoSRE",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 4,\n    \"value\": \"valor alterado 4\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/updateDemoSRE",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"updateDemoSRE"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RemoveDemoSRE",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/removeDemoSRE/4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"removeDemoSRE",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "External API Call",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/externalApiCall/ok",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"externalApiCall",
+								"ok"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Retry",
+			"item": [
+				{
+					"name": "Retry - DB",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/retry/db",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"retry",
+								"db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retry - API",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/retry/api",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"retry",
+								"api"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retry - CircuitBreaker",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/retry/circuitbreaker",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"retry",
+								"circuitbreaker"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CircuitBreaker",
+			"item": [
+				{
+					"name": "CircuitBreaker - DB",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/circuitbreaker/db",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"circuitbreaker",
+								"db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CircuitBreaker - API",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/circuitbreaker/api",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"circuitbreaker",
+								"api"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TimeLimiter",
+			"item": [
+				{
+					"name": "TimeLimiter - DB",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/timelimiter/db",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"timelimiter",
+								"db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TimeLimiter - API",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/timelimiter/api",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"timelimiter",
+								"api"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TimeLimiter - Retry",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/timelimiter/retry",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"timelimiter",
+								"retry"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BulkHead",
+			"item": [
+				{
+					"name": "SemaphoreBulkhead",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/semaphorebulkhead",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"semaphorebulkhead"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SemaphoreBulkhead - Retry",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/semaphorebulkhead/retry",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"semaphorebulkhead",
+								"retry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ThreadPoolBulkhead",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/threadpoolbulkhead",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"threadpoolbulkhead"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
