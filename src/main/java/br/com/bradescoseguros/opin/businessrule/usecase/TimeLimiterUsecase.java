@@ -4,7 +4,7 @@ import br.com.bradescoseguros.opin.domain.DemoSRE;
 
 public interface TimeLimiterUsecase {
 
-    DemoSRE getDemoSRE();
+    DemoSRE getDemoSRE(Integer id);
     String externalApiCallWithTimeLimiter();
     String externalApiCallWithTimeLimiterAndRetry();
 
