@@ -33,7 +33,7 @@ public class TimeLimiterController {
 
         log.info("Fluxo DB Time Limiter");
 
-        return ResponseEntity.ok(this.timeLimiterUsecase.getDemoSRE());
+        return ResponseEntity.ok(this.timeLimiterUsecase.getDemoSRE(1));
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter.",

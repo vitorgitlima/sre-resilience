@@ -43,7 +43,7 @@ class TimeLimiterUsecaseImplTest {
         when(mockGateway.findByIdWithTimeLimiter(anyInt())).thenReturn(demoSREMock);
 
         //Act
-        DemoSRE result = useCase.getDemoSRE();
+        DemoSRE result = useCase.getDemoSRE(1);
 
         //Assert
         assertThat(result).isNotNull();
@@ -60,7 +60,7 @@ class TimeLimiterUsecaseImplTest {
         when(mockGateway.findByIdWithTimeLimiter(anyInt())).thenReturn(Optional.empty());
 
         //Act
-        NoContentException exception = Assertions.assertThrows(NoContentException.class, () -> useCase.getDemoSRE());
+        NoContentException exception = Assertions.assertThrows(NoContentException.class, () -> useCase.getDemoSRE(1));
 
         //Assert
         assertThat(exception.getMessage()).isEqualTo(MESSAGE_MOCK);
