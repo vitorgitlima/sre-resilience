@@ -141,7 +141,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
             log.info(warnMessage, NO_CONTENT_CODE, exception.getLocalizedMessage());
         }
         if(exception.getMessage().equals("warn")) {
-            log.info(warnMessage, NO_CONTENT_CODE, exception.getLocalizedMessage());
+            log.warn(warnMessage, NO_CONTENT_CODE, exception.getLocalizedMessage());
         }
 
         return ResponseEntity.noContent().build();
