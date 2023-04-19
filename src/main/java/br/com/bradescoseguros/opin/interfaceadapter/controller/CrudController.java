@@ -38,8 +38,15 @@ public class CrudController {
     @GetMapping(value = "/getDemoSRE/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
         log.info("/getDemoSRE com id {}", id);
+        DemoSRE demoSRE = null;
 
-        return ResponseEntity.ok(this.crudUseCase.getDemoSRE(id));
+        try {
+            demoSRE = this.crudUseCase.getDemoSRE(id);
+        } catch (Exception e) {
+            return ResponseEntity.noContent().build();
+        }
+        
+        return ResponseEntity.ok(demoSRE);
     }
 
     @Operation(summary = "Insere um novo registro de SRE.",
