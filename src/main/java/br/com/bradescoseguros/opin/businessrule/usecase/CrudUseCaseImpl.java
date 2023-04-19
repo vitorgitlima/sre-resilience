@@ -34,6 +34,13 @@ public class CrudUseCaseImpl implements CrudUseCase {
     public DemoSRE getDemoSRE(final Integer id) {
         log.info("Iniciando fluxo de recuperação de objeto por id");
 
+        if(id == 3) {
+            throw new NoContentException("info");
+        }
+        if(id == 4) {
+            throw new NoContentException("warn");
+        }
+
         DemoSRE demoSRE = gateway.findById(id).orElseThrow(() -> {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
