@@ -136,13 +136,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NoContentException.class)
     public ResponseEntity<Object> handleNoContentException(final NoContentException exception) {
         final String warnMessage = MessageFormat.format("NoContentException: {0}", exception.getMessage());
-
-        if(exception.getMessage().equals("info")) {
-            log.info(warnMessage, NO_CONTENT_CODE, exception.getLocalizedMessage());
-        }
-        if(exception.getMessage().equals("warn")) {
-            log.warn(warnMessage, NO_CONTENT_CODE, exception.getLocalizedMessage());
-        }
+        log.warn(warnMessage, NO_CONTENT_CODE, exception.getLocalizedMessage());
 
         return ResponseEntity.noContent().build();
     }
