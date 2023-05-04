@@ -2,6 +2,8 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
 import br.com.bradescoseguros.opin.businessrule.usecase.CrudUseCase;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import br.com.bradescoseguros.opin.interfaceadapter.controller.dto.demosre.DemoSREDTO;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/sre/v1")
-public class CrudController {
+public class CrudController extends BaseController{
 
     @Autowired
     private CrudUseCase crudUseCase;
@@ -36,10 +38,20 @@ public class CrudController {
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/getDemoSRE/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
+    public ResponseEntity<Object> getDemoSRE(@PathVariable final Integer id) {
         log.info("/getDemoSRE com id {}", id);
 
-        return ResponseEntity.ok(this.crudUseCase.getDemoSRE(id));
+        ExecutionResult<DemoSRE> executionResult = this.crudUseCase.getDemoSRE(id);
+
+        if (executionResult.getErrorType() == ErrorEnum.VALIDATION) {
+            return generateBadRequestResponse(executionResult);
+        }
+
+        if (executionResult.getObject() == null) {
+            return generateNotFoundResponse();
+        }
+
+        return ResponseEntity.ok(executionResult.getObject());
     }
 
     @Operation(summary = "Insere um novo registro de SRE.",

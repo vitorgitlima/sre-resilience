@@ -1,19 +1,21 @@
 package br.com.bradescoseguros.opin.businessrule.usecase;
 
-import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
-import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
 import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
+import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
 import br.com.bradescoseguros.opin.businessrule.exception.RegistryAlreadyExistsException;
 import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,17 +33,24 @@ public class CrudUseCaseImpl implements CrudUseCase {
     private static final String NOT_FOUND = "demo-sre.id-not-found";
 
     @Override
-    public DemoSRE getDemoSRE(final Integer id) {
+    public ExecutionResult<DemoSRE> getDemoSRE(final Integer id) {
         log.info("Iniciando fluxo de recuperação de objeto por id");
 
-        DemoSRE demoSRE = gateway.findById(id).orElseThrow(() -> {
-            log.warn(messageSourceService.getMessage(NOT_FOUND));
+        if(id < 0 ) {
+            log.warn("Id menor que 0");
+            return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.VALIDATION).errorMessage("ID inválido").build();
+        }
 
-            throw new NoContentException(messageSourceService.getMessage(NOT_FOUND));
-        });
+        Optional<DemoSRE> demoSREOptional = gateway.findById(id);
 
         log.info("Finalizando fluxo de recuperação de objeto por id");
-        return demoSRE;
+
+        if(demoSREOptional.isEmpty()) {
+            log.warn(messageSourceService.getMessage(NOT_FOUND));
+            return ExecutionResult.<DemoSRE>builder().build();
+        }
+
+        return ExecutionResult.<DemoSRE>builder().object(demoSREOptional.get()).build();
     }
 
     @Override
