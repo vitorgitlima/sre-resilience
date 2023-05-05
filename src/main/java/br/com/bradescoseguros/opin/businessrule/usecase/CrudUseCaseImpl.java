@@ -2,7 +2,6 @@ package br.com.bradescoseguros.opin.businessrule.usecase;
 
 import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
 import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
-import br.com.bradescoseguros.opin.businessrule.exception.RegistryAlreadyExistsException;
 import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
@@ -47,14 +46,14 @@ public class CrudUseCaseImpl implements CrudUseCase {
 
         if(demoSREOptional.isEmpty()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
-            return ExecutionResult.<DemoSRE>builder().build();
+            return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
         }
 
         return ExecutionResult.<DemoSRE>builder().object(demoSREOptional.get()).build();
     }
 
     @Override
-    public void insertDemoSRE(final DemoSRE payload) {
+    public ExecutionResult<DemoSRE> insertDemoSRE(final DemoSRE payload) {
         log.info("Iniciando fluxo de inserção de objeto");
 
         validator.execute(payload);
@@ -62,17 +61,17 @@ public class CrudUseCaseImpl implements CrudUseCase {
         if (gateway.findById(payload.getId()).isPresent()) {
             String error = "O ID informado na inserção DemoSRE já existe na base de dados";
             log.warn(error);
-
-            throw new RegistryAlreadyExistsException(error);
+            return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.CONFLICT).errorMessage(error).build();
         }
 
         gateway.insertDemoSRE(payload);
 
         log.info("Finalizando fluxo de inserção de objeto");
+        return ExecutionResult.<DemoSRE>builder().object(null).build();
     }
 
     @Override
-    public void updateDemoSRE(final DemoSRE payload) {
+    public ExecutionResult<DemoSRE> updateDemoSRE(final DemoSRE payload) {
         log.info("Iniciando fluxo de atualização de objeto");
 
         validator.execute(payload);
@@ -80,12 +79,13 @@ public class CrudUseCaseImpl implements CrudUseCase {
         if (gateway.findById(payload.getId()).isEmpty()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
-            throw new NotFoundException(messageSourceService.getMessage(NOT_FOUND));
+            return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
         }
 
         gateway.updateDemoSRE(payload);
 
         log.info("Finalizando fluxo de atualização de objeto");
+        return ExecutionResult.<DemoSRE>builder().object(null).build();
     }
 
     @Override

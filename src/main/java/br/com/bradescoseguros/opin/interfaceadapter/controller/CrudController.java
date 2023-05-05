@@ -41,17 +41,17 @@ public class CrudController extends BaseController{
     public ResponseEntity<Object> getDemoSRE(@PathVariable final Integer id) {
         log.info("/getDemoSRE com id {}", id);
 
-        ExecutionResult<DemoSRE> executionResult = this.crudUseCase.getDemoSRE(id);
+        ExecutionResult<DemoSRE> result = this.crudUseCase.getDemoSRE(id);
 
-        if (executionResult.getErrorType() == ErrorEnum.VALIDATION) {
-            return generateBadRequestResponse(executionResult);
+        if (result.getErrorType() == ErrorEnum.VALIDATION) {
+            return generateBadRequestResponse(result);
         }
 
-        if (executionResult.getObject() == null) {
+        if (result.getErrorType() == ErrorEnum.NOT_FOUND) {
             return generateNotFoundResponse();
         }
 
-        return ResponseEntity.ok(executionResult.getObject());
+        return ResponseEntity.ok(result.getObject());
     }
 
     @Operation(summary = "Insere um novo registro de SRE.",
@@ -64,12 +64,17 @@ public class CrudController extends BaseController{
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @PostMapping(value = "/insertDemoSRE")
-    public ResponseEntity<DemoSRE> insertDemoSRE(@RequestBody final DemoSREDTO payload) {
+    public ResponseEntity<Object> insertDemoSRE(@RequestBody final DemoSREDTO payload) {
         DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
 
         log.info("/insertDemoSRE com Payload {}", payload.toString());
 
-        this.crudUseCase.insertDemoSRE(demoSRE);
+        ExecutionResult<DemoSRE> result = this.crudUseCase.insertDemoSRE(demoSRE);
+
+        if (result.getErrorType() == ErrorEnum.CONFLICT) {
+            return generateConflictResponse(result);
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -83,12 +88,17 @@ public class CrudController extends BaseController{
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @PutMapping("/updateDemoSRE")
-    public ResponseEntity<DemoSRE> updateDemoSRE(@RequestBody final DemoSREDTO payload) {
+    public ResponseEntity<Object> updateDemoSRE(@RequestBody final DemoSREDTO payload) {
         DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
 
         log.info("/updateDemoSRE com Payload {}", payload.toString());
 
-        this.crudUseCase.updateDemoSRE(demoSRE);
+        ExecutionResult<DemoSRE> result = this.crudUseCase.updateDemoSRE(demoSRE);
+
+        if (result.getErrorType() == ErrorEnum.NOT_FOUND) {
+            return generateNotFoundResponse();
+        }
+
         return ResponseEntity.noContent().build();
     }
 

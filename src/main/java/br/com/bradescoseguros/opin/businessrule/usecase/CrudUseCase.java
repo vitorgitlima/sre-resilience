@@ -7,9 +7,9 @@ import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 public interface CrudUseCase {
     ExecutionResult<DemoSRE> getDemoSRE(final Integer id);
 
-    void insertDemoSRE(final DemoSRE payload);
+    ExecutionResult<DemoSRE> insertDemoSRE(final DemoSRE payload);
 
-    void updateDemoSRE(final DemoSRE payload);
+    ExecutionResult<DemoSRE> updateDemoSRE(final DemoSRE payload);
 
     void removeDemoSRE(final Integer id);
 

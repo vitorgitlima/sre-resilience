@@ -12,15 +12,24 @@ import org.springframework.http.ResponseEntity;
 public abstract class BaseController {
 
     public ResponseEntity<Object> generateBadRequestResponse(ExecutionResult<DemoSRE> executionResult) {
-        MetaDataEnvelope response = new MetaDataEnvelope(HttpStatus.BAD_REQUEST.toString(), ErrorCode.BAD_REQUEST, executionResult.getErrorMessage());
-
-        final MetaData meta = new MetaData(HttpStatus.BAD_REQUEST.toString(), MDC.get("TRACE_ID"));
-        response.setMeta(meta);
-        return ResponseEntity.badRequest().body(response);
+        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+        return generateErrorResponseWithStatusCode(badRequest, ErrorCode.BAD_REQUEST, executionResult);
     }
 
     public ResponseEntity<Object> generateNotFoundResponse() {
         return ResponseEntity.notFound().build();
     }
 
+    public ResponseEntity<Object> generateConflictResponse(ExecutionResult<DemoSRE> executionResult) {
+        HttpStatus conflict = HttpStatus.CONFLICT;
+        return generateErrorResponseWithStatusCode(conflict, ErrorCode.CONFLICT, executionResult);
+    }
+
+    private ResponseEntity<Object> generateErrorResponseWithStatusCode(HttpStatus conflict, ErrorCode conflict1, ExecutionResult<DemoSRE> executionResult) {
+        MetaDataEnvelope response = new MetaDataEnvelope(conflict.toString(), conflict1, executionResult.getErrorMessage());
+
+        final MetaData meta = new MetaData(conflict.toString(), MDC.get("TRACE_ID"));
+        response.setMeta(meta);
+        return ResponseEntity.status(conflict).body(response);
+    }
 }
