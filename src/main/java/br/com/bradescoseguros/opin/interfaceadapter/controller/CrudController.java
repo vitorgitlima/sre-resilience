@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/sre/v1")
-public class CrudController extends BaseController{
+public class CrudController implements BaseController {
 
     @Autowired
     private CrudUseCase crudUseCase;
@@ -112,10 +112,15 @@ public class CrudController extends BaseController{
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @DeleteMapping("/removeDemoSRE/{id}")
-    public ResponseEntity<DemoSRE> removeDemoSRE(@PathVariable final Integer id) {
+    public ResponseEntity<Object> removeDemoSRE(@PathVariable final Integer id) {
         log.info("/removeDemoSRE com id {}", id);
 
-        this.crudUseCase.removeDemoSRE(id);
+        ExecutionResult<DemoSRE> result = this.crudUseCase.removeDemoSRE(id);
+
+        if (result.getErrorType() == ErrorEnum.NOT_FOUND) {
+            return generateNotFoundResponse();
+        }
+
         return ResponseEntity.noContent().build();
     }
 
@@ -129,12 +134,14 @@ public class CrudController extends BaseController{
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/externalApiCall/{status}")
-    public ResponseEntity<String> externalApiCall(@PathVariable final String status) {
+    public ResponseEntity<Object> externalApiCall(@PathVariable final String status) {
 
         ExtraStatusCode extraStatusCode = ExtraStatusCode.fromString(status);
 
         log.info("/externalApiCall com Status {}", extraStatusCode.getStatusURL());
 
-        return ResponseEntity.ok(this.crudUseCase.externalApiCall(extraStatusCode));
+        ExecutionResult<String> result = this.crudUseCase.externalApiCall(extraStatusCode);
+
+        return ResponseEntity.ok(result.getObject());
     }
 }

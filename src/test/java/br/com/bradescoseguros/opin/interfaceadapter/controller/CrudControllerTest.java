@@ -104,7 +104,49 @@ class CrudControllerTest {
         assertThat(result.getResponse().getContentAsString()).isEqualTo(demoSREMockJson);
     }
 
+    @Test
+    @Tag("comp")
+    void getDemoSRE_ShouldReturnBadRequest() throws Exception {
+        //Arrange
+        DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
+        final String url = BASE_URL + "/getDemoSRE/-1";
 
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.of(demoSREMock));
+
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @Tag("comp")
+    void getDemoSRE_ShouldReturnNotFound() throws Exception {
+        //Arrange
+        DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
+        final String url = BASE_URL + "/getDemoSRE/1";
+
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.empty());
+
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
 
 
     @Test
@@ -181,6 +223,30 @@ class CrudControllerTest {
 
     @Test
     @Tag("comp")
+    void updateDemoSRE_ShouldReturnNotFound() throws Exception {
+        //Arrange
+        final String url = BASE_URL + "/updateDemoSRE";
+        DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
+        String demoSREMockJson = new ObjectMapper().writeValueAsString(demoSREMock);
+
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.empty());
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .put(url)
+                        .content(demoSREMockJson)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        verify(crudRepositoryMock, times(0)).save(any());
+    }
+
+    @Test
+    @Tag("comp")
     void removeDemoSRE() throws Exception {
         //Arrange
         final String url = BASE_URL + "/removeDemoSRE/" + 1;
@@ -200,6 +266,28 @@ class CrudControllerTest {
         //Assert
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
         Mockito.verify(crudRepositoryMock).deleteById(anyInt());
+    }
+
+    @Test
+    @Tag("comp")
+    void removeDemoSRE_ShouldReturnNotFound() throws Exception {
+        //Arrange
+        final String url = BASE_URL + "/removeDemoSRE/" + 1;
+        DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
+
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.empty());
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .delete(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        verify(crudRepositoryMock, times(0)).deleteById(any());
     }
 
     @Test

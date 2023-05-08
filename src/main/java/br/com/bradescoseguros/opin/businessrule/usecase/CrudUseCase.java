@@ -11,7 +11,7 @@ public interface CrudUseCase {
 
     ExecutionResult<DemoSRE> updateDemoSRE(final DemoSRE payload);
 
-    void removeDemoSRE(final Integer id);
+    ExecutionResult<DemoSRE> removeDemoSRE(final Integer id);
 
-    String externalApiCall(final ExtraStatusCode status);
+    ExecutionResult<String> externalApiCall(final ExtraStatusCode status);
 }

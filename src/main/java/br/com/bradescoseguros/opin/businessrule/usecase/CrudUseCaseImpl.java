@@ -1,7 +1,5 @@
 package br.com.bradescoseguros.opin.businessrule.usecase;
 
-import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
-import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
 import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
@@ -89,36 +87,37 @@ public class CrudUseCaseImpl implements CrudUseCase {
     }
 
     @Override
-    public void removeDemoSRE(final Integer id) {
+    public ExecutionResult<DemoSRE> removeDemoSRE(final Integer id) {
         log.info("Iniciando fluxo de remoção de objeto");
 
         if (gateway.findById(id).isEmpty()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
-            throw new NotFoundException(messageSourceService.getMessage(NOT_FOUND));
+            return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
         }
 
         gateway.removeDemoSRE(id);
 
         log.info("Finalizando fluxo de remoção de objeto");
+        return ExecutionResult.<DemoSRE>builder().object(null).build();
     }
 
     @Override
-    public String externalApiCall(final ExtraStatusCode status) {
+    public ExecutionResult<String> externalApiCall(final ExtraStatusCode status) {
         log.info("Iniciando fluxo de consulta por status");
 
         if (Objects.isNull(status)) {
             String error = "O status informado não é suportado pela aplicação.";
             log.warn(error);
 
-            throw new BadRequestException(error);
+            return ExecutionResult.<String>builder().errorType(ErrorEnum.VALIDATION).errorMessage(error).build();
         }
 
         String externalApi = getExternalApi(status);
 
         log.info("Finalizando fluxo de consulta por status");
 
-        return externalApi;
+        return ExecutionResult.<String>builder().object(externalApi).build();
     }
 
     private String getExternalApi(ExtraStatusCode status) {

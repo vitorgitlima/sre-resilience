@@ -8,6 +8,8 @@ import br.com.bradescoseguros.opin.businessrule.gateway.CrudGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import org.junit.jupiter.api.Assertions;
@@ -52,17 +54,17 @@ class CrudUseCaseImplTest {
         when(mockGateway.findById(anyInt())).thenReturn(demoSREMock);
 
         //Act
-        DemoSRE result = useCase.getDemoSRE(id);
+        ExecutionResult<DemoSRE> result = useCase.getDemoSRE(id);
 
         //Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isNotNull();
+        assertThat(result.getObject().getId()).isNotNull();
         verify(mockGateway, times(1)).findById(anyInt());
     }
 
     @Test
     @Tag("unit")
-    void getDemoSRE_ThrowsDemoSRENoContentException() {
+    void getDemoSRE_ShouldReturnNotFound() {
         //Arrange
         final int id = 1;
 
@@ -70,11 +72,25 @@ class CrudUseCaseImplTest {
         when(mockGateway.findById(anyInt())).thenReturn(Optional.empty());
 
         //Act
-        NoContentException exception = Assertions.assertThrows(NoContentException.class, () -> useCase.getDemoSRE(id));
+        ExecutionResult<DemoSRE> result = useCase.getDemoSRE(id);
 
         //Assert
-        assertThat(exception.getMessage()).isEqualTo(MESSAGE_MOCK);
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.NOT_FOUND);
         verify(mockGateway, times(1)).findById(anyInt());
+    }
+
+    @Test
+    @Tag("unit")
+    void getDemoSRE_ShouldReturnValidationError() {
+        //Arrange
+        final int id = -1;
+
+        //Act
+        ExecutionResult<DemoSRE> result = useCase.getDemoSRE(id);
+
+        //Assert
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.VALIDATION);
+        verify(mockGateway, times(0)).findById(anyInt());
     }
 
     @Test
@@ -98,7 +114,7 @@ class CrudUseCaseImplTest {
 
     @Test
     @Tag("unit")
-    void insertDemoSRE_ThrowsDemoSRERegistryAlreadyExistsException() {
+    void insertDemoSRE_ShouldReturnConflict() {
         //Arrange
         DemoSRE demoSRE = new DemoSRE();
         demoSRE.setId(1);
@@ -108,10 +124,11 @@ class CrudUseCaseImplTest {
         doNothing().when(mockValidator).execute(any());
 
         //Act
-        RegistryAlreadyExistsException exception = Assertions.assertThrows(RegistryAlreadyExistsException.class, () -> useCase.insertDemoSRE(demoSRE));
+        ExecutionResult<DemoSRE> result = useCase.insertDemoSRE(demoSRE);
 
         //Assert
-        assertThat(exception.getMessage()).isEqualTo(messageError);
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.CONFLICT);
+        assertThat(result.getErrorMessage()).isEqualTo(messageError);
         verify(mockGateway, times(1)).findById(anyInt());
         verify(mockGateway, times(0)).insertDemoSRE(any());
     }
@@ -137,7 +154,7 @@ class CrudUseCaseImplTest {
 
     @Test
     @Tag("unit")
-    void updateDemoSRE_ThrowsNotFoundException() {
+    void updateDemoSRE_ShouldReturnNotFound() {
         //Arrange
         DemoSRE demoSRE = new DemoSRE();
         demoSRE.setId(1);
@@ -147,10 +164,10 @@ class CrudUseCaseImplTest {
         doNothing().when(mockValidator).execute(any());
 
         //Act
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> useCase.updateDemoSRE(demoSRE));
+        ExecutionResult<DemoSRE> result = useCase.updateDemoSRE(demoSRE);
 
         //Assert
-        assertThat(exception.getMessage()).isEqualTo(MESSAGE_MOCK);
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.NOT_FOUND);
         verify(mockGateway, times(1)).findById(anyInt());
         verify(mockGateway, times(0)).updateDemoSRE(any());
     }
@@ -174,7 +191,7 @@ class CrudUseCaseImplTest {
 
     @Test
     @Tag("unit")
-    void removeDemoSRE_ThrowsNotFoundException() {
+    void removeDemoSRE_ShouldReturnNotFound() {
         //Arrange
         final int id = 1;
 
@@ -182,10 +199,10 @@ class CrudUseCaseImplTest {
         when(mockGateway.findById(anyInt())).thenReturn(Optional.empty());
 
         //Act
-        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> useCase.removeDemoSRE(id));
+        ExecutionResult<DemoSRE> result = useCase.removeDemoSRE(id);
 
         //Assert
-        assertThat(exception.getMessage()).isEqualTo(MESSAGE_MOCK);
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.NOT_FOUND);
         verify(mockGateway, times(1)).findById(anyInt());
         verify(mockGateway, times(0)).removeDemoSRE(any());
     }
@@ -205,16 +222,17 @@ class CrudUseCaseImplTest {
     }
 
     @Test
-    void externalApiCall_ThrowsDemoSREBadRequestException() {
+    void externalApiCall_ShouldReturnValidationError() {
         //Arrange
         final String resultMock = "ok";
         final String messageError = "O status informado não é suportado pela aplicação.";
 
         //Act
-        BadRequestException exception = Assertions.assertThrows(BadRequestException.class, () -> useCase.externalApiCall(null));
+        ExecutionResult<String> result = useCase.externalApiCall(null);
 
         //Assert
-        assertThat(exception.getMessage()).isEqualTo(messageError);
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.VALIDATION);
+        assertThat(result.getErrorMessage()).isEqualTo(messageError);
         verify(mockGateway, times(0)).externalApiCall(any());
     }
 }
