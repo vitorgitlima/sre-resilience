@@ -5,8 +5,8 @@ SONARURL="http://localhost:9000/api"
 wait_sonarqube_up() {
     sonar_status="DOWN"
     printf "INFO initiating connection with SonarQube.\n"
-    apk add curl
-    apk add jq
+    apt install curl
+    apt install jq
     sleep 15
     while [ "${sonar_status}" != "UP" ]; do
         sleep 5

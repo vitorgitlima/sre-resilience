@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ReflectionUtils;
+import lombok.var;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

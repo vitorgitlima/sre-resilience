@@ -68,7 +68,7 @@ public class CrudUseCaseImpl implements CrudUseCase {
 
         validator.execute(payload);
 
-        if (gateway.findById(payload.getId()).isEmpty()) {
+        if (!gateway.findById(payload.getId()).isPresent()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
             throw new NotFoundException(messageSourceService.getMessage(NOT_FOUND));
@@ -83,7 +83,7 @@ public class CrudUseCaseImpl implements CrudUseCase {
     public void removeDemoSRE(final Integer id) {
         log.info("Iniciando fluxo de remoção de objeto");
 
-        if (gateway.findById(id).isEmpty()) {
+        if (!gateway.findById(id).isPresent()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
 
             throw new NotFoundException(messageSourceService.getMessage(NOT_FOUND));
