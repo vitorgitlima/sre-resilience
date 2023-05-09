@@ -24,6 +24,9 @@ public class CrudController {
     @Autowired
     private CrudUseCase crudUseCase;
 
+    @Autowired
+    private DemoSREMapper demoSREMapper;
+
     @Operation(summary = "Obtêm o registro de SRE.",
             description = "Obtêm o registro de SRE identificado através do ID.")
     @ApiResponses(value = {
@@ -53,7 +56,7 @@ public class CrudController {
     })
     @PostMapping(value = "/insertDemoSRE")
     public ResponseEntity<DemoSRE> insertDemoSRE(@RequestBody final DemoSREDTO payload) {
-        DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
+        DemoSRE demoSRE = demoSREMapper.mapDemoSREFrom(payload);
 
         log.info("/insertDemoSRE com Payload {}", payload.toString());
 
@@ -72,7 +75,7 @@ public class CrudController {
     })
     @PutMapping("/updateDemoSRE")
     public ResponseEntity<DemoSRE> updateDemoSRE(@RequestBody final DemoSREDTO payload) {
-        DemoSRE demoSRE = DemoSREMapper.INSTANCE.mapDemoSREFrom(payload);
+        DemoSRE demoSRE = demoSREMapper.mapDemoSREFrom(payload);
 
         log.info("/updateDemoSRE com Payload {}", payload.toString());
 
