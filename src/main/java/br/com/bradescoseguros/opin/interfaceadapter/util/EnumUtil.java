@@ -5,7 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ReflectionUtils;
-import lombok.var;
+
+import java.lang.reflect.Method;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -16,7 +17,7 @@ public final class EnumUtil {
 
 	public static Object getEnumValue(@NonNull final Class<?> clazz, final String value) {
 		try {
-			var method = ReflectionUtils.findMethod(clazz, FROM_VALUE, String.class);
+			Method method = ReflectionUtils.findMethod(clazz, FROM_VALUE, String.class);
 			return method != null ? method.invoke(null, value) : null;
 		} catch (Exception e) {
 			log.error(String.format(LOG_MESSAGE, e.getCause().getMessage(), clazz.getSimpleName()));
