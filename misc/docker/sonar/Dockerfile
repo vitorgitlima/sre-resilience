@@ -2,6 +2,7 @@ FROM alpine:latest
 WORKDIR /root/
 RUN apk update && apk add ca-certificates wget && update-ca-certificates && apk add curl
 
+
 RUN LATEST_RELEASE=$(curl -L -s -H 'Accept: application/json' https://github.com/devcon5io/mutation-analysis-plugin/releases/latest); \
     LATEST_VERSION=$(echo $LATEST_RELEASE | sed -e 's/.*"tag_name":"\([^"]*\)".*/\1/'); \
     ARTIFACT_URL="https://github.com/devcon5io/mutation-analysis-plugin/releases/download/$LATEST_VERSION/mutation-analysis-plugin-${LATEST_VERSION/v/""}.jar"; \
