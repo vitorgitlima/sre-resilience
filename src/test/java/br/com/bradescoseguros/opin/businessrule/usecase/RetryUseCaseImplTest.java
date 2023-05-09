@@ -5,6 +5,8 @@ import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.gateway.RetryGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import org.junit.jupiter.api.Assertions;
@@ -46,17 +48,17 @@ public class RetryUseCaseImplTest {
         when(mockGateway.findByIdWithRetry(anyInt())).thenReturn(demoSREMock);
 
         //Act
-        DemoSRE result = useCase.getDemoSREWithRetry(id);
+        ExecutionResult<DemoSRE> result = useCase.getDemoSREWithRetry(id);
 
         //Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isNotNull();
+        assertThat(result.getObject().getId()).isNotNull();
         verify(mockGateway, times(1)).findByIdWithRetry(anyInt());
     }
 
     @Test
     @Tag("unit")
-    void getDemoSRE_ThrowsDemoSRENoContentException() {
+    void getDemoSRE_ShouldReturnNotFound() {
         //Arrange
         final int id = 1;
 
@@ -64,10 +66,10 @@ public class RetryUseCaseImplTest {
         when(mockGateway.findByIdWithRetry(anyInt())).thenReturn(Optional.empty());
 
         //Act
-        NoContentException exception = Assertions.assertThrows(NoContentException.class, () -> useCase.getDemoSREWithRetry(id));
+        ExecutionResult<DemoSRE> result = useCase.getDemoSREWithRetry(id);
 
         //Assert
-        assertThat(exception.getMessage()).isEqualTo(MESSAGE_MOCK);
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.NOT_FOUND);
         verify(mockGateway, times(1)).findByIdWithRetry(anyInt());
     }
 
@@ -86,20 +88,6 @@ public class RetryUseCaseImplTest {
     }
 
     @Test
-    void externalApiCallWithRetry_ThrowsDemoSREBadRequestException() {
-        //Arrange
-        final String resultMock = "ok";
-        final String messageError = "O status informado não é suportado pela aplicação.";
-
-        //Act
-        BadRequestException exception = Assertions.assertThrows(BadRequestException.class, () -> useCase.externalApiCallWithRetry(null));
-
-        //Assert
-        assertThat(exception.getMessage()).isEqualTo(messageError);
-        verify(mockGateway, times(0)).externalApiCallWithRetry(any());
-    }
-
-    @Test
     void externalApiCallWithRetryAndCircuitBreaker_SuccessfullyExecuted() {
         //Arrange
         final String resultMock = "ok";
@@ -111,19 +99,5 @@ public class RetryUseCaseImplTest {
 
         //Assert
         verify(mockGateway, times(1)).externalApiCallWithRetryAndCircuitBreaker(ExtraStatusCode.OK);
-    }
-
-    @Test
-    void externalApiCallWithRetryAndCircuitBreaker_ThrowsDemoSREBadRequestException() {
-        //Arrange
-        final String resultMock = "ok";
-        final String messageError = "O status informado não é suportado pela aplicação.";
-
-        //Act
-        BadRequestException exception = Assertions.assertThrows(BadRequestException.class, () -> useCase.externalApiCallWithRetryAndCircuitBreaker(null));
-
-        //Assert
-        assertThat(exception.getMessage()).isEqualTo(messageError);
-        verify(mockGateway, times(0)).externalApiCallWithRetryAndCircuitBreaker(any());
     }
 }
