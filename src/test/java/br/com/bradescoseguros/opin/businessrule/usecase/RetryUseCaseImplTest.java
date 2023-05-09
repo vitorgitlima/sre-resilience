@@ -88,20 +88,6 @@ public class RetryUseCaseImplTest {
     }
 
     @Test
-    void externalApiCallWithRetry_ThrowsDemoSREBadRequestException() {
-        //Arrange
-        final String resultMock = "ok";
-        final String messageError = "O status informado não é suportado pela aplicação.";
-
-        //Act
-        BadRequestException exception = Assertions.assertThrows(BadRequestException.class, () -> useCase.externalApiCallWithRetry(null));
-
-        //Assert
-        assertThat(exception.getMessage()).isEqualTo(messageError);
-        verify(mockGateway, times(0)).externalApiCallWithRetry(any());
-    }
-
-    @Test
     void externalApiCallWithRetryAndCircuitBreaker_SuccessfullyExecuted() {
         //Arrange
         final String resultMock = "ok";
@@ -113,19 +99,5 @@ public class RetryUseCaseImplTest {
 
         //Assert
         verify(mockGateway, times(1)).externalApiCallWithRetryAndCircuitBreaker(ExtraStatusCode.OK);
-    }
-
-    @Test
-    void externalApiCallWithRetryAndCircuitBreaker_ThrowsDemoSREBadRequestException() {
-        //Arrange
-        final String resultMock = "ok";
-        final String messageError = "O status informado não é suportado pela aplicação.";
-
-        //Act
-        BadRequestException exception = Assertions.assertThrows(BadRequestException.class, () -> useCase.externalApiCallWithRetryAndCircuitBreaker(null));
-
-        //Assert
-        assertThat(exception.getMessage()).isEqualTo(messageError);
-        verify(mockGateway, times(0)).externalApiCallWithRetryAndCircuitBreaker(any());
     }
 }

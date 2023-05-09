@@ -50,8 +50,6 @@ public class RetryUseCaseImpl implements RetryUseCase {
     public String externalApiCallWithRetry(final ExtraStatusCode status) {
         log.info("Iniciando fluxo de consulta por status com Retry");
 
-        validaStatus(status);
-
         String value = gateway.externalApiCallWithRetry(status);
 
         log.info("Finalizando fluxo de consulta por status com Retry");
@@ -63,20 +61,9 @@ public class RetryUseCaseImpl implements RetryUseCase {
     public String externalApiCallWithRetryAndCircuitBreaker(final ExtraStatusCode status) {
         log.info("Iniciando fluxo de consulta por status com Retry e Circuit Breaker");
 
-        validaStatus(status);
-
         String value = gateway.externalApiCallWithRetryAndCircuitBreaker(status);
 
         log.info("Finalizando fluxo de consulta por status com Retry e Circuit Breaker");
         return value;
-    }
-
-    private static void validaStatus(ExtraStatusCode status) {
-        if (Objects.isNull(status)) {
-            String error = "O status informado não é suportado pela aplicação.";
-            log.warn(error);
-
-            throw new BadRequestException(error);
-        }
     }
 }
