@@ -101,6 +101,30 @@ public class TimeLimiterControllerTest {
 
     @Test
     @Tag("comp")
+    public void getDbWithTimelimiter_ShouldReturnNotFoundWhenIdNotFound() throws Exception {
+        // Arrange
+        final String url = BASE_URL + "/timelimiter/db";
+        DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
+
+
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.empty());
+
+        // Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+
+        // Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+
+    }
+
+    @Test
+    @Tag("comp")
     public void getDbWithTimelimiter_ShouldReturn500WhenTimeLimiterInvoked() throws Exception {
         // Arrange
         final String url = BASE_URL + "/timelimiter/db";

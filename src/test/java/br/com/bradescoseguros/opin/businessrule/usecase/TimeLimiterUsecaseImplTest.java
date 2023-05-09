@@ -4,6 +4,8 @@ import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.gateway.TimeLimiterGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
@@ -43,27 +45,27 @@ class TimeLimiterUsecaseImplTest {
         when(mockGateway.findByIdWithTimeLimiter(anyInt())).thenReturn(demoSREMock);
 
         //Act
-        DemoSRE result = useCase.getDemoSRE(1);
+        ExecutionResult<DemoSRE> result = useCase.getDemoSRE(1);
 
         //Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isNotNull();
+        assertThat(result.getObject().getId()).isNotNull();
         verify(mockGateway, times(1)).findByIdWithTimeLimiter(anyInt());
     }
 
     @Test
     @Tag("unit")
-    void getDemoSRE_ThrowsDemoSRENoContentException() {
+    void getDemoSRE_ShouldReturnNotFound() {
         //Arrange
 
         when(mockMessageSourceService.getMessage(anyString())).thenReturn(MESSAGE_MOCK);
         when(mockGateway.findByIdWithTimeLimiter(anyInt())).thenReturn(Optional.empty());
 
         //Act
-        NoContentException exception = Assertions.assertThrows(NoContentException.class, () -> useCase.getDemoSRE(1));
+        ExecutionResult<DemoSRE> result = useCase.getDemoSRE(1);
 
         //Assert
-        assertThat(exception.getMessage()).isEqualTo(MESSAGE_MOCK);
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.NOT_FOUND);
         verify(mockGateway, times(1)).findByIdWithTimeLimiter(anyInt());
     }
 
