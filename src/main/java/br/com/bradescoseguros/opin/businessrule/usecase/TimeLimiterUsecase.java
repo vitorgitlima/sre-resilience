@@ -1,10 +1,11 @@
 package br.com.bradescoseguros.opin.businessrule.usecase;
 
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 
 public interface TimeLimiterUsecase {
 
-    DemoSRE getDemoSRE(Integer id);
+    ExecutionResult<DemoSRE> getDemoSRE(Integer id);
     String externalApiCallWithTimeLimiter();
     String externalApiCallWithTimeLimiterAndRetry();
 

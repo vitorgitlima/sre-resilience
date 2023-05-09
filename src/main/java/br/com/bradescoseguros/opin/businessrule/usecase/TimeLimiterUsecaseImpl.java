@@ -4,9 +4,13 @@ import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.gateway.TimeLimiterGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -22,17 +26,19 @@ public class TimeLimiterUsecaseImpl implements TimeLimiterUsecase {
 
 
     @Override
-    public DemoSRE getDemoSRE(Integer id) {
+    public ExecutionResult<DemoSRE> getDemoSRE(Integer id) {
         log.info("Iniciando fluxo de recuperação de objeto por id com Time Limiter");
 
-        DemoSRE demoSRE = timeLimiterGateway.findByIdWithTimeLimiter(id).orElseThrow(() -> {
-            log.warn(messageSourceService.getMessage(NOT_FOUND));
-
-            throw new NoContentException(messageSourceService.getMessage(NOT_FOUND));
-        });
+        Optional<DemoSRE> demoSREOptional = timeLimiterGateway.findByIdWithTimeLimiter(id);
 
         log.info("Finalizando fluxo de recuperação de objeto por id com Time Limiter");
-        return demoSRE;
+
+        if(demoSREOptional.isEmpty()) {
+            log.warn(messageSourceService.getMessage(NOT_FOUND));
+            return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
+        }
+
+        return ExecutionResult.<DemoSRE>builder().object(demoSREOptional.get()).build();
     }
 
     @Override
