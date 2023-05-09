@@ -38,15 +38,15 @@ public class CrudUseCaseImpl implements CrudUseCase {
             return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.VALIDATION).errorMessage("ID inválido").build();
         }
 
+        
         Optional<DemoSRE> demoSREOptional = gateway.findById(id);
-
-        log.info("Finalizando fluxo de recuperação de objeto por id");
-
         if(demoSREOptional.isEmpty()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
             return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
         }
 
+        
+        log.info("Finalizando fluxo de recuperação de objeto por id");
         return ExecutionResult.<DemoSRE>builder().object(demoSREOptional.get()).build();
     }
 
@@ -62,8 +62,10 @@ public class CrudUseCaseImpl implements CrudUseCase {
             return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.CONFLICT).errorMessage(error).build();
         }
 
+        
         gateway.insertDemoSRE(payload);
 
+        
         log.info("Finalizando fluxo de inserção de objeto");
         return ExecutionResult.<DemoSRE>builder().object(null).build();
     }
@@ -76,12 +78,13 @@ public class CrudUseCaseImpl implements CrudUseCase {
 
         if (gateway.findById(payload.getId()).isEmpty()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
-
             return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
         }
 
+        
         gateway.updateDemoSRE(payload);
 
+        
         log.info("Finalizando fluxo de atualização de objeto");
         return ExecutionResult.<DemoSRE>builder().object(null).build();
     }
@@ -92,12 +95,13 @@ public class CrudUseCaseImpl implements CrudUseCase {
 
         if (gateway.findById(id).isEmpty()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
-
             return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
         }
 
+        
         gateway.removeDemoSRE(id);
 
+        
         log.info("Finalizando fluxo de remoção de objeto");
         return ExecutionResult.<DemoSRE>builder().object(null).build();
     }
@@ -109,19 +113,18 @@ public class CrudUseCaseImpl implements CrudUseCase {
         if (Objects.isNull(status)) {
             String error = "O status informado não é suportado pela aplicação.";
             log.warn(error);
-
             return ExecutionResult.<String>builder().errorType(ErrorEnum.VALIDATION).errorMessage(error).build();
         }
 
+        
         String externalApi = getExternalApi(status);
 
+        
         log.info("Finalizando fluxo de consulta por status");
-
         return ExecutionResult.<String>builder().object(externalApi).build();
     }
 
     private String getExternalApi(ExtraStatusCode status) {
-
         log.info("Chamando ExternalApiCall");
         return gateway.externalApiCall(status);
     }
