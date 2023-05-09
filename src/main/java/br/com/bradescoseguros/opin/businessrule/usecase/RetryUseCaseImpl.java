@@ -1,17 +1,19 @@
 package br.com.bradescoseguros.opin.businessrule.usecase;
 
 import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
-import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.gateway.RetryGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,17 +31,19 @@ public class RetryUseCaseImpl implements RetryUseCase {
     private static final String NOT_FOUND = "demo-sre.id-not-found";
 
     @Override
-    public DemoSRE getDemoSREWithRetry(final Integer id) {
+    public ExecutionResult<DemoSRE> getDemoSREWithRetry(final Integer id) {
         log.info("Iniciando fluxo de recuperação de objeto por id com Retry");
 
-        DemoSRE demoSRE = gateway.findByIdWithRetry(id).orElseThrow(() -> {
-            log.warn(messageSourceService.getMessage(NOT_FOUND));
 
-            throw new NoContentException(messageSourceService.getMessage(NOT_FOUND));
-        });
+        Optional<DemoSRE> demoSREOptional = gateway.findByIdWithRetry(id);
+        if(demoSREOptional.isEmpty()) {
+            log.warn(messageSourceService.getMessage(NOT_FOUND));
+            return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
+        }
+
 
         log.info("Finalizando fluxo de recuperação de objeto por id com Retry");
-        return demoSRE;
+        return ExecutionResult.<DemoSRE>builder().object(demoSREOptional.get()).build();
     }
 
     @Override

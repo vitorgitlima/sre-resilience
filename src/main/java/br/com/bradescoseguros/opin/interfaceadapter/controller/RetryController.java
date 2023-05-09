@@ -2,6 +2,8 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
 import br.com.bradescoseguros.opin.businessrule.usecase.RetryUseCase;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import io.swagger.annotations.ApiResponse;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/sre/v1/retry")
-public class RetryController {
+public class RetryController implements BaseController {
 
     @Autowired
     private RetryUseCase retryUseCase;
@@ -30,11 +32,17 @@ public class RetryController {
             @ApiResponse(code = 503, message = "O limite de retentativas foi excedido.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/db")
-    public ResponseEntity<DemoSRE> getDbWithRetry() {
+    public ResponseEntity<Object> getDbWithRetry() {
 
         log.info("Fluxo Retry DB");
 
-        return ResponseEntity.ok(this.retryUseCase.getDemoSREWithRetry(1));
+        ExecutionResult<DemoSRE> result = this.retryUseCase.getDemoSREWithRetry(1);
+
+        if (result.getErrorType() == ErrorEnum.NOT_FOUND) {
+            return generateNotFoundResponse();
+        }
+
+        return ResponseEntity.ok(result.getObject());
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter.",
