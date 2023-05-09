@@ -13,4 +13,5 @@ public enum ErrorCode {
     LOCKED,
     BULKHEAD_FULL,
     TIME_OUT,
+    CONFLICT,
 }
