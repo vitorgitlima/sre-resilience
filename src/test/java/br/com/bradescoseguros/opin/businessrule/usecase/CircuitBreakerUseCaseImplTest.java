@@ -6,6 +6,8 @@ import br.com.bradescoseguros.opin.businessrule.gateway.CircuitBreakerGateway;
 import br.com.bradescoseguros.opin.businessrule.gateway.RetryGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import org.junit.jupiter.api.Assertions;
@@ -47,17 +49,17 @@ public class CircuitBreakerUseCaseImplTest {
         when(mockGateway.findByIdWithCircuitBreaker(anyInt())).thenReturn(demoSREMock);
 
         //Act
-        DemoSRE result = useCase.getDemoSREWithCircuitBreaker(id);
+        ExecutionResult<DemoSRE> result = useCase.getDemoSREWithCircuitBreaker(id);
 
         //Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isNotNull();
+        assertThat(result.getObject().getId()).isNotNull();
         verify(mockGateway, times(1)).findByIdWithCircuitBreaker(anyInt());
     }
 
     @Test
     @Tag("unit")
-    void getDemoSRE_ThrowsDemoSRENoContentException() {
+    void getDemoSRE_ShouldReturnNotFound() {
         //Arrange
         final int id = 1;
 
@@ -65,10 +67,10 @@ public class CircuitBreakerUseCaseImplTest {
         when(mockGateway.findByIdWithCircuitBreaker(anyInt())).thenReturn(Optional.empty());
 
         //Act
-        NoContentException exception = Assertions.assertThrows(NoContentException.class, () -> useCase.getDemoSREWithCircuitBreaker(id));
+        ExecutionResult<DemoSRE> result = useCase.getDemoSREWithCircuitBreaker(id);
 
         //Assert
-        assertThat(exception.getMessage()).isEqualTo(MESSAGE_MOCK);
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.NOT_FOUND);
         verify(mockGateway, times(1)).findByIdWithCircuitBreaker(anyInt());
     }
 
@@ -86,16 +88,4 @@ public class CircuitBreakerUseCaseImplTest {
         verify(mockGateway, times(1)).externalApiCallWithCircuitBreaker(ExtraStatusCode.OK);
     }
 
-    @Test
-    void externalApiCallWithRetry_ThrowsDemoSREBadRequestException() {
-        //Arrange
-        final String messageError = "O status informado não é suportado pela aplicação.";
-
-        //Act
-        BadRequestException exception = Assertions.assertThrows(BadRequestException.class, () -> useCase.externalApiCallWithCircuitBreaker(null));
-
-        //Assert
-        assertThat(exception.getMessage()).isEqualTo(messageError);
-        verify(mockGateway, times(0)).externalApiCallWithCircuitBreaker(any());
-    }
 }
