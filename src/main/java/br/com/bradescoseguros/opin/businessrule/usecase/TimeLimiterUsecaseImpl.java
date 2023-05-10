@@ -22,7 +22,7 @@ public class TimeLimiterUsecaseImpl implements TimeLimiterUsecase {
 
 
     @Override
-    public DemoSRE getDemoSRE(Integer id) {
+    public DemoSRE getDemoSRE(Integer id) throws Throwable{
         log.info("Iniciando fluxo de recuperação de objeto por id com Time Limiter");
 
         DemoSRE demoSRE = timeLimiterGateway.findByIdWithTimeLimiter(id).orElseThrow(() -> {

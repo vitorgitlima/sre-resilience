@@ -30,7 +30,7 @@ public class CircuitBreakerController {
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/db")
-    public ResponseEntity<DemoSRE> getDbWithCircuitBreaker() {
+    public ResponseEntity<DemoSRE> getDbWithCircuitBreaker() throws Throwable {
 
         log.info("Fluxo Circuit Breaker DB");
 

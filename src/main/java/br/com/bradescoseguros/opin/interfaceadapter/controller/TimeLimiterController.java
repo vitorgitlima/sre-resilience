@@ -29,7 +29,7 @@ public class TimeLimiterController {
             @ApiResponse(code = 500, message = "Ocorreu um erro interno na execução da requisição.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/db")
-    public ResponseEntity<DemoSRE> getDbWithTimelimiter() {
+    public ResponseEntity<DemoSRE> getDbWithTimelimiter() throws Throwable {
 
         log.info("Fluxo DB Time Limiter");
 

@@ -31,7 +31,7 @@ public class CrudUseCaseImpl implements CrudUseCase {
     private static final String NOT_FOUND = "demo-sre.id-not-found";
 
     @Override
-    public DemoSRE getDemoSRE(final Integer id) {
+    public DemoSRE getDemoSRE(final Integer id) throws Throwable {
         log.info("Iniciando fluxo de recuperação de objeto por id");
 
         DemoSRE demoSRE = gateway.findById(id).orElseThrow(() -> {

@@ -39,7 +39,7 @@ public class CrudController {
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/getDemoSRE/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) {
+    public ResponseEntity<DemoSRE> getDemoSRE(@PathVariable final Integer id) throws Throwable {
         log.info("/getDemoSRE com id {}", id);
 
         return ResponseEntity.ok(this.crudUseCase.getDemoSRE(id));

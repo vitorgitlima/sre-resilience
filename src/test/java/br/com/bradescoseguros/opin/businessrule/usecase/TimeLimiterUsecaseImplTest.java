@@ -36,7 +36,7 @@ class TimeLimiterUsecaseImplTest {
 
     @Test
     @Tag("unit")
-    void getDemoSRE_ReturnValidValue() {
+    void getDemoSRE_ReturnValidValue() throws Throwable {
         //Arrange
         Optional<DemoSRE> demoSREMock = Optional.of(DummyObjectsUtil.newInstance(DemoSRE.class));
 

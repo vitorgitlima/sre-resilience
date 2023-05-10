@@ -4,7 +4,7 @@ import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 
 public interface CrudUseCase {
-    DemoSRE getDemoSRE(final Integer id);
+    DemoSRE getDemoSRE(final Integer id) throws Throwable;
 
     void insertDemoSRE(final DemoSRE payload);
 

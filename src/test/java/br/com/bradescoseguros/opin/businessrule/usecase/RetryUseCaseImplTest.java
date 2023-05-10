@@ -38,7 +38,7 @@ public class RetryUseCaseImplTest {
 
     @Test
     @Tag("unit")
-    void getDemoSRE_ReturnValidValue() {
+    void getDemoSRE_ReturnValidValue() throws Throwable {
         //Arrange
         final int id = 1;
         Optional<DemoSRE> demoSREMock = Optional.of(DummyObjectsUtil.newInstance(DemoSRE.class));

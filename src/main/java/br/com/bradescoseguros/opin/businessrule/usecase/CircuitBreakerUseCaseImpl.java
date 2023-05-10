@@ -29,7 +29,7 @@ public class CircuitBreakerUseCaseImpl implements CircuitBreakerUseCase {
     private static final String NOT_FOUND = "demo-sre.id-not-found";
 
     @Override
-    public DemoSRE getDemoSREWithCircuitBreaker(final Integer id) {
+    public DemoSRE getDemoSREWithCircuitBreaker(final Integer id)throws Throwable {
         log.info("Iniciando fluxo de recuperação de objeto por id com Circuit Breaker");
 
         DemoSRE demoSRE = gateway.findByIdWithCircuitBreaker(id).orElseThrow(() -> {

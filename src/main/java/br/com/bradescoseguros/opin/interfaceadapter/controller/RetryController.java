@@ -30,7 +30,7 @@ public class RetryController {
             @ApiResponse(code = 503, message = "O limite de retentativas foi excedido.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/db")
-    public ResponseEntity<DemoSRE> getDbWithRetry() {
+    public ResponseEntity<DemoSRE> getDbWithRetry() throws Throwable {
 
         log.info("Fluxo Retry DB");
 
