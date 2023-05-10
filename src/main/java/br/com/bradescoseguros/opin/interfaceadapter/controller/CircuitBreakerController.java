@@ -2,6 +2,8 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
 import br.com.bradescoseguros.opin.businessrule.usecase.CircuitBreakerUseCase;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import io.swagger.annotations.ApiResponse;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/sre/v1/circuitbreaker")
-public class CircuitBreakerController {
+public class CircuitBreakerController implements BaseController {
 
     @Autowired
     private CircuitBreakerUseCase circuitBreakerUseCase;
@@ -30,11 +32,17 @@ public class CircuitBreakerController {
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/db")
-    public ResponseEntity<DemoSRE> getDbWithCircuitBreaker() {
+    public ResponseEntity<Object> getDbWithCircuitBreaker() {
 
         log.info("Fluxo Circuit Breaker DB");
 
-        return ResponseEntity.ok(this.circuitBreakerUseCase.getDemoSREWithCircuitBreaker(1));
+        ExecutionResult<DemoSRE> result = this.circuitBreakerUseCase.getDemoSREWithCircuitBreaker(1);
+
+        if (result.getErrorType() == ErrorEnum.NOT_FOUND) {
+            return generateNotFoundResponse();
+        }
+
+        return ResponseEntity.ok(result.getObject());
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter.",
