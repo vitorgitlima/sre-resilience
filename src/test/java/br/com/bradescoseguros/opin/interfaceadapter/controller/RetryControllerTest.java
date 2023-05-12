@@ -106,6 +106,28 @@ public class RetryControllerTest {
 
     @Test
     @Tag("comp")
+    void getDemoSRE_ShouldReturnNotFound() throws Exception {
+        //Arrange
+        DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
+        final String url = BASE_URL + "/retry/db";
+
+        when(crudRepositoryMock.findById(anyInt())).thenReturn(Optional.empty());
+
+
+        //Act
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    @Tag("comp")
     void externalApiCallWithRetry_ShouldReturnSuccess() throws Exception {
         //Arrange
         final String url = BASE_URL + "/retry/api";

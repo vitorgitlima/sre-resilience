@@ -10,6 +10,7 @@
   - [Pre-Requires](#pre-requires "Pre-Requires")
   - [Clean Architecture](#clean-architecture "Clean Architecture")
   - [Packages Structure](#packages-structure "Packages Structure")
+  - [Avoiding Exceptions](#avoiding-exceptions "Avoiding Exceptions")
 - [Configurations](#configurations "Configurations")
 - [Running application](#running-application "Running application")
   - [Running apllication via ide](#running-apllication-via-ide "Running apllication via ide")
@@ -58,6 +59,33 @@
     - mapper -> Used to suit the domain object comming from the database into the response.
     - repository -> Used to call and get data from the database.
     - util -> Package with utils used in the application.
+
+### Avoiding Exceptions
+
+In order to avoid using exceptions in cases where there are only business rules, the ExecutionResult class was created.
+
+The idea of his class is that, in scenarios where some type of "error" occurs (such as validation errors or entity not found) this object represents the error and the controller is responsible for carrying out the necessary dealings to generate the correct response.
+
+The use of exceptions in validation scenarios makes Dynatrace identify exceptions as errors, generating indications of errors occurring in the application, where in fact, only necessary and mapped validations were performed.
+
+An example of using this class can be found in the example below:
+
+```java
+public class ExecutionResult<T> {
+  private T object;
+  private ErrorEnum errorType;
+  private String errorMessage;
+}
+```
+
+```java
+if(id < 0 ) {
+  log.warn("Id menor que 0");
+  return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.VALIDATION).errorMessage("ID inválido").build();
+}
+
+return ExecutionResult.<DemoSRE>builder().object(demoSREOptional.get()).build();
+```
 
 ## + Configurations
 ```bash

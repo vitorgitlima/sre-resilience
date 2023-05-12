@@ -2,6 +2,8 @@ package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
 import br.com.bradescoseguros.opin.businessrule.usecase.TimeLimiterUsecase;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
+import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -16,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/api/sre/v1/timelimiter")
-public class TimeLimiterController {
+public class TimeLimiterController implements BaseController {
 
     @Autowired
     private TimeLimiterUsecase timeLimiterUsecase;
@@ -29,11 +31,17 @@ public class TimeLimiterController {
             @ApiResponse(code = 500, message = "Ocorreu um erro interno na execução da requisição.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/db")
-    public ResponseEntity<DemoSRE> getDbWithTimelimiter() throws Throwable {
+    public ResponseEntity<Object> getDbWithTimelimiter() {
 
         log.info("Fluxo DB Time Limiter");
 
-        return ResponseEntity.ok(this.timeLimiterUsecase.getDemoSRE(1));
+        ExecutionResult<DemoSRE> result = this.timeLimiterUsecase.getDemoSRE(1);
+
+        if (result.getErrorType() == ErrorEnum.NOT_FOUND) {
+            return generateNotFoundResponse();
+        }
+
+        return ResponseEntity.ok(result.getObject());
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter.",
