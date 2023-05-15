@@ -157,6 +157,8 @@ resilience4j.circuitbreaker:
     apiCircuitBreaker:
       baseConfig: default
       automatic-transition-from-open-to-half-open-enabled: false
+      recordExceptions:
+        - org.springframework.web.client.HttpServerErrorException
 
 resilience4j.bulkhead:
   instances:

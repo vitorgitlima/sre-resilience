@@ -1,5 +1,6 @@
 package br.com.bradescoseguros.opin.interfaceadapter.controller;
 
+import br.com.bradescoseguros.opin.businessrule.exception.NotFoundException;
 import br.com.bradescoseguros.opin.configuration.TestRedisConfiguration;
 import br.com.bradescoseguros.opin.configuration.TestResilienceConfig;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
@@ -72,8 +73,6 @@ public class CircuitBreakerControllerTest {
         Mockito.reset(restTemplateMock);
 
     }
-
-
 
     @Test
     @Tag("comp")
@@ -151,7 +150,7 @@ public class CircuitBreakerControllerTest {
     @Tag("comp")
     void externalApiCall_ShouldReturnSuccess() throws Exception {
         //Arrange
-        final String url = BASE_URL + "/circuitbreaker/api";
+        final String url = BASE_URL + "/circuitbreaker/api/ok";
         final String response = "ok";
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
@@ -173,7 +172,7 @@ public class CircuitBreakerControllerTest {
     @Tag("comp")
     void externalApiCall_ShouldReturnExceptionWhenCircuitIsOpened() throws Exception {
         //Arrange
-        final String url = BASE_URL + "/circuitbreaker/api";
+        final String url = BASE_URL + "/circuitbreaker/api/nok500";
         final String errorMessage = "LOCKED O circuito apiCircuitBreaker que está registrado para esta operação está ABERTO, novas requisições estão temporariamente suspensas.";
 
         circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).transitionToOpenState();
@@ -194,5 +193,49 @@ public class CircuitBreakerControllerTest {
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.LOCKED.value());
         assertThat(bodyResult.getErrors()).hasSize(1);
         assertThat(bodyResult.getErrors().stream().findFirst().get().getTitle()).isEqualTo(errorMessage);
+    }
+
+    @Test
+    @Tag("comp")
+    void externalApiCall_ShouldOpenCircuitBreakerWhenExceptionIsRecorded() throws Exception {
+        //Arrange
+        final String url = BASE_URL + "/circuitbreaker/api/nok500";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
+
+        //Act
+        for (int i = 0; i < 3; i++) {
+            mockMvc.perform(MockMvcRequestBuilders
+                            .get(url)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                    .andDo(print())
+                    .andReturn();
+        }
+
+        //Assert
+        assertThat(circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).tryAcquirePermission()).isEqualTo(false);
+    }
+
+    @Test
+    @Tag("comp")
+    void externalApiCall_ShouldNotOpenCircuitBreakerWhenExceptionIsIgnored() throws Exception {
+        //Arrange
+        final String url = BASE_URL + "/circuitbreaker/api/nok404";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(NotFoundException.class);
+
+        //Act
+        for (int i = 0; i < 3; i++) {
+            mockMvc.perform(MockMvcRequestBuilders
+                            .get(url)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                    .andDo(print())
+                    .andReturn();
+        }
+
+        //Assert
+        assertThat(circuitBreakerRegistry.circuitBreaker(CB_API_CONFIG).tryAcquirePermission()).isEqualTo(true);
     }
 }

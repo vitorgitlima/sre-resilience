@@ -69,12 +69,12 @@ resilience4j.circuitbreaker:
   configs:
     default:
       registerHealthIndicator: true
-      failure-rate-threshold: 50 # Threshold de falhas para ir para estado de "Aberto", em porcentagem.
-      minimum-number-of-calls: 5  # Número de chamadas mínimas que são necessárias antes do CircuitBreaker poder calcular o error-rate. Se o número for 10, então ao menos 10 requisições tem que ser armazenadas para que seja calculado o valor da taxa de erro
+      failure-rate-threshold: 100 # Threshold de falhas para ir para estado de "Aberto", em porcentagem.
+      minimum-number-of-calls: 3  # Número de chamadas mínimas que são necessárias antes do CircuitBreaker poder calcular o error-rate. Se o número for 10, então ao menos 10 requisições tem que ser armazenadas para que seja calculado o valor da taxa de erro
       automatic-transition-from-open-to-half-open-enabled: true # Dispara um thread que faz a transição quando o tempo terminar. Caso seja false, aguarda uma nova request para mudar de status
       wait-duration-in-open-state: 50s # Tempo de espera no estado "Aberto". Será movido para o estado de "Semi-Aberto" após esse tempo
       permitted-number-of-calls-in-half-open-state: 3 # Número máximo de requisições permitidas quando no estado "Semi-Aberto". As demais requisições serão rejeitadas com CallNotPermittedException, até que todas as chamadas permitidas sejam concluídas.
-      sliding-window-size: 10 # Tamanho da janela que é usada para registrar o resultado das chamadas quando o circuito esta fechado (quantas chamadas ele memoriza). Esse valor precisa ser maior que os valores de análise. Caso seja menor, vai sobrescrever o valor de requisições minimas necessárias
+      sliding-window-size: 3 # Tamanho da janela que é usada para registrar o resultado das chamadas quando o circuito esta fechado (quantas chamadas ele memoriza). Esse valor precisa ser maior que os valores de análise. Caso seja menor, vai sobrescrever o valor de requisições minimas necessárias
       sliding-window-type: count_based # COUNT_BASED ou TIME_BASED. Se for TIME, os segundos das ultimas requisições serão armazenados para cálculos
   instances:
     cosmoCircuitBreaker:
@@ -85,6 +85,8 @@ resilience4j.circuitbreaker:
     apiCircuitBreaker:
       baseConfig: default
       automatic-transition-from-open-to-half-open-enabled: false
+      recordExceptions:
+        - org.springframework.web.client.HttpServerErrorException
 
 
 resilience4j.bulkhead:

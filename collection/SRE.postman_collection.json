@@ -223,7 +223,13 @@
 					"name": "GetDemoSRE",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "trace-id",
+								"value": "123",
+								"type": "default"
+							}
+						],
 						"url": {
 							"raw": "http://localhost:8080/api/sre/v1/getDemoSRE/2",
 							"protocol": "http",
@@ -453,12 +459,12 @@
 					"response": []
 				},
 				{
-					"name": "CircuitBreaker - API",
+					"name": "CircuitBreaker - API [recordException]",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/sre/v1/circuitbreaker/api",
+							"raw": "http://localhost:8080/api/sre/v1/circuitbreaker/api/nok500",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -469,7 +475,32 @@
 								"sre",
 								"v1",
 								"circuitbreaker",
-								"api"
+								"api",
+								"nok500"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CircuitBreaker - API [ignoreException]",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/circuitbreaker/api/nok404",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"circuitbreaker",
+								"api",
+								"nok404"
 							]
 						}
 					},
