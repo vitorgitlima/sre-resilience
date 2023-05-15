@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -53,11 +54,11 @@ public class CircuitBreakerController implements BaseController {
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
             @ApiResponse(code = 503, message = "O limite de retentativas foi excedido.", response = MetaDataEnvelope.class),
     })
-    @GetMapping(value = "/api")
-    public ResponseEntity<String> getApiWithCircuitBreaker() {
+    @GetMapping(value = "/api/{status}")
+    public ResponseEntity<String> getApiWithCircuitBreaker(@PathVariable final String status) {
 
-        log.info("Fluxo Circuit Breaker API");
+        log.info("Fluxo Circuit Breaker API com status {}", status);
 
-        return ResponseEntity.ok(this.circuitBreakerUseCase.externalApiCallWithCircuitBreaker(ExtraStatusCode.INTERNAL_SERVER_ERROR));
+        return ResponseEntity.ok(this.circuitBreakerUseCase.externalApiCallWithCircuitBreaker(ExtraStatusCode.fromString(status)));
     }
 }
