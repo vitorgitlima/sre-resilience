@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,12 +53,12 @@ public class RetryController implements BaseController {
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
             @ApiResponse(code = 503, message = "O limite de retentativas foi excedido.", response = MetaDataEnvelope.class),
     })
-    @GetMapping(value = "/api")
-    public ResponseEntity<String> getApiWithRetry() {
+    @GetMapping(value = "/api/{status}")
+    public ResponseEntity<String> getApiWithRetry(@PathVariable final String status) {
 
         log.info("Fluxo Retry API");
 
-        return ResponseEntity.ok(this.retryUseCase.externalApiCallWithRetry(ExtraStatusCode.INTERNAL_SERVER_ERROR));
+        return ResponseEntity.ok(this.retryUseCase.externalApiCallWithRetry(ExtraStatusCode.fromString(status)));
     }
 
     @Operation(summary = "Realiza uma chamada externa de API com Time Limiter e Circuit Breaker.",
