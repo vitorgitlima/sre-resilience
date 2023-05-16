@@ -385,12 +385,12 @@
 					"response": []
 				},
 				{
-					"name": "Retry - API",
+					"name": "Retry - API [recordException]",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/sre/v1/retry/api",
+							"raw": "http://localhost:8080/api/sre/v1/retry/api/nok500",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -401,7 +401,32 @@
 								"sre",
 								"v1",
 								"retry",
-								"api"
+								"api",
+								"nok500"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retry - API [ignoreException]",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/sre/v1/retry/api/nok404",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"sre",
+								"v1",
+								"retry",
+								"api",
+								"nok404"
 							]
 						}
 					},
