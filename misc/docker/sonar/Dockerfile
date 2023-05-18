@@ -9,4 +9,7 @@ RUN LATEST_RELEASE=$(curl -L -s -H 'Accept: application/json' https://github.com
     wget -O mutation-analysis-plugin.jar "$ARTIFACT_URL" -P ./;
 
 FROM sonarqube:7.9.6-community
+USER root
+RUN apt update && apt install -y curl jq
+USER sonarqube
 COPY --from=0 /root/mutation-analysis-plugin.jar /opt/sonarqube/extensions/plugins

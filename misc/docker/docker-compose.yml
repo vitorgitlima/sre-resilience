@@ -19,53 +19,53 @@ services:
       retries: 30
     entrypoint: [ "bash", "./scripts/entrypoint.bash" ]
 
-  redis:
-    image: redis:7.0.8
-    ports:
-      - "6379:6379"
-    networks:
-      - vpcopeninsurance
+#  redis:
+#    image: redis:7.0.8
+#    ports:
+#      - "6379:6379"
+#    networks:
+#      - vpcopeninsurance
+#
+#  mongo:
+#    image: mongo:6.0.4
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: admin
+#      MONGO_INITDB_ROOT_PASSWORD: admin!
+#      MONGO_INITDB_DATABASE: opin-db-apis
+#    volumes:
+#      - ./mongodb/init_mongo_user.sh:/docker-entrypoint-initdb.d/init_mongo_user.sh
+#      - ./mongodb/init_mongo_data.js:/docker-entrypoint-initdb.d/init_mongo_data.js:ro
+#      - mongo-volume:/data/db
+#    ports:
+#      - "27017:27017"
+#    networks:
+#      - vpcopeninsurance
 
-  mongo:
-    image: mongo:6.0.4
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin!
-      MONGO_INITDB_DATABASE: opin-db-apis
-    volumes:
-      - ./mongodb/init_mongo_user.sh:/docker-entrypoint-initdb.d/init_mongo_user.sh
-      - ./mongodb/init_mongo_data.js:/docker-entrypoint-initdb.d/init_mongo_data.js:ro
-      - mongo-volume:/data/db
-    ports:
-      - "27017:27017"
-    networks:
-      - vpcopeninsurance
-
-  mongo-express:
-    image: mongo-express:1.0.0-alpha.4
-    ports:
-      - "8086:8081"
-    environment:
-      ME_CONFIG_BASICAUTH_USERNAME: dev
-      ME_CONFIG_BASICAUTH_PASSWORD: dev!
-      ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: admin!
-      ME_CONFIG_MONGODB_SERVER: mongo
-    links:
-      - mongo
-    networks:
-      - vpcopeninsurance
-    depends_on:
-      - mongo
-
-  demo-sre-extra:
-    build: ./demo_sre_extra
-    ports:
-      - "8081:8081"
-    networks:
-      - vpcopeninsurance
+#  mongo-express:
+#    image: mongo-express:1.0.0-alpha.4
+#    ports:
+#      - "8086:8081"
+#    environment:
+#      ME_CONFIG_BASICAUTH_USERNAME: dev
+#      ME_CONFIG_BASICAUTH_PASSWORD: dev!
+#      ME_CONFIG_MONGODB_PORT: 27017
+#      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: admin!
+#      ME_CONFIG_MONGODB_SERVER: mongo
+#    links:
+#      - mongo
+#    networks:
+#      - vpcopeninsurance
+#    depends_on:
+#      - mongo
+#
+#  demo-sre-extra:
+#    build: ./demo_sre_extra
+#    ports:
+#      - "8081:8081"
+#    networks:
+#      - vpcopeninsurance
 
 networks:
   vpcopeninsurance:
