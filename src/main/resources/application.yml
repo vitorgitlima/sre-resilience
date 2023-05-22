@@ -189,3 +189,7 @@ resilience4j.timelimiter:
       baseConfig: default
     limiterDb:
       baseConfig: default
+
+# Definições de Feature Toggle
+feature-management:
+  feature-a: true
