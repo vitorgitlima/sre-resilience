@@ -1,4 +1,8 @@
 package br.com.bradescoseguros.opin.businessrule.usecase;
 
-public interface FeatureToggleUseCaseImpl {
+import org.springframework.stereotype.Service;
+
+@Service
+public class FeatureToggleUseCaseImpl {
+
 }
