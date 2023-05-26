@@ -27,6 +27,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -130,7 +131,7 @@ public class RetryControllerTest {
     @Tag("comp")
     void externalApiCallWithRetry_ShouldReturnSuccess() throws Exception {
         //Arrange
-        final String url = BASE_URL + "/retry/api";
+        final String url = BASE_URL + "/retry/api/ok";
         final String response = "ok";
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenReturn(new ResponseEntity<>(response, HttpStatus.OK));
@@ -171,9 +172,9 @@ public class RetryControllerTest {
 
     @Test
     @Tag("comp")
-    void externalApiCall_RetryAndReturnException() throws Exception {
+    void externalApiCall_ShouldRetryAndReturnException() throws Exception {
         //Arrange
-        final String url = BASE_URL + "/retry/api";
+        final String url = BASE_URL + "/retry/api/nok500";
         final int retryAttempts = retryRegistry.retry(RETRY_API_CONFIG).getRetryConfig().getMaxAttempts();
 
         when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpServerErrorException.class);
@@ -189,6 +190,26 @@ public class RetryControllerTest {
         //Assert
         assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE.value());
         verify(restTemplateMock, times(retryAttempts)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
+    }
+
+    @Test
+    @Tag("comp")
+    void externalApiCall_ShouldNotRetryWhenErrorIsNotRecorded() throws Exception {
+        //Arrange
+        final String url = BASE_URL + "/retry/api/nok404";
+
+        when(restTemplateMock.exchange(anyString(), any(HttpMethod.class), any(), eq(String.class))).thenThrow(HttpClientErrorException.class);
+
+        //Act
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andDo(print())
+                .andReturn();
+
+        //Assert
+        verify(restTemplateMock, times(1)).exchange(anyString(), any(HttpMethod.class), any(), eq(String.class));
     }
 
     @Test

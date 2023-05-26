@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -171,6 +172,22 @@ public class ResilienceControllerExceptionHandler extends ResponseEntityExceptio
 
     @ExceptionHandler(HttpServerErrorException.class)
     public ResponseEntity<Object> handleHttpServerErrorException(final HttpServerErrorException exception, final WebRequest request) {
+
+        String exceptionMessage = messageSourceService.getMessage("sre.generic-error", exception.getMessage());
+
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        MetaDataEnvelope response =
+                new MetaDataEnvelope(httpStatus.toString(), ErrorCode.INTERNAL_SERVER_ERROR, exceptionMessage);
+
+        final String errorMessage = MessageFormat.format("handleHttpServerErrorException: {0}", response);
+        log.error(errorMessage, exception);
+
+        return handleExceptionInternal(exception, response, new HttpHeaders(),
+                httpStatus, request);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<Object> handleHttpClientErrorException(final HttpClientErrorException exception, final WebRequest request) {
 
         String exceptionMessage = messageSourceService.getMessage("sre.generic-error", exception.getMessage());
 
