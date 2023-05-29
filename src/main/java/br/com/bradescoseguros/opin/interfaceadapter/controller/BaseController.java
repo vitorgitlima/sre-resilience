@@ -24,7 +24,7 @@ public interface BaseController {
         return generateErrorResponseWithStatusCode(conflict, ErrorCode.CONFLICT, executionResult);
     }
 
-    private ResponseEntity<Object> generateErrorResponseWithStatusCode(HttpStatus httpStatus, ErrorCode errorCode, ExecutionResult<?> executionResult) {
+    default ResponseEntity<Object> generateErrorResponseWithStatusCode(HttpStatus httpStatus, ErrorCode errorCode, ExecutionResult<?> executionResult) {
         MetaDataEnvelope response = new MetaDataEnvelope(httpStatus.toString(), errorCode, executionResult.getErrorMessage());
 
         final MetaData meta = new MetaData(httpStatus.toString(), MDC.get("TRACE_ID"));

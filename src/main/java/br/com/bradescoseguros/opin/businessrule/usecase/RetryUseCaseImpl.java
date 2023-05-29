@@ -1,6 +1,5 @@
 package br.com.bradescoseguros.opin.businessrule.usecase;
 
-import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
 import br.com.bradescoseguros.opin.businessrule.gateway.RetryGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.businessrule.validator.DemoSREValidator;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -36,7 +34,7 @@ public class RetryUseCaseImpl implements RetryUseCase {
 
 
         Optional<DemoSRE> demoSREOptional = gateway.findByIdWithRetry(id);
-        if(demoSREOptional.isEmpty()) {
+        if(!demoSREOptional.isPresent()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
             return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
         }
