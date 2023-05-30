@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 @Slf4j
 @RestController
 @RequestMapping("api/sre/v1/featuretoggle")
@@ -21,10 +22,10 @@ public class FeatureToggleController {
     @Autowired
     private FeatureToggleUseCase featureToggleUseCase;
 
-
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "A API foi executada com sucesso."),
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 404, message = "O recurso solicitado não existe ou não foi implementado.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/enabled")
     public ResponseEntity<Object> getIdEnabled() {

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
 @Slf4j
 @Service
 public class FeatureToggleUseCaseImpl implements FeatureToggleUseCase {
@@ -25,7 +26,7 @@ public class FeatureToggleUseCaseImpl implements FeatureToggleUseCase {
 
     @Override
     public ExecutionResult<DemoSRE> getDemoSREWithToggleEnabled(final Integer id) {
-        if(featureManager.isEnabledAsync("feature-a").block()) {
+        if (featureManager.isEnabledAsync("feature-a").block()) {
             Optional<DemoSRE> demoSREOptional = gateway.findByIdWithFeatureToggle(id);
             if (demoSREOptional.isEmpty()) {
                 log.info("Feature habilitada e não encontrou objeto com id requerido.");
@@ -36,6 +37,6 @@ public class FeatureToggleUseCaseImpl implements FeatureToggleUseCase {
             }
         }
         log.info("Feature desabilitada.");
-       return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
+        return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
     }
 }
