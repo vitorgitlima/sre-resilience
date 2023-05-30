@@ -2,6 +2,7 @@ package br.com.bradescoseguros.opin.businessrule.usecase;
 
 import br.com.bradescoseguros.opin.businessrule.gateway.FeatureToggleGateway;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
+import br.com.bradescoseguros.opin.domain.ErrorEnum;
 import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import com.azure.spring.cloud.feature.management.FeatureManager;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import static com.mongodb.assertions.Assertions.assertNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
@@ -50,4 +52,39 @@ public class FeatureToggleUseCaseImplTest {
         verify(featureManager).isEnabledAsync("feature-a");
         verify(mockGateway, times(1)).findByIdWithFeatureToggle(anyInt());
     }
+
+    @Test
+    void getDemoSREWithToggleEnabled_ReturnNotFound() {
+        // Arrange
+        final int id = 2;
+        Optional<DemoSRE> demoSREMock = Optional.empty();
+        when(featureManager.isEnabledAsync("feature-a")).thenReturn(Mono.just(true));
+        when(mockGateway.findByIdWithFeatureToggle(anyInt())).thenReturn(demoSREMock);
+
+        // Act
+        ExecutionResult<DemoSRE> result = featureToggleUseCase.getDemoSREWithToggleEnabled(id);
+
+        // Assert
+        assertNull(result.getObject());
+        assertThat(result.getErrorType()).isEqualTo(ErrorEnum.NOT_FOUND);
+        verify(featureManager).isEnabledAsync("feature-a");
+        verify(mockGateway, times(1)).findByIdWithFeatureToggle(anyInt());
+    }
+
+    @Test
+    void getDemoSREWithFeatureToggleDisabled() {
+        // Arrange
+        final int id = 2;
+        when(featureManager.isEnabledAsync("feature-a")).thenReturn(Mono.just(false));
+
+        // Act
+        ExecutionResult<DemoSRE> result = featureToggleUseCase.getDemoSREWithToggleEnabled(id);
+
+        // Assert
+        assertNull(result.getObject());
+        assertEquals(ErrorEnum.NOT_FOUND, result.getErrorType());
+        verify(featureManager).isEnabledAsync("feature-a");
+        verifyZeroInteractions(mockGateway);
+    }
+
 }
