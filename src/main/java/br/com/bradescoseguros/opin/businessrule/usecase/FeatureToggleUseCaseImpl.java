@@ -21,6 +21,7 @@ public class FeatureToggleUseCaseImpl implements FeatureToggleUseCase {
 
     @Autowired
     private FeatureManager featureManager;
+
     @Autowired
     private DemoSREValidator validator;
 

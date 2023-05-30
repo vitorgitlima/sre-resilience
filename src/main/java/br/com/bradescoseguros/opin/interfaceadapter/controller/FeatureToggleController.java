@@ -24,8 +24,8 @@ public class FeatureToggleController {
 
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "A API foi executada com sucesso."),
-            @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
             @ApiResponse(code = 404, message = "O recurso solicitado não existe ou não foi implementado.", response = MetaDataEnvelope.class),
+            @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/enabled")
     public ResponseEntity<Object> getIdEnabled() {
