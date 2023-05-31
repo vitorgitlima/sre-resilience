@@ -4,13 +4,12 @@ import br.com.bradescoseguros.opin.businessrule.gateway.FeatureToggleGateway;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.domain.ErrorEnum;
 import br.com.bradescoseguros.opin.domain.ExecutionResult;
-import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
 import com.azure.spring.cloud.feature.management.FeatureManager;
-import com.mongodb.assertions.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
@@ -84,7 +83,7 @@ public class FeatureToggleUseCaseImplTest {
         assertNull(result.getObject());
         assertEquals(ErrorEnum.NOT_FOUND, result.getErrorType());
         verify(featureManager).isEnabledAsync("feature-a");
-        verifyZeroInteractions(mockGateway);
+        assertThat(Mockito.mockingDetails(mockGateway).getInvocations()).isEmpty();
     }
 
 }
