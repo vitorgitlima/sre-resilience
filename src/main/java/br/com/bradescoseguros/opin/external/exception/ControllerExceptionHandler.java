@@ -25,6 +25,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -183,6 +184,6 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private Set<ErrorData> processMethodNotReadableErrors(final HttpMessageNotReadableException exception) {
-        return Set.of(new ErrorData(ErrorCode.INVALID_PARAMETER.name(), exception.getMessage()));
+        return Collections.singleton(new ErrorData(ErrorCode.INVALID_PARAMETER.name(), exception.getMessage()));
     }
 }

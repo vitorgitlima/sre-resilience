@@ -1,13 +1,11 @@
 package br.com.bradescoseguros.opin.businessrule.usecase;
 
-import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.gateway.TimeLimiterGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.domain.ErrorEnum;
 import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +36,7 @@ class TimeLimiterUsecaseImplTest {
 
     @Test
     @Tag("unit")
-    void getDemoSRE_ReturnValidValue() {
+    void getDemoSRE_ReturnValidValue() throws Throwable {
         //Arrange
         Optional<DemoSRE> demoSREMock = Optional.of(DummyObjectsUtil.newInstance(DemoSRE.class));
 

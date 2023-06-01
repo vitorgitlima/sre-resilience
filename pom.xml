@@ -28,7 +28,7 @@
         <log4j2.version>2.17.2</log4j2.version>
         <start-class>br.com.bradescoseguros.opin.Application</start-class>
         <spring.boot.version>2.5.6</spring.boot.version>
-        <project.java.version>11</project.java.version>
+        <project.java.version>8</project.java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <lombok.version>1.18.22</lombok.version>
@@ -471,9 +471,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.version}</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
-                    <release>${project.java.version}</release>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <annotationProcessorPaths>
                         <path>

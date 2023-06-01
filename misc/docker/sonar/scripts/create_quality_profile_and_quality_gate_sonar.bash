@@ -5,8 +5,6 @@ SONARURL="http://localhost:9000/api"
 wait_sonarqube_up() {
     sonar_status="DOWN"
     printf "INFO initiating connection with SonarQube.\n"
-    apk add curl
-    apk add jq
     sleep 15
     while [ "${sonar_status}" != "UP" ]; do
         sleep 5
@@ -14,7 +12,7 @@ wait_sonarqube_up() {
         sonar_status=$(curl -s -X GET "localhost:9000/api/system/status" | jq -r '.status')
         printf "INFO SonarQube is ${sonar_status}, expecting it to be UP.\n"
     done
-    curl -u admin:admin -X POST "${SONARURL}/users/change_password?login=admin&previousPassword=admin&password=dev!"
+    curl --user admin:admin -X POST "${SONARURL}/users/change_password?login=admin&previousPassword=admin&password=dev!"
     printf "INFO SonarQube is ${sonar_status}."
 }
 
@@ -62,7 +60,7 @@ create_quality_gate() {
         -X GET \
         "${SONARURL}/qualitygates/show?name=ChassiSRE")
     if [ "$(echo "${res}" | jq '(.errors | length)')" == "0" ]; then
-        GATEID=$(echo ${res} | jq '.id' | tail -c +2 | head -c -2)
+        GATEID=$(echo ${res} | jq '.id')
         printf "INFO successfully retrieved quality gate ID (ID=$GATEID).\n"
     else
         printf "ERROR impossible to reach quality gate ID $(echo "${res}" | jq '.errors[].msg')\n"

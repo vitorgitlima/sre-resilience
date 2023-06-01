@@ -29,7 +29,7 @@ public class TimeLimiterUsecaseImpl implements TimeLimiterUsecase {
         log.info("Iniciando fluxo de recuperação de objeto por id com Time Limiter");
 
         Optional<DemoSRE> demoSREOptional = timeLimiterGateway.findByIdWithTimeLimiter(id);
-        if (demoSREOptional.isEmpty()) {
+        if(!demoSREOptional.isPresent()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
             return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
         }

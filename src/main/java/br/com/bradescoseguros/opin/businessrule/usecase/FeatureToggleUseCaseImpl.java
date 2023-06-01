@@ -29,7 +29,7 @@ public class FeatureToggleUseCaseImpl implements FeatureToggleUseCase {
     public ExecutionResult<DemoSRE> getDemoSREWithToggleEnabled(final Integer id) {
         if (featureManager.isEnabledAsync("feature-a").block()) {
             Optional<DemoSRE> demoSREOptional = gateway.findByIdWithFeatureToggle(id);
-            if (demoSREOptional.isEmpty()) {
+            if (!demoSREOptional.isPresent()) {
                 log.info("Feature habilitada e não encontrou objeto com id requerido.");
                 return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
             } else {

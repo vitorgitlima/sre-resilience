@@ -1,7 +1,5 @@
 package br.com.bradescoseguros.opin.businessrule.usecase;
 
-import br.com.bradescoseguros.opin.businessrule.exception.BadRequestException;
-import br.com.bradescoseguros.opin.businessrule.exception.NoContentException;
 import br.com.bradescoseguros.opin.businessrule.gateway.RetryGateway;
 import br.com.bradescoseguros.opin.businessrule.messages.MessageSourceService;
 import br.com.bradescoseguros.opin.domain.DemoSRE;
@@ -9,7 +7,6 @@ import br.com.bradescoseguros.opin.domain.ErrorEnum;
 import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.domain.ExtraStatusCode;
 import br.com.bradescoseguros.opin.dummy.DummyObjectsUtil;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +37,7 @@ public class RetryUseCaseImplTest {
 
     @Test
     @Tag("unit")
-    void getDemoSRE_ReturnValidValue() {
+    void getDemoSRE_ReturnValidValue() throws Throwable {
         //Arrange
         final int id = 1;
         Optional<DemoSRE> demoSREMock = Optional.of(DummyObjectsUtil.newInstance(DemoSRE.class));

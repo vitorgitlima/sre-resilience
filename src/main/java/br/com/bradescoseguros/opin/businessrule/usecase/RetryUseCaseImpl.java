@@ -34,7 +34,7 @@ public class RetryUseCaseImpl implements RetryUseCase {
 
 
         Optional<DemoSRE> demoSREOptional = gateway.findByIdWithRetry(id);
-        if (demoSREOptional.isEmpty()) {
+        if(!demoSREOptional.isPresent()) {
             log.warn(messageSourceService.getMessage(NOT_FOUND));
             return ExecutionResult.<DemoSRE>builder().errorType(ErrorEnum.NOT_FOUND).build();
         }
