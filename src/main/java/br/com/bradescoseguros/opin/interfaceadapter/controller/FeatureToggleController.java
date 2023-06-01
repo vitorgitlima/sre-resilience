@@ -29,7 +29,7 @@ public class FeatureToggleController {
     })
     @GetMapping(value = "/enabled")
     public ResponseEntity<Object> getIdEnabled() {
-        ExecutionResult<DemoSRE> result = this.featureToggleUseCase.getDemoSREWithToggleEnabled(2);
+        ExecutionResult<DemoSRE> result = this.featureToggleUseCase.getDemoSREWithToggleEnabled(1);
 
         if (result.getErrorType() == ErrorEnum.NOT_FOUND) {
             log.info("Not found");
