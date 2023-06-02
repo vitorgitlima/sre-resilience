@@ -319,6 +319,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- Feature Toggle -->
+        <dependency>
+            <groupId>com.azure.spring</groupId>
+            <artifactId>spring-cloud-azure-feature-management-web</artifactId>
+            <version>4.7.0</version>
+        </dependency>
+
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
