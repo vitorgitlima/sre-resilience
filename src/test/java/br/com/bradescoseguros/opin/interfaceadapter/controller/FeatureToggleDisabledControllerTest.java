@@ -70,7 +70,6 @@ public class FeatureToggleDisabledControllerTest {
 
         //Arrange
         DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
-        String demoSREMockJson = new ObjectMapper().writeValueAsString(demoSREMock);
 
         when(mockGateway.findByIdWithFeatureToggle(anyInt())).thenReturn(Optional.of(demoSREMock));
 
