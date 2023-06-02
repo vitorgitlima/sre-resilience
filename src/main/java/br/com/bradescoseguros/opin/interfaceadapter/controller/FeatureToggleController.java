@@ -5,6 +5,7 @@ import br.com.bradescoseguros.opin.domain.DemoSRE;
 import br.com.bradescoseguros.opin.domain.ErrorEnum;
 import br.com.bradescoseguros.opin.domain.ExecutionResult;
 import br.com.bradescoseguros.opin.external.exception.entities.MetaDataEnvelope;
+import com.azure.spring.cloud.feature.management.web.FeatureGate;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class FeatureToggleController {
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
     @GetMapping(value = "/enabled")
+    @FeatureGate(feature = "feature-b")
     public ResponseEntity<Object> getIdEnabled() {
         ExecutionResult<DemoSRE> result = this.featureToggleUseCase.getDemoSREWithToggleEnabled(1);
 

@@ -126,3 +126,4 @@ resilience4j.timelimiter:
 # Definições de Feature Toggle
 feature-management:
   feature-a: true
+  feature-b: true
