@@ -27,7 +27,7 @@ public class FeatureToggleUseCaseImpl implements FeatureToggleUseCase {
 
     @Override
     public ExecutionResult<DemoSRE> getDemoSREWithToggleEnabled(final Integer id) {
-        if (featureManager.isEnabledAsync("feature-a").block()) {
+        if (Boolean.TRUE.equals(featureManager.isEnabledAsync("feature-a").block())) {
             Optional<DemoSRE> demoSREOptional = gateway.findByIdWithFeatureToggle(id);
             if (!demoSREOptional.isPresent()) {
                 log.info("Feature habilitada e não encontrou objeto com id requerido.");

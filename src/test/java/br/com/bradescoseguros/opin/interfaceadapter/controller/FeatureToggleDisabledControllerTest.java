@@ -25,7 +25,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
@@ -33,13 +32,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Import({TestResilienceConfig.class, TestRedisConfiguration.class})
-public class FeatureToggleControllerTest {
+@TestPropertySource(properties = "feature-management.feature-c=false")
+public class FeatureToggleDisabledControllerTest {
 
     private static final String BASE_URL = "/api/sre/v1/featuretoggle";
 
@@ -52,6 +53,9 @@ public class FeatureToggleControllerTest {
     @MockBean
     private FeatureToggleGateway mockGateway;
 
+    @Mock
+    private FeatureManager featureManager;
+
     @MockBean
     private MongoTemplate mongoTemplate;
 
@@ -61,47 +65,7 @@ public class FeatureToggleControllerTest {
 
     @Test
     @Tag("comp")
-    void getDemoSRE_ToggleControllerShouldReturnValidResult() throws Exception {
-        //Arrange
-        DemoSRE demoSREMock = DummyObjectsUtil.newInstance(DemoSRE.class);
-        String demoSREMockJson = new ObjectMapper().writeValueAsString(demoSREMock);
-
-        when(mockGateway.findByIdWithFeatureToggle(anyInt())).thenReturn(Optional.of(demoSREMock));
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        //Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.getResponse().getContentAsString()).isEqualTo(demoSREMockJson);
-    }
-
-    @Test
-    @Tag("comp")
-    void getDemoSRE_ToggleControllerShouldReturnNotFound() throws Exception {
-        //Arrange
-        when(mockGateway.findByIdWithFeatureToggle(anyInt())).thenReturn(Optional.empty());
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        //Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
-    }
-
-    @Test
-    @Tag("comp")
-    void getDemoSRE_ToggleWithFallbackControllerShouldReturnValidResult() throws Exception {
+    void getDemoSRE_ToggleWithFallbackControllerShouldCallFallbackUrl() throws Exception {
         final String url = BASE_URL + "/fallback";
 
         //Arrange
@@ -115,30 +79,11 @@ public class FeatureToggleControllerTest {
                         .get(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
+                .andExpect(redirectedUrl("/api/sre/v1/featuretoggle"))
                 .andDo(print())
                 .andReturn();
 
         //Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(result.getResponse().getContentAsString()).isEqualTo(demoSREMockJson);
-    }
-
-    @Test
-    @Tag("comp")
-    void getDemoSRE_ToggleWithFallbackControllerShouldReturnNotFound() throws Exception {
-        //Arrange
-        final String url = BASE_URL + "/fallback";
-        when(mockGateway.findByIdWithFeatureToggle(anyInt())).thenReturn(Optional.empty());
-
-        //Act
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                        .get(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.parseMediaType("application/json;charset=UTF-8")))
-                .andDo(print())
-                .andReturn();
-
-        //Assert
-        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.FOUND.value());
     }
 }
