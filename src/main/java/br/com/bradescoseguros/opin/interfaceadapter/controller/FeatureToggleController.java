@@ -28,9 +28,11 @@ public class FeatureToggleController {
             @ApiResponse(code = 404, message = "O recurso solicitado não existe ou não foi implementado.", response = MetaDataEnvelope.class),
             @ApiResponse(code = 500, message = "Ocorreu um erro no gateway da API ou no microsserviço.", response = MetaDataEnvelope.class),
     })
-    @GetMapping(value = "/enabled")
+    @GetMapping
     @FeatureGate(feature = "feature-b")
     public ResponseEntity<Object> getIdEnabled() {
+        log.info("feature-b: true, chamando getIdEnabled");
+
         ExecutionResult<DemoSRE> result = this.featureToggleUseCase.getDemoSREWithToggleEnabled(1);
 
         if (result.getErrorType() == ErrorEnum.NOT_FOUND) {
@@ -39,4 +41,20 @@ public class FeatureToggleController {
         }
         return ResponseEntity.ok(result.getObject());
     }
+
+    @GetMapping(value = "/fallback")
+    @FeatureGate(feature = "feature-c", fallback = "/api/sre/v1/featuretoggle")
+    public ResponseEntity<Object> getIdWithFallback() {
+        log.info("feature-c: true, chamando getIdWithFallback");
+
+        ExecutionResult<DemoSRE> result = this.featureToggleUseCase.getDemoSREWithToggleEnabled(2);
+
+        if (result.getErrorType() == ErrorEnum.NOT_FOUND) {
+            log.info("Not found");
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(result.getObject());
+    }
+
+
 }

@@ -194,3 +194,4 @@ resilience4j.timelimiter:
 feature-management:
   feature-a: true
   feature-b: true
+  feature-c: true
