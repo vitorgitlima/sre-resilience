@@ -22,7 +22,7 @@ spring:
     banner-mode: "off"
     lazy-initialization: false
   application:
-    name: Open Insurance - Fornecimento de Produtos Residenciais
+    name: SRE Resilience Chassis
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:production}
   cache:
@@ -53,9 +53,9 @@ mongo-properties:
   url: ${MONGODB_URL:mongodb://${mongo-properties.username}:${mongo-properties.password}@${mongo-properties.host}:${mongo-properties.port}/${mongo-properties.database}?${mongo-properties.query-string}}
   host: ${MONGO_HOST:localhost}
   port: ${MONGO_PORT:27017}
-  database: ${MONGO_DB:opin-db-apis}
-  username: ${MONGO_USER:admin}
-  password: ${MONGO_PASS:admin!}
+  database: ${MONGO_DB:sre-resilience-db}
+  username: ${MONGO_USER:}
+  password: ${MONGO_PASS:}
   query-string: ${MONGO_QUERY_STRING:retryWrites=true&w=majority}
   connection-pool-max-connection-life-time: 3
   connection-pool-min-size: ${MONGO_MIN_CONNECTIONS:75}
@@ -103,7 +103,7 @@ resilience4j.retry:
       waitDuration: 3s # Tempo de espera entre as tentativas de retry
       failAfterMaxAttempts: true # Booleano para indicar se a exceção "MaxRetriesExceededException" será lançada ao atingir o valor definido em "maxAttempts"
       retryExceptions: # Lista de exceções que, caso lançadas, será realizado o comportamento de retry
-        - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
+        - br.com.bradescoseguros.sre.businessrule.exception.RetriableBaseException
       ignoreExceptions: # Lista de exceções que, caso lançadas, não será realizado o comportamento de retry
         - io.github.resilience4j.circuitbreaker.CallNotPermittedException
   instances: # Define as instancias de retrys que teremos em nossa aplicação. Novas instancias podem ser criadas conforme necessário
@@ -112,7 +112,7 @@ resilience4j.retry:
       maxAttempts: 10
       waitDuration: 2s
       retryExceptions:
-        - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
+        - br.com.bradescoseguros.sre.businessrule.exception.RetriableBaseException
         - org.springframework.dao.DataAccessResourceFailureException
         - com.mongodb.MongoSocketOpenException
         - java.net.ConnectException
@@ -120,7 +120,7 @@ resilience4j.retry:
       baseConfig: default
       waitDuration: 5s
       retryExceptions:
-        - br.com.bradescoseguros.opin.businessrule.exception.RetriableBaseException
+        - br.com.bradescoseguros.sre.businessrule.exception.RetriableBaseException
         - org.springframework.web.client.HttpServerErrorException
     apiBulkhead:
       baseConfig: default
@@ -132,7 +132,7 @@ resilience4j.retry:
       baseConfig: default
       waitDuration: 5s
       retryExceptions:
-        - br.com.bradescoseguros.opin.interfaceadapter.exception.TimeOutException
+        - br.com.bradescoseguros.sre.interfaceadapter.exception.TimeOutException
 
 
 

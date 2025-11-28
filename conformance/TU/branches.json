@@ -1,9 +1,0 @@
-{
-  "publish": "summary",
-  "consent": {},
-  "alias": "test-devops-azure-branches",
-  "description": "Test DevOps Azure - Branches",
-  "resource": {
-    "resourceUrl": "https://opin.tu.digiseg.com.br/open-insurance/channels/v1/branches"
-  }
-}

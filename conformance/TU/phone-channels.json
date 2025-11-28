@@ -1,9 +1,0 @@
-{
-  "publish": "summary",
-  "consent": {},
-  "alias": "test-devops-azure-phone",
-  "description": "Test DevOps Azure - Phone Channels",
-  "resource": {
-    "resourceUrl": "https://opin.tu.digiseg.com.br/open-insurance/channels/v1/phone-channels"
-  }
-}
