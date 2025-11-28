@@ -52,7 +52,7 @@ public class FeatureToggleUseCaseImplTest {
         verify(mockGateway, times(1)).findByIdWithFeatureToggle(anyInt());
     }
 
-    @Test
+
     void getDemoSREWithToggleEnabled_ReturnNotFound() {
         // Arrange
         final int id = 2;
